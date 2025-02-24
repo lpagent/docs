@@ -30,7 +30,7 @@
             "pages": [
               "features/ai-suggestions",
               "features/auto-compound",
-              "features/risk-management",
+              "features/take-profit-stop-loss",
               "features/dashboard"
             ]
           }
