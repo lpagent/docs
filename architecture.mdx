@@ -1,0 +1,136 @@
+---
+title: "System Architecture"
+description: "Understanding LP Agent's technical infrastructure"
+---
+
+## High Level Architecture
+
+LP Agent's architecture is designed for optimal performance, security, and reliability in DeFi automation.
+
+<Frame>
+  ![LP Agent Architecture](/images/architecture.png)
+  <em>High-level system architecture of LP Agent</em>
+</Frame>
+
+## Core Components
+
+### API Tools Layer
+
+Our frontend interface provides several key tools:
+
+<CardGroup cols={2}>
+  <Card title="Suggestion Engine" icon="lightbulb">
+    AI-powered position optimization and recommendations
+  </Card>
+  <Card title="LP Info" icon="chart-line">
+    Comprehensive liquidity position analytics
+  </Card>
+  <Card title="Pool Info" icon="water">
+    Detailed pool metrics and performance data
+  </Card>
+  <Card title="Wallet Info" icon="wallet">
+    Wallet integration and position management
+  </Card>
+</CardGroup>
+
+### Schedule Engine
+
+Manages automated operations through three key modules:
+
+- **LP Actions**: Executes position management operations
+- **Rebalancing**: Handles automated position rebalancing
+- **TP/Stop Loss**: Manages take-profit and stop-loss executions
+
+### AI Engine
+
+Our intelligent core consists of:
+
+<AccordionGroup>
+  <Accordion title="LLM (Language Learning Model)">
+    - Natural language processing for user interactions
+    - Strategy explanation and recommendations
+    - Risk assessment communications
+    - Market analysis interpretation
+  </Accordion>
+  
+  <Accordion title="Tools Integration">
+    - Connects AI decision-making with execution tools
+    - Integrates market data analysis
+    - Manages automation workflows
+    - Coordinates with LP knowledge base
+  </Accordion>
+
+  <Accordion title="LP Knowledge Base">
+    - Historical performance data
+    - Market patterns and trends
+    - Strategy optimization models
+    - Risk management parameters
+  </Accordion>
+</AccordionGroup>
+
+## Data Sources
+
+### On-Chain Data
+
+- **SOL RPC Node**: Direct blockchain interaction for real-time data
+- **Market Data**: Token pricing, pool metrics, and social indicators
+
+### User Interface
+
+Multiple access points for users:
+
+- Web interface for complete platform access
+- Telegram integration for notifications and basic controls
+- Chat API for direct communication with our AI
+
+## Security Architecture
+
+### User Sandbox
+
+Secure environment for user operations:
+
+- Private key/Privy key management
+- Isolated LP action execution
+- Delegated action system
+
+### Notification System
+
+Real-time alerts for:
+
+- Position changes
+- Market events
+- Strategy updates
+- Risk notifications
+
+## Integration Flow
+
+<Steps>
+  <Step title="Data Collection">
+    Market and on-chain data are continuously gathered through our RPC node and
+    market data feeds
+  </Step>
+  <Step title="Analysis">
+    The AI Engine processes data through our Tools and LP Knowledge systems
+  </Step>
+  <Step title="Decision Making">
+    Automated decisions are made based on user preferences and market conditions
+  </Step>
+  <Step title="Execution">
+    Actions are executed through the Schedule Engine with proper security
+    measures
+  </Step>
+  <Step title="Monitoring">
+    Continuous monitoring and adjustments through our notification system
+  </Step>
+</Steps>
+
+<Note>
+  All components are designed to work seamlessly together, providing a secure,
+  efficient, and user-friendly experience while maintaining high performance and
+  reliability.
+</Note>
+
+<Card title="Technical Integration" icon="code" href="/integration">
+  Ready to integrate? Check our technical documentation for detailed API
+  specifications and integration guides.
+</Card>{" "}
