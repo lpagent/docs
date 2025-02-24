@@ -28,11 +28,9 @@
           {
             "group": "Features",
             "pages": [
+              "features/ai-suggestions",
               "features/auto-compound",
               "features/risk-management",
-              "features/ai-suggestions",
-              "features/integrations",
-              "features/ai-llm",
               "features/dashboard"
             ]
           }
