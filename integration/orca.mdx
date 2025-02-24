@@ -16,122 +16,6 @@ LP Agent provides advanced automation and optimization for Orca's Whirlpools con
   <em>Example of an optimized SOL/USDC position</em>
 </Frame>
 
-#### Scenario
-
-A user wants to provide liquidity for the SOL/USDC pair but is unsure about:
-
-- Optimal price range selection
-- Position size allocation
-- When to rebalance positions
-- How to manage risks
-
-#### LP Agent Solution
-
-<Steps>
-  <Step title="Initial Analysis">
-    Our AI analyzes: - Current SOL/USDC price: $100 - 24h price range: $95-$105
-    - Volume concentration: 80% within $97-$103 - Fee APR: 15% at current range
-  </Step>
-  <Step title="Position Suggestion">
-    AI recommends: - Price range: $96-$104 (wider than current volume for
-    safety) - Position size: 50 SOL / 5,000 USDC - Expected APR: 12-18% from
-    fees - Estimated IL risk: Medium
-  </Step>
-  <Step title="Risk Management">
-    Automated protections: - Stop loss if SOL drops below $90 - Take profit at
-    25% cumulative returns - Range adjustment if price stays near boundaries
-  </Step>
-  <Step title="Automation Setup">
-    - Auto-compound every 24 hours - Rebalance when out of range for >6 hours -
-    Emergency exit if volatility exceeds 2x normal
-  </Step>
-</Steps>
-
-### Performance Metrics
-
-<CardGroup cols={2}>
-  <Card title="Fee Generation" icon="money-bill-trend-up">
-    Average 15% APR from trading fees
-  </Card>
-  <Card title="Rebalancing Efficiency" icon="rotate">
-    92% time in optimal range
-  </Card>
-  <Card title="Risk Management" icon="shield">
-    Reduced IL by 40% vs manual management
-  </Card>
-  <Card title="Total Returns" icon="chart-line">
-    20% average APY including all costs
-  </Card>
-</CardGroup>
-
-## Integration Steps
-
-### 1. Connect Your Wallet
-
-```solana
-// Example wallet connection
-const wallet = new PhantomWallet();
-await lpAgent.connect(wallet);
-```
-
-### 2. Select Whirlpool
-
-```typescript
-// Example pool selection
-const pool = await lpAgent.getWhirlpool({
-  tokenA: "SOL",
-  tokenB: "USDC",
-  fee: 0.05,
-});
-```
-
-### 3. Configure Strategy
-
-<CodeGroup>
-```typescript Strategy Configuration
-const strategy = {
-  riskLevel: "moderate",
-  targetAPR: 15,
-  rebalanceThreshold: 6, // hours
-  autoCompound: true,
-  stopLoss: {
-    threshold: -10, // percentage
-    type: "trailing"
-  },
-  takeProfit: {
-    target: 25, // percentage
-    type: "partial"
-  }
-};
-```
-
-```typescript Advanced Configuration
-const advancedStrategy = {
-  // More detailed parameters
-  priceRangeWidth: 10, // percentage
-  maxSlippage: 0.5,
-  gasLimit: 300000,
-  rebalanceGasPrice: "auto",
-  // ... other advanced options
-};
-```
-
-</CodeGroup>
-
-### 4. Deploy Position
-
-```typescript
-// Example position deployment
-const position = await lpAgent.deployPosition({
-  pool,
-  strategy,
-  amount: {
-    tokenA: 50, // 50 SOL
-    tokenB: 5000, // 5000 USDC
-  },
-});
-```
-
 ## Monitoring & Management
 
 <AccordionGroup>
@@ -146,22 +30,15 @@ const position = await lpAgent.deployPosition({
     - Last rebalance timestamp
     - Compound history
     - Strategy adjustments
-    - Gas usage analytics
   </Accordion>
 
-  <Accordion title="Risk Indicators">
+  <Accordion title="Risk Indicators (Soon)">
     - Volatility metrics
     - Range efficiency
     - IL exposure
     - Market direction indicators
   </Accordion>
 </AccordionGroup>
-
-<Note>
-  All parameters can be adjusted at any time through our dashboard or API. Our
-  AI continuously monitors and suggests optimizations based on market
-  conditions.
-</Note>
 
 <Card title="Ready to Start?" icon="rocket" href="/quickstart">
   Deploy your first Orca position with LP Agent's intelligent automation.

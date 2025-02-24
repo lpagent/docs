@@ -16,173 +16,29 @@ LP Agent seamlessly integrates with Meteora's dynamic liquidity pools, providing
   <em>Example of an optimized stablecoin position</em>
 </Frame>
 
-#### Scenario
-
-A user wants to provide liquidity to Meteora's USDC/USDH pool but needs help with:
-
-- Optimal position timing
-- Capital allocation strategy
-- Yield optimization
-- Risk management in stable pairs
-
-#### LP Agent Solution
-
-<Steps>
-  <Step title="Initial Analysis">
-    Our AI analyzes: - Current pool TVL: $10M - 7-day volume: $5M - Average
-    daily yield: 0.1% - Pool stability score: 95/100
-  </Step>
-  <Step title="Position Suggestion">
-    AI recommends: - Initial position: 10,000 USDC / 10,000 USDH - Target APY:
-    15-20% - Compound frequency: Every 12 hours - Risk rating: Low
-  </Step>
-  <Step title="Risk Management">
-    Automated protections: - Price deviation threshold: 0.2% - Dynamic
-    rebalancing based on pool imbalance - Automated exit if depeg > 1%
-  </Step>
-  <Step title="Yield Optimization">
-    - Auto-compound rewards into position - Harvest and reinvest protocol
-    rewards - Dynamic fee tier selection - Pool rebalancing optimization
-  </Step>
-</Steps>
-
-### Performance Metrics
-
-<CardGroup cols={2}>
-  <Card title="Base APY" icon="percentage">
-    8-12% from trading fees
-  </Card>
-  <Card title="Reward APY" icon="gift">
-    Additional 5-8% from MTRX rewards
-  </Card>
-  <Card title="Efficiency" icon="chart-pie">
-    99.5% capital utilization
-  </Card>
-  <Card title="Risk Score" icon="shield-check">
-    95/100 safety rating
-  </Card>
-</CardGroup>
-
-## Integration Steps
-
-### 1. Connect Your Wallet
-
-```solana
-// Example wallet connection
-const wallet = new PhantomWallet();
-await lpAgent.connect(wallet);
-```
-
-### 2. Select Meteora Pool
-
-```typescript
-// Example pool selection
-const pool = await lpAgent.getMeteoraPair({
-  tokenA: "USDC",
-  tokenB: "USDH",
-  poolType: "stable",
-});
-```
-
-### 3. Configure Strategy
-
-<CodeGroup>
-```typescript Basic Configuration
-const strategy = {
-  riskLevel: "conservative",
-  targetAPY: 20,
-  compoundFrequency: 12, // hours
-  autoHarvest: true,
-  protection: {
-    depegThreshold: 0.01, // 1%
-    slippageTolerance: 0.001 // 0.1%
-  }
-};
-```
-
-```typescript Advanced Configuration
-const advancedStrategy = {
-  // Detailed parameters
-  rewardOptimization: true,
-  minRewardHarvest: 10, // MTRX
-  rebalanceThreshold: 0.005, // 0.5%
-  gasOptimization: "high",
-  // ... other advanced options
-};
-```
-
-</CodeGroup>
-
-### 4. Deploy Position
-
-```typescript
-// Example position deployment
-const position = await lpAgent.deployMeteora({
-  pool,
-  strategy,
-  amount: {
-    tokenA: 10000, // 10,000 USDC
-    tokenB: 10000, // 10,000 USDH
-  },
-});
-```
-
 ## Monitoring & Management
 
 <AccordionGroup>
-  <Accordion title="Position Analytics">
-    - Real-time APY breakdown
-    - Reward accrual tracking
-    - Pool share percentage
-    - Impermanent loss monitoring
+  <Accordion title="Position Metrics">
+    - Real-time APR tracking
+    - Fee accumulation rate
+    - Price range status
+    - Impermanent loss calculator
   </Accordion>
   
-  <Accordion title="Reward Management">
-    - MTRX rewards tracking
-    - Auto-harvest statistics
+  <Accordion title="Automation Status">
+    - Last rebalance timestamp
     - Compound history
-    - Reward optimization metrics
+    - Strategy adjustments
   </Accordion>
 
-  <Accordion title="Risk Monitoring">
-    - Price deviation alerts
-    - Pool health indicators
-    - Protocol risk metrics
-    - Market correlation data
+  <Accordion title="Risk Indicators (Soon)">
+    - Volatility metrics
+    - Range efficiency
+    - IL exposure
+    - Market direction indicators
   </Accordion>
 </AccordionGroup>
-
-## Unique Meteora Features
-
-### Dynamic Pool Management
-
-- Automated adjustment to pool weight changes
-- Smart response to protocol upgrades
-- Optimal fee tier selection
-- Pool migration assistance
-
-### Reward Optimization
-
-<CardGroup cols={2}>
-  <Card title="MTRX Rewards" icon="gift">
-    Optimal harvest and reinvestment timing
-  </Card>
-  <Card title="Compound Strategy" icon="rotate">
-    Dynamic compound frequency based on rewards
-  </Card>
-  <Card title="Fee Optimization" icon="coins">
-    Strategic fee tier selection
-  </Card>
-  <Card title="Yield Routing" icon="route">
-    Cross-pool yield optimization
-  </Card>
-</CardGroup>
-
-<Note>
-  All parameters can be adjusted at any time through our dashboard or API. Our
-  AI continuously monitors and suggests optimizations based on market conditions
-  and Meteora protocol updates.
-</Note>
 
 <Warning>
   While Meteora stable pools are designed for minimal volatility, always monitor
