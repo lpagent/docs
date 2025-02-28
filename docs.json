@@ -31,6 +31,7 @@
               "features/ai-suggestions",
               "features/auto-compound",
               "features/take-profit-stop-loss",
+              "features/delegate-actions",
               "features/dashboard"
             ]
           }
