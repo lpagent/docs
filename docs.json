@@ -15,7 +15,12 @@
         "groups": [
           {
             "group": "Getting Started",
-            "pages": ["introduction", "quickstart", "architecture"]
+            "pages": [
+              "introduction",
+              "quickstart",
+              "delegate-actions",
+              "architecture"
+            ]
           },
           {
             "group": "Integration",
@@ -31,7 +36,6 @@
               "features/ai-suggestions",
               "features/auto-compound",
               "features/take-profit-stop-loss",
-              "features/delegate-actions",
               "features/dashboard"
             ]
           }
