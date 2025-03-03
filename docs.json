@@ -56,8 +56,8 @@
     ],
     "primary": {
       "type": "button",
-      "label": "Launch App",
-      "href": "https://app.lpagent.com"
+      "label": "Join waiting list",
+      "href": "https://docs.google.com/forms/d/e/1FAIpQLSdmBvH_hAnMn-lntvmfmx6-2ObaDg3NfeAEIJKcL4G_CX3lgw/viewform"
     }
   },
   "footer": {
