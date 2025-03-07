@@ -27,7 +27,8 @@
             "pages": [
               "integration/overview",
               "integration/orca",
-              "integration/meteora"
+              "integration/meteora",
+              "integration/meteora-airdrop"
             ]
           },
           {
