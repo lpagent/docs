@@ -18,7 +18,7 @@
             "pages": [
               "introduction",
               "quickstart",
-              "delegate-actions",
+              "automation-model",
               "architecture",
               "prompts"
             ]
