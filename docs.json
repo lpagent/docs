@@ -18,8 +18,8 @@
             "pages": [
               "introduction",
               "quickstart",
-              "automation-model",
               "architecture",
+              "automation-model",
               "prompts"
             ]
           },
