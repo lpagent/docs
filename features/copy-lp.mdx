@@ -85,6 +85,14 @@ Follow these steps to start copying a successful LP:
     amounts or percentages of your capital to each, as long as you have
     sufficient funds.
   </Accordion>
+  <Accordion title="How are opening and closing positions handled when copying?">
+    When the source wallet opens a new position, LP Agent will automatically
+    perform a "zap-in" transaction for you using your chosen base token
+    (typically SOL or USDC) to create the equivalent position according to your
+    copy settings (percentage, max amount). Similarly, when the source wallet
+    closes a position, LP Agent will automatically "zap-out" your corresponding
+    position, converting the assets back to your base token.
+  </Accordion>
   <Accordion title="What happens if the wallet I'm copying changes their strategy?">
     Your copied position will automatically follow the changes made by the
     source wallet, provided the actions align with your configured settings (Max
