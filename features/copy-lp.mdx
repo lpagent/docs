@@ -1,0 +1,123 @@
+---
+title: "Copy LP"
+description: "Automatically copy the strategies of successful liquidity providers"
+---
+
+## What is Copy LP ?
+
+Our Copy LP feature allows you to automatically replicate the positions and strategies of experienced liquidity providers on LP Agent.
+
+- Find successful wallets
+- Copy their moves
+- And potentially achieve similar returns without needing deep market knowledge.
+
+<div className="my-6">
+  <iframe
+    width="100%"
+    className="aspect-video"
+    src="https://www.youtube.com/embed/7z1bXwxur3k"
+    title="YouTube video player: Copy LP Trading"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+  ></iframe>
+</div>
+
+## How to Copy a Wallet
+
+Follow these steps to start copying a successful LP:
+
+<Steps>
+  <Step title="Find a Wallet to Copy">
+    Browse the Portfolio Leaderboard or explore user profiles to find wallets
+    with performance metrics you like.
+
+  </Step>
+  <Step title="Click 'Copy'">
+    <Frame>
+    ![LP Agent Copy button](/images/copy-button.png)
+    <em>Copy button</em>
+    </Frame>
+    Once you've chosen a wallet, navigate to their profile and click the "Copy"
+    button.
+  </Step>
+  <Step title="Configure Copy Settings">
+      <Frame>
+    ![LP Agent Copy LP Settings](/images/copy-lp.png)
+    <em>LP Agent Copy LP Setting</em>
+    </Frame>
+    Set up your copy parameters:
+    - **Copy Percentage:** Allocate a percentage of value you want to copy
+    - **Max Amount:** Set a maximum total value (in SOL or USDC) that this copy strategy can use.
+    - **Take Profit (TP):** Automatically stop copying and secure profits when the copied position reaches a certain % gain.
+    - **Stop Loss (SL):** Automatically stop copying to limit potential losses if the copied position reaches a certain % loss.
+
+    Example:
+    - Your settings: **Copy 50%, Max amount $30**
+    - If original wallet: Open a position `$20`, you open a position worth `$10` (`$20*50% = $10`)
+    - If original wallet: Open a position `$100`, you open a position worth `$30` (`$100*50% = $50` but it is bigger than Max Amount, so Max Amount is used)
+
+  </Step>
+  <Step title="Start Copying">
+    Confirm your settings and activate the copy trade. LP Agent will now
+    automatically replicate the selected wallet's LP actions within your defined
+    parameters.
+  </Step>
+</Steps>
+
+## Key Configuration Details
+
+- **Proportional Copying:** Trades are typically copied proportionally based on the percentage you allocate relative to the copied wallet's size and your available capital.
+- **Risk Management:** TP and SL settings apply specifically to your copied position, allowing you to manage risk independently.
+- **Dynamic Adjustments:** LP Agent monitors the source wallet and automatically adjusts your copied position when they make changes (e.g., rebalancing, adding/removing liquidity), respecting your max amount and risk settings.
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="How exactly does copying work?">
+    When you copy a wallet, LP Agent monitors the source wallet's LP actions on
+    supported protocols (Orca, Meteora). When they open, close, or modify a
+    position, our system automatically replicates that action in your account,
+    scaled according to your settings.
+  </Accordion>
+  <Accordion title="Can I copy more than one wallet?">
+    Yes, you can copy multiple wallets simultaneously, allocating different
+    amounts or percentages of your capital to each, as long as you have
+    sufficient funds.
+  </Accordion>
+  <Accordion title="What happens if the wallet I'm copying changes their strategy?">
+    Your copied position will automatically follow the changes made by the
+    source wallet, provided the actions align with your configured settings (Max
+    Amount, TP, SL).
+  </Accordion>
+  <Accordion title="Are there extra fees for using the Copy LP feature?">
+    Please refer to our standard [Fee Structure](/fee) documentation. The usual
+    zap-in/zap-out fees apply if single-token operations are required to
+    replicate trades. There are no specific *additional* fees just for copying.
+  </Accordion>
+  <Accordion title="How do I stop copying a wallet?">
+    You can stop copying any wallet at any time through your dashboard. Go to
+    your "Copy LP" section, select the active copy, and choose the "Disable"
+    option. You can decide whether to close the replicated positions immediately
+    or manage them manually afterward.
+  </Accordion>
+  <Accordion title="What are the risks involved in Copy LP Trading?">
+    While Copy LP Trading allows you to leverage the expertise of others, it
+    still involves risks. Past performance is not indicative of future results.
+    The wallet you copy might make poor decisions, or market conditions could
+    change rapidly. Always use the risk management tools (SL/TP, Max Amount) and
+    only invest capital you can afford to lose.
+  </Accordion>
+  <Accordion title="What happens if I set a Take Profit (TP) or Stop Loss (SL) on my copied position?">
+    Your copied position will be closed or adjusted based on whichever condition
+    is met first: either your predefined TP/SL level is reached, or the wallet
+    you are copying takes an action (e.g., closes their position). This ensures
+    your risk management settings are respected while still following the source
+    wallet's activity.
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  Copy LP Trading is a powerful tool, but it's important to understand the risks
+  and configure your settings carefully.
+</Note>

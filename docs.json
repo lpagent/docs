@@ -37,6 +37,7 @@
             "group": "Features",
             "pages": [
               "features/ai-suggestions",
+              "features/copy-lp",
               "features/auto-compound",
               "features/take-profit-stop-loss",
               "features/dashboard"
