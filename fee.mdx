@@ -8,30 +8,34 @@ description: "Simple and transparent fee structure for LP Agent services"
 LP Agent maintains a simple and transparent fee structure to ensure you always know exactly what you're paying.
 
 <Note>
-  We only charge a small fee on entry and exit - there are no hidden fees or
-  ongoing management charges.
+  We only charge a small fee when a swap is required during entry or exit -
+  there are no hidden fees or ongoing management charges.
 </Note>
 
 ### Transaction Fees
 
+A small fee is applied only when a swap is necessary to facilitate your transaction.
+
 <CardGroup cols={2}>
-  <Card title="One-token Zap-In Fee" icon="arrow-right-to-bracket">
+  <Card title="Zap-In Fee (with Swap)" icon="arrow-right-to-bracket">
     <div className="mt-2">
       <span className="text-2xl font-bold text-primary">0.3%</span>
       <div className="mt-2 text-sm">
-        One-time fee when entering a position with one token
+        Fee applied if entering a position requires swapping tokens.
       </div>
     </div>
   </Card>
-  <Card title="One-token Zap-Out Fee" icon="arrow-right-from-bracket">
+  <Card title="Zap-Out Fee (with Swap)" icon="arrow-right-from-bracket">
     <div className="mt-2">
       <span className="text-2xl font-bold text-primary">0.3%</span>
       <div className="mt-2 text-sm">
-        One-time fee when exiting a position with one token
+        Fee applied if exiting a position requires swapping tokens.
       </div>
     </div>
   </Card>
 </CardGroup>
+
+**Example:** If you Zap-In to a SOL/USDC pool using only SOL, no swap is needed, and thus no fee is charged by LP Agent. However, if you Zap-In using USDT, a swap from USDT to SOL and/or USDC is required, and the 0.3% fee applies.
 
 ## What's Included
 
@@ -57,8 +61,8 @@ LP Agent maintains a simple and transparent fee structure to ensure you always k
 <Check>No withdrawal lockups</Check>
 
 <Warning>
-  While LP Agent only charges the above fees, normal protocol fees (like network
-  gas fees and pool trading fees) still apply.
+  While LP Agent only charges the above fees **when swaps occur**, normal
+  protocol fees (like network gas fees and pool trading fees) still apply.
 </Warning>
 
 <Card title="Ready to Start?" icon="rocket" href="/quickstart">
