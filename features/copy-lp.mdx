@@ -28,10 +28,26 @@ Our Copy LP feature allows you to automatically replicate the positions and stra
 Follow these steps to start copying a successful LP:
 
 <Steps>
+  <Step title="Prerequisite: Delegate & Fund Copy Wallet">
+    Before you can copy, you need to create a dedicated wallet for Copy LP operations. This involves delegating authority to LP Agent for this specific wallet and funding it with the SOL or USDC you want to use for copying. This keeps your main wallet funds separate and secure.
+
+    Watch this guide for detailed instructions:
+    <div className="my-6">
+      <iframe
+        width="100%"
+        className="aspect-video"
+        src="https://www.youtube.com/embed/cpXiWul-xMg"
+        title="YouTube video player: LP Agent Delegate & Fund Wallet"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+    </div>
+
+  </Step>
   <Step title="Find a Wallet to Copy">
     Browse the Portfolio Leaderboard or explore user profiles to find wallets
     with performance metrics you like.
-
   </Step>
   <Step title="Click 'Copy'">
     <Frame>
@@ -74,6 +90,14 @@ Follow these steps to start copying a successful LP:
 ## Frequently Asked Questions
 
 <AccordionGroup>
+  <Accordion title="Why do I need to delegate authority and fund a separate wallet for Copy LP?">
+    Delegating authority to a separate, dedicated wallet allows LP Agent to
+    execute copy trades automatically on your behalf without needing permission
+    for every single transaction. Funding this specific wallet defines the
+    capital allocated exclusively for your Copy LP activities, separating it
+    from your main funds and enhancing security. It ensures LP Agent can only
+    access the funds you've explicitly designated for copying.
+  </Accordion>
   <Accordion title="How exactly does copying work?">
     When you copy a wallet, LP Agent monitors the source wallet's LP actions on
     supported protocols (Orca, Meteora). When they open, close, or modify a
