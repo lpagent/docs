@@ -17,25 +17,16 @@ LP Agent maintains a simple and transparent fee structure to ensure you always k
 A small fee is applied only when a swap is necessary to facilitate your transaction.
 
 <CardGroup cols={2}>
-  <Card title="Zap-In Fee (with Swap)" icon="arrow-right-to-bracket">
+  <Card title="Swap Fee" icon="arrow-right-to-bracket">
     <div className="mt-2">
       <span className="text-2xl font-bold text-primary">0.3%</span>
-      <div className="mt-2 text-sm">
-        Fee applied if entering a position requires swapping tokens.
-      </div>
-    </div>
-  </Card>
-  <Card title="Zap-Out Fee (with Swap)" icon="arrow-right-from-bracket">
-    <div className="mt-2">
-      <span className="text-2xl font-bold text-primary">0.3%</span>
-      <div className="mt-2 text-sm">
-        Fee applied if exiting a position requires swapping tokens.
-      </div>
+      <div className="mt-2 text-sm">Fee applied if you swapping tokens.</div>
     </div>
   </Card>
 </CardGroup>
 
-**Example:** If you Zap-In to a SOL/USDC pool using only SOL, no swap is needed, and thus no fee is charged by LP Agent. However, if you Zap-In using USDT, a swap from USDT to SOL and/or USDC is required, and the 0.3% fee applies.
+**Example:** If you Zap-In to a SOL/USDC pool using only SOL, no swap is needed, and thus no fee is charged by LP Agent. However, if you Zap-In using 2 sides, a swap from SOL to USD is required, and the 0.3% fee applies.
+**Example:** You open a position on SOL/USDC with 1 SOL, 0.5 SOL need to swap into USDC, so the fee only apply to 0.5 SOL Swapped
 
 ## What's Included
 
