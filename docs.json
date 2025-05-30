@@ -21,7 +21,8 @@
               "architecture",
               "automation-model",
               "prompts",
-              "fee"
+              "fee",
+              "data-methodology"
             ]
           },
           {

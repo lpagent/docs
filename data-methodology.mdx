@@ -1,0 +1,51 @@
+---
+title: Data Methodology
+---
+
+## PnL Calculation Insights
+
+Understanding how Profit and Loss (PnL) is calculated is crucial for accurately assessing the performance of your liquidity positions. This document outlines our current methodology and explains certain considerations.
+
+### Current Calculation (T1 to T2)
+
+The diagram below illustrates the lifecycle of a liquidity provision:
+
+<Frame>
+  ![LP Agent Time line copy](/images/data-calc.png)
+  <em>Time line copy</em>
+</Frame>
+
+_(Image illustrating T0, T1, T2, T3 points in time)_
+
+Currently, the PnL of a position is calculated based on the token prices at the moment of:
+
+- **T1**: When liquidity is added to the pool.
+- **T2**: When liquidity is removed from the pool.
+
+This means we measure the performance of the assets _while they are actively providing liquidity_.
+
+### The "Real World" PnL (T0 to T3)
+
+In reality, a user's overall PnL for a liquidity provision cycle might be more accurately reflected by considering:
+
+- **T0**: The price at which the user initially swapped their base asset (e.g., SOL) into the tokens required for the liquidity pool. This is the _true entry cost_.
+- **T3**: The price at which the user swaps the tokens (received after removing liquidity) back into their original base asset (e.g., SOL). This is the _true exit value_.
+
+The time gap between T0 (actual swap) and T1 (adding liquidity), and the gap between T2 (removing liquidity) and T3 (swapping back) can lead to discrepancies between the calculated PnL (T1-T2) and the user's realized PnL (T0-T3). The prices of the tokens can change during these intervals.
+
+### Why We Use T1 and T2 for Calculation
+
+While using T0 and T3 might seem more comprehensive, we cannot reliably use these points for standardized PnL calculation due to several factors:
+
+1.  **Uncertainty of User Actions**:
+
+    - **Post-Close Decisions**: After removing liquidity at T2, we don't know the user's immediate intentions. They might choose to:
+      - Hold the received tokens.
+      - Swap them back to their original asset (like SOL) immediately.
+      - Swap only a portion of the tokens.
+      - Swap them for a different asset altogether.
+    - **Pre-Open Actions**: Similarly, the exact timing and execution of the swap at T0 can vary.
+
+2.  **Attribution**: Our system focuses on the performance of the liquidity provision itself. Price movements _before_ liquidity is added (T0 to T1) or _after_ it's removed (T2 to T3) are influenced by broader market dynamics and individual user trading decisions, rather than the LP strategy's direct performance.
+
+By focusing on T1 and T2, we provide a consistent measure of how the liquidity position performed during the period it was active. Users should be aware of the potential differences and consider their entry (T0) and exit (T3) points for their overall financial picture.
