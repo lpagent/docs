@@ -60,7 +60,7 @@
     ],
     "primary": {
       "type": "button",
-      "label": "Open App",
+      "label": "Launch App",
       "href": "https://app.lpagent.io/"
     }
   },
