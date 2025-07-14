@@ -40,7 +40,8 @@
               "features/copy-lp",
               "features/auto-compound",
               "features/take-profit-stop-loss",
-              "features/dashboard"
+              "features/dashboard",
+              "features/referral"
             ]
           }
         ]
@@ -55,7 +56,7 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:support@lpagent.com"
+        "href": "https://discord.gg/h8YDHtzmRU"
       }
     ],
     "primary": {
