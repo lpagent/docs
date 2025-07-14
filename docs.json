@@ -22,6 +22,7 @@
               "automation-model",
               "prompts",
               "fee",
+              "referral",
               "data-methodology"
             ]
           },
@@ -40,8 +41,7 @@
               "features/copy-lp",
               "features/auto-compound",
               "features/take-profit-stop-loss",
-              "features/dashboard",
-              "features/referral"
+              "features/dashboard"
             ]
           }
         ]
