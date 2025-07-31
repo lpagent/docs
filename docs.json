@@ -8,13 +8,6 @@
     "dark": "#15803D"
   },
   "favicon": "/favicon.svg",
-  "tabs": [
-    {
-      "name": "API Reference",
-      "url": "api-reference",
-      "openapi": "/api-reference/openapi.json"
-    }
-  ],
   "navigation": {
     "tabs": [
       {
@@ -52,6 +45,18 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "API",
+            "pages": [
+              "api-reference/introduction"
+            ]
+          }
+        ],
+        "openapi": "api-reference/openapi.json"
       }
     ]
   },
