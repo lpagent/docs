@@ -1,195 +1,520 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
+    "title": "LP Agent API",
+    "version": "1.0.0",
+    "description": "API for LP Agent\n\n**Rate Limiting**\n\nThis API implements rate limiting to ensure fair usage and protect our services. The current rate limit is:\n\n- **5 requests per 1 minute** per API Keys\n\nIf you exceed this limit, you will receive a 429 (Too Many Requests) response. Please wait for the rate limit window to reset before making additional requests.\n\nIf you need more, please contact us at **thanhle@getnimbus.io** or TG: **@thanhle27**"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://api.lpagent.io",
+      "description": "API server"
     }
   ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
+    "schemas": {
+    }
+  },
   "security": [
     {
-      "bearerAuth": []
+      "apiKeyAuth": []
     }
   ],
   "paths": {
-    "/plants": {
+    "/open-api/v1/lp-positions/opening": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "summary": "Get opening LP positions for an owner",
+        "description": "Retrieves current liquidity pool positions that are open for a specific wallet owner",
+        "tags": [
+          "positions"
+        ],
         "parameters": [
           {
-            "name": "limit",
             "in": "query",
-            "description": "The maximum number of results to return",
+            "name": "owner",
+            "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
+              "type": "string"
+            },
+            "description": "Wallet address of the position owner",
+            "example": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Successfully retrieved opening positions",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Position ID (token ID)"
+                          },
+                          "tokenId": {
+                            "type": "string"
+                          },
+                          "tokenName0": {
+                            "type": "string"
+                          },
+                          "tokenName1": {
+                            "type": "string"
+                          },
+                          "tokenSymbol0": {
+                            "type": "string"
+                          },
+                          "tokenSymbol1": {
+                            "type": "string"
+                          },
+                          "liquidity": {
+                            "type": "number"
+                          },
+                          "fee": {
+                            "type": "number"
+                          },
+                          "apr": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
+            "description": "Bad request - owner parameter is required",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "owner is required"
+                    }
+                  }
                 }
               }
             }
           },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+          "500": {
+            "description": "Internal server error"
           }
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/open-api/v1/lp-positions/historical": {
+      "get": {
+        "summary": "Get historical LP positions for an owner",
+        "description": "Retrieves historical liquidity pool positions for a specific wallet owner",
+        "tags": [
+          "positions"
+        ],
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
+            "in": "query",
+            "name": "owner",
             "required": true,
             "schema": {
+              "type": "string"
+            },
+            "description": "Wallet address of the position owner",
+            "example": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
               "type": "integer",
-              "format": "int64"
-            }
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            },
+            "description": "Number of items per page"
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
+          "200": {
+            "description": "Successfully retrieved historical positions",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "tokenName0": {
+                            "type": "string"
+                          },
+                          "tokenName1": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "open",
+                              "closed"
+                            ]
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "closedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad request - owner parameter is required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "owner is required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/open-api/v1/lp-positions/revenue": {
+      "get": {
+        "summary": "Get revenue data for LP positions",
+        "description": "Retrieves revenue analytics for liquidity pool positions of a specific owner",
+        "tags": [
+          "positions"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "owner",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Wallet address of the position owner",
+            "example": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
+          },
+          {
+            "in": "query",
+            "name": "period",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month"
+              ],
+              "default": "day"
+            },
+            "description": "Aggregation period for revenue data"
+          },
+          {
+            "in": "query",
+            "name": "range",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "7D",
+                "1M",
+                "3M",
+                "1Y",
+                "YTD",
+                "ALL"
+              ]
+            },
+            "description": "Time range for data retrieval"
+          },
+          {
+            "in": "query",
+            "name": "protocol",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Protocol filter (e.g., meteora, orca)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved revenue data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "totalRevenue": {
+                          "type": "number",
+                          "description": "Total revenue in USD"
+                        },
+                        "dailyRevenue": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "date": {
+                                "type": "string",
+                                "format": "date"
+                              },
+                              "revenue": {
+                                "type": "number"
+                              },
+                              "volume": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        },
+                        "periodRevenue": {
+                          "type": "number",
+                          "description": "Revenue for the specified period"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid query parameters"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/open-api/v1/lp-positions/overview": {
+      "get": {
+        "summary": "Get overview metrics for LP positions",
+        "description": "Retrieves comprehensive overview and metrics for liquidity pool positions of a specific owner",
+        "tags": [
+          "positions"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "owner",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Wallet address of the position owner",
+            "example": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
+          },
+          {
+            "in": "query",
+            "name": "protocol",
+            "schema": {
+              "type": "string",
+              "default": "meteora"
+            },
+            "description": "Protocol to filter by (e.g., meteora, orca)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved overview data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "totalValue": {
+                          "type": "number",
+                          "description": "Total value of all positions in USD"
+                        },
+                        "totalPositions": {
+                          "type": "integer",
+                          "description": "Number of active positions"
+                        },
+                        "totalRevenue": {
+                          "type": "number",
+                          "description": "Total revenue generated"
+                        },
+                        "averageApr": {
+                          "type": "number",
+                          "description": "Average APR across all positions"
+                        },
+                        "topPositions": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "tokenName0": {
+                                "type": "string"
+                              },
+                              "tokenName1": {
+                                "type": "string"
+                              },
+                              "value": {
+                                "type": "number"
+                              },
+                              "apr": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - owner parameter is required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "owner is required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Owner overview not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Owner overview not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
           }
         }
       }
     }
   },
-  "components": {
-    "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
-      }
-    }
-  }
+  "tags": []
 }

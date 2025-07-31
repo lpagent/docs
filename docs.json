@@ -8,6 +8,13 @@
     "dark": "#15803D"
   },
   "favicon": "/favicon.svg",
+  "tabs": [
+    {
+      "name": "API Reference",
+      "url": "api-reference",
+      "openapi": "/api-reference/openapi.json"
+    }
+  ],
   "navigation": {
     "tabs": [
       {
