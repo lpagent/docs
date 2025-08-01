@@ -24,8 +24,7 @@
         "name": "x-api-key"
       }
     },
-    "schemas": {
-    }
+    "schemas": {}
   },
   "security": [
     {
@@ -37,17 +36,13 @@
       "get": {
         "summary": "Get opening LP positions for an owner",
         "description": "Retrieves current liquidity pool positions that are open for a specific wallet owner",
-        "tags": [
-          "positions"
-        ],
+        "tags": ["positions"],
         "parameters": [
           {
             "in": "query",
             "name": "owner",
             "required": true,
-            "schema": {
-              "type": "string"
-            },
+            "schema": { "type": "string" },
             "description": "Wallet address of the position owner",
             "example": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
           }
@@ -60,42 +55,294 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "status": {
-                      "type": "string",
-                      "example": "success"
+                    "status": { "type": "string", "example": "success" },
+                    "count": {
+                      "type": "integer",
+                      "description": "Total number of positions",
+                      "example": 11
                     },
                     "data": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
-                          "id": {
+                          "status": { "type": "string", "example": "Open" },
+                          "strategyType": {
                             "type": "string",
-                            "description": "Position ID (token ID)"
+                            "example": "BidAskImBalanced"
                           },
                           "tokenId": {
-                            "type": "string"
+                            "type": "string",
+                            "description": "Position ID (token ID)",
+                            "example": "Ep22EwKegXis3bTC6P8JLgsHaT5J2beM2TncKe2Hmv24"
                           },
-                          "tokenName0": {
-                            "type": "string"
+                          "pairName": { "type": "string", "example": "GP" },
+                          "currentValue": {
+                            "type": "string",
+                            "example": "53413.446031254"
                           },
-                          "tokenName1": {
-                            "type": "string"
+                          "inputValue": {
+                            "type": "number",
+                            "example": 54754.429180896324
                           },
-                          "tokenSymbol0": {
-                            "type": "string"
+                          "inputNative": {
+                            "type": "number",
+                            "example": 307.6172496731366
                           },
-                          "tokenSymbol1": {
-                            "type": "string"
+                          "outputValue": { "type": "number", "example": 0 },
+                          "outputNative": { "type": "number", "example": 0 },
+                          "collectedReward": { "type": "number", "example": 0 },
+                          "collectedRewardNative": {
+                            "type": "number",
+                            "example": 0
                           },
-                          "liquidity": {
-                            "type": "number"
+                          "collectedFee": {
+                            "type": "number",
+                            "example": 5625.827591325444
                           },
-                          "fee": {
-                            "type": "number"
+                          "collectedFeeNative": {
+                            "type": "number",
+                            "example": 31.587863106085184
+                          },
+                          "uncollectedFee": {
+                            "type": "string",
+                            "example": "0"
+                          },
+                          "tickLower": { "type": "integer", "example": -402 },
+                          "tickUpper": { "type": "integer", "example": -333 },
+                          "pool": {
+                            "type": "string",
+                            "example": "2DeF1QHAQMpNXCGjcsm2pWw1V4KknGtwd2wEh2fTriKC"
+                          },
+                          "liquidity": { "type": "string", "example": "0" },
+                          "token0": {
+                            "type": "string",
+                            "example": "31k88G5Mq7ptbRDf3AM13HAq6wRQHXHikR8hik7wPygk"
+                          },
+                          "token1": {
+                            "type": "string",
+                            "example": "So11111111111111111111111111111111111111112"
+                          },
+                          "inRange": { "type": "boolean", "example": true },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2025-07-25T16:23:04.000Z"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2025-08-01T03:35:38.000Z"
+                          },
+                          "pnl": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "number",
+                                "example": 1515.548691898919
+                              },
+                              "percent": {
+                                "type": "number",
+                                "example": 2.7679015461779115
+                              },
+                              "valueNative": {
+                                "type": "number",
+                                "example": 20.712922225935518
+                              },
+                              "percentNative": {
+                                "type": "number",
+                                "example": 6.733342245255866
+                              }
+                            }
+                          },
+                          "pnlNative": {
+                            "type": "number",
+                            "example": -276.0293865670514
+                          },
+                          "upnl": {
+                            "type": "number",
+                            "nullable": true,
+                            "example": null
+                          },
+                          "owner": {
+                            "type": "string",
+                            "example": "7KHx2Uc5qsqz652eXbu8Qtabi5KLxWJLgxFzcaBzP32i"
+                          },
+                          "dpr": {
+                            "type": "number",
+                            "example": 0.0042857830392432185
+                          },
+                          "dprNative": {
+                            "type": "number",
+                            "example": 0.01042582025071876
+                          },
+                          "ageHour": {
+                            "type": "number",
+                            "nullable": true,
+                            "example": null
+                          },
+                          "decimal0": { "type": "integer", "example": 9 },
+                          "decimal1": { "type": "integer", "example": 9 },
+                          "yield24h": {
+                            "type": "number",
+                            "nullable": true,
+                            "example": null
                           },
                           "apr": {
-                            "type": "number"
+                            "type": "number",
+                            "nullable": true,
+                            "example": null
+                          },
+                          "protocol": {
+                            "type": "string",
+                            "example": "meteora"
+                          },
+                          "token0Info": {
+                            "type": "object",
+                            "properties": {
+                              "token_symbol": {
+                                "type": "string",
+                                "example": "GP"
+                              },
+                              "token_name": {
+                                "type": "string",
+                                "example": "Graphite"
+                              },
+                              "token_decimals": {
+                                "type": "integer",
+                                "example": 9
+                              },
+                              "token_address": {
+                                "type": "string",
+                                "example": "31k88G5Mq7ptbRDf3AM13HAq6wRQHXHikR8hik7wPygk"
+                              },
+                              "logo": {
+                                "type": "string",
+                                "example": "https://arweave.net/ALLzymnuIihFPhoNUJpPxQzbGI8LodXKhNzXzbRMPbA"
+                              }
+                            }
+                          },
+                          "token1Info": {
+                            "type": "object",
+                            "properties": {
+                              "token_symbol": {
+                                "type": "string",
+                                "example": "SOL"
+                              },
+                              "token_name": {
+                                "type": "string",
+                                "example": "Wrapped SOL"
+                              },
+                              "token_decimals": {
+                                "type": "integer",
+                                "example": 9
+                              },
+                              "token_address": {
+                                "type": "string",
+                                "example": "So11111111111111111111111111111111111111112"
+                              },
+                              "logo": {
+                                "type": "string",
+                                "example": "https://www.dextools.io/resources/tokens/logos/3/solana/So11111111111111111111111111111111111111112.jpg"
+                              }
+                            }
+                          },
+                          "poolInfo": {
+                            "type": "object",
+                            "properties": {
+                              "fee": { "type": "integer", "example": 100 },
+                              "tickSpacing": {
+                                "type": "integer",
+                                "example": 100
+                              }
+                            }
+                          },
+                          "age": { "type": "string", "example": "6.49" },
+                          "position": {
+                            "type": "string",
+                            "example": "Ep22EwKegXis3bTC6P8JLgsHaT5J2beM2TncKe2Hmv24"
+                          },
+                          "logo0": {
+                            "type": "string",
+                            "example": "https://token-logo.getnimbus.io/api/v1/logo?address=31k88G5Mq7ptbRDf3AM13HAq6wRQHXHikR8hik7wPygk&chain=SOL"
+                          },
+                          "logo1": {
+                            "type": "string",
+                            "example": "https://token-logo.getnimbus.io/api/v1/logo?address=So11111111111111111111111111111111111111112&chain=SOL"
+                          },
+                          "tokenName0": { "type": "string", "example": "GP" },
+                          "tokenName1": { "type": "string", "example": "SOL" },
+                          "priceRange": {
+                            "type": "array",
+                            "items": { "type": "number" },
+                            "example": [
+                              3.1257738735100027, 6.210582680442794,
+                              3.8521785290623467
+                            ]
+                          },
+                          "range": {
+                            "type": "array",
+                            "items": { "type": "integer" },
+                            "example": [-402, -333, -381]
+                          },
+                          "value": {
+                            "type": "number",
+                            "example": 50639.07907119099
+                          },
+                          "valueNative": {
+                            "type": "number",
+                            "example": 296.7125947462876
+                          },
+                          "current": {
+                            "type": "object",
+                            "properties": {
+                              "amount0": {
+                                "type": "string",
+                                "example": "6134935664996.8532855"
+                              },
+                              "amount1": {
+                                "type": "string",
+                                "example": "158524771007.10491558"
+                              },
+                              "amount0Adjusted": {
+                                "type": "number",
+                                "example": 6134.935664996853
+                              },
+                              "amount1Adjusted": {
+                                "type": "number",
+                                "example": 158.52477100710493
+                              }
+                            }
+                          },
+                          "unCollectedFee0": {
+                            "type": "number",
+                            "example": 1.31917386
+                          },
+                          "unCollectedFee1": { "type": "number", "example": 0 },
+                          "unCollectedFee": {
+                            "type": "number",
+                            "example": 5.071210278816663
+                          },
+                          "unCollectedFeeNative": {
+                            "type": "number",
+                            "example": 0.029714046699316238
+                          },
+                          "price0": {
+                            "type": "number",
+                            "example": 3.844231933777601
+                          },
+                          "price1": {
+                            "type": "number",
+                            "example": 170.66710334453902
+                          },
+                          "id": {
+                            "type": "string",
+                            "example": "1dfc9575a268b50f1848f732eb8bca84:ff76fef2591c25fbfb32279f17372a60ad69577aaf06163dd2c980b369736e89422c35ef5f6b5cdbe66861e4acfabbec"
+                          },
+                          "logs": {
+                            "type": "array",
+                            "items": { "type": "object" },
+                            "example": []
                           }
                         }
                       }
@@ -112,10 +359,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "status": {
-                      "type": "string",
-                      "example": "error"
-                    },
+                    "status": { "type": "string", "example": "error" },
                     "message": {
                       "type": "string",
                       "example": "owner is required"
@@ -125,9 +369,7 @@
               }
             }
           },
-          "500": {
-            "description": "Internal server error"
-          }
+          "500": { "description": "Internal server error" }
         }
       }
     },
@@ -135,36 +377,26 @@
       "get": {
         "summary": "Get historical LP positions for an owner",
         "description": "Retrieves historical liquidity pool positions for a specific wallet owner",
-        "tags": [
-          "positions"
-        ],
+        "tags": ["positions"],
         "parameters": [
           {
             "in": "query",
             "name": "owner",
             "required": true,
-            "schema": {
-              "type": "string"
-            },
+            "schema": { "type": "string" },
             "description": "Wallet address of the position owner",
             "example": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
           },
           {
             "in": "query",
             "name": "page",
-            "schema": {
-              "type": "integer",
-              "default": 1
-            },
+            "schema": { "type": "integer", "default": 1 },
             "description": "Page number for pagination"
           },
           {
             "in": "query",
             "name": "limit",
-            "schema": {
-              "type": "integer",
-              "default": 20
-            },
+            "schema": { "type": "integer", "default": 20 },
             "description": "Number of items per page"
           }
         ],
@@ -176,38 +408,332 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "status": {
-                      "type": "string",
-                      "example": "success"
+                    "status": { "type": "string", "example": "success" },
+                    "count": {
+                      "type": "integer",
+                      "description": "Total number of positions",
+                      "example": 12
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "tokenName0": {
-                            "type": "string"
-                          },
-                          "tokenName1": {
-                            "type": "string"
-                          },
-                          "status": {
-                            "type": "string",
-                            "enum": [
-                              "open",
-                              "closed"
-                            ]
-                          },
-                          "createdAt": {
-                            "type": "string",
-                            "format": "date-time"
-                          },
-                          "closedAt": {
-                            "type": "string",
-                            "format": "date-time"
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "type": "string",
+                                "example": "Close"
+                              },
+                              "strategyType": {
+                                "type": "string",
+                                "example": "SpotImBalanced"
+                              },
+                              "tokenId": {
+                                "type": "string",
+                                "description": "Position ID (token ID)",
+                                "example": "EAKJUJDFjRNQ6guA3Q1xqkfZ2ArXxKGL2LUQn69nZ6w7"
+                              },
+                              "pairName": {
+                                "type": "string",
+                                "example": "STARTUP"
+                              },
+                              "currentValue": {
+                                "type": "string",
+                                "example": "23.6413056088255"
+                              },
+                              "inputValue": {
+                                "type": "number",
+                                "example": 23.641305608825547
+                              },
+                              "inputNative": {
+                                "type": "number",
+                                "example": 0.13232864407362593
+                              },
+                              "outputValue": {
+                                "type": "number",
+                                "example": 23.487261686308557
+                              },
+                              "outputNative": {
+                                "type": "number",
+                                "example": 0.13143240986197438
+                              },
+                              "collectedReward": {
+                                "type": "number",
+                                "example": 0
+                              },
+                              "collectedRewardNative": {
+                                "type": "number",
+                                "example": 0
+                              },
+                              "collectedFee": {
+                                "type": "number",
+                                "example": 0
+                              },
+                              "collectedFeeNative": {
+                                "type": "number",
+                                "example": 0
+                              },
+                              "uncollectedFee": {
+                                "type": "string",
+                                "example": "0"
+                              },
+                              "tickLower": {
+                                "type": "integer",
+                                "example": -4501
+                              },
+                              "tickUpper": {
+                                "type": "integer",
+                                "example": -4431
+                              },
+                              "pool": {
+                                "type": "string",
+                                "example": "UUVJ9rVGVtMyEnLi473xyS7teC1PLg3oCWhVs1c1jpU"
+                              },
+                              "liquidity": { "type": "string", "example": "0" },
+                              "token0": {
+                                "type": "string",
+                                "example": "97PVGU2DzFqsAWaYU17ZBqGvQFmkqtdMywYBNPAfy8vy"
+                              },
+                              "token1": {
+                                "type": "string",
+                                "example": "So11111111111111111111111111111111111111112"
+                              },
+                              "inRange": { "type": "boolean", "example": true },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2025-07-30T16:03:34.000Z"
+                              },
+                              "updatedAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2025-07-30T16:03:45.000Z"
+                              },
+                              "pnl": {
+                                "type": "object",
+                                "properties": {
+                                  "value": {
+                                    "type": "number",
+                                    "example": -0.1540439225169905
+                                  },
+                                  "valueNative": {
+                                    "type": "number",
+                                    "example": -0.0008962342116515531
+                                  },
+                                  "percent": {
+                                    "type": "number",
+                                    "example": -0.6515880512939365
+                                  },
+                                  "percentNative": {
+                                    "type": "number",
+                                    "example": -0.6772790713043958
+                                  }
+                                }
+                              },
+                              "pnlNative": {
+                                "type": "number",
+                                "example": -0.0008962342116515531
+                              },
+                              "upnl": {
+                                "type": "number",
+                                "nullable": true,
+                                "example": null
+                              },
+                              "owner": {
+                                "type": "string",
+                                "example": "DMQ7mJ8DTXYLoc1g1NpSv7jtDdaCzsLUdzvvY8MA4hbX"
+                              },
+                              "dpr": {
+                                "type": "number",
+                                "example": -51.17927966526919
+                              },
+                              "dprNative": {
+                                "type": "number",
+                                "example": -53.19719250972708
+                              },
+                              "ageHour": {
+                                "type": "string",
+                                "example": "0.00305555555555555556"
+                              },
+                              "decimal0": { "type": "integer", "example": 9 },
+                              "decimal1": { "type": "integer", "example": 9 },
+                              "yield24h": {
+                                "type": "number",
+                                "nullable": true,
+                                "example": null
+                              },
+                              "apr": {
+                                "type": "number",
+                                "nullable": true,
+                                "example": null
+                              },
+                              "protocol": {
+                                "type": "string",
+                                "example": "meteora"
+                              },
+                              "token0Info": {
+                                "type": "object",
+                                "properties": {
+                                  "token_symbol": {
+                                    "type": "string",
+                                    "example": "STARTUP"
+                                  },
+                                  "token_name": {
+                                    "type": "string",
+                                    "example": "Startup"
+                                  },
+                                  "token_decimals": {
+                                    "type": "integer",
+                                    "example": 9
+                                  },
+                                  "token_address": {
+                                    "type": "string",
+                                    "example": "97PVGU2DzFqsAWaYU17ZBqGvQFmkqtdMywYBNPAfy8vy"
+                                  },
+                                  "logo": {
+                                    "type": "string",
+                                    "nullable": true,
+                                    "example": null
+                                  }
+                                }
+                              },
+                              "token1Info": {
+                                "type": "object",
+                                "properties": {
+                                  "token_symbol": {
+                                    "type": "string",
+                                    "example": "SOL"
+                                  },
+                                  "token_name": {
+                                    "type": "string",
+                                    "example": "Wrapped SOL"
+                                  },
+                                  "token_decimals": {
+                                    "type": "integer",
+                                    "example": 9
+                                  },
+                                  "token_address": {
+                                    "type": "string",
+                                    "example": "So11111111111111111111111111111111111111112"
+                                  },
+                                  "logo": {
+                                    "type": "string",
+                                    "example": "https://www.dextools.io/resources/tokens/logos/3/solana/So11111111111111111111111111111111111111112.jpg"
+                                  }
+                                }
+                              },
+                              "poolInfo": {
+                                "type": "object",
+                                "properties": {
+                                  "fee": { "type": "integer", "example": 20 },
+                                  "tickSpacing": {
+                                    "type": "integer",
+                                    "example": 20
+                                  }
+                                }
+                              },
+                              "age": { "type": "string", "example": "0.00" },
+                              "position": {
+                                "type": "string",
+                                "example": "EAKJUJDFjRNQ6guA3Q1xqkfZ2ArXxKGL2LUQn69nZ6w7"
+                              },
+                              "logo0": {
+                                "type": "string",
+                                "example": "https://token-logo.getnimbus.io/api/v1/logo?address=97PVGU2DzFqsAWaYU17ZBqGvQFmkqtdMywYBNPAfy8vy&chain=SOL"
+                              },
+                              "logo1": {
+                                "type": "string",
+                                "example": "https://token-logo.getnimbus.io/api/v1/logo?address=So11111111111111111111111111111111111111112&chain=SOL"
+                              },
+                              "tokenName0": {
+                                "type": "string",
+                                "example": "STARTUP"
+                              },
+                              "tokenName1": {
+                                "type": "string",
+                                "example": "SOL"
+                              },
+                              "priceRange": {
+                                "type": "array",
+                                "items": { "type": "number" },
+                                "example": [
+                                  0.02119779171413261, 0.024379855528418568,
+                                  0.01839426300470885
+                                ]
+                              },
+                              "value": {
+                                "type": "number",
+                                "example": 23.641305608825547
+                              },
+                              "valueNative": {
+                                "type": "number",
+                                "example": 0.13232864407362593
+                              },
+                              "close_At": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2025-07-30T16:03:45.000Z"
+                              },
+                              "closeAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2025-07-30T16:03:45.000Z"
+                              },
+                              "fee": { "type": "number", "example": 0 },
+                              "feeNative": { "type": "number", "example": 0 },
+                              "feePercent": { "type": "number", "example": 0 },
+                              "feePercentNative": {
+                                "type": "number",
+                                "example": 0
+                              },
+                              "creationType": {
+                                "type": "string",
+                                "example": "AUTO"
+                              },
+                              "pnlNativeAudited": {
+                                "type": "number",
+                                "example": -0.004338157999999981
+                              },
+                              "solInAudited": {
+                                "type": "number",
+                                "example": 0.192444558
+                              },
+                              "solOutAudited": {
+                                "type": "number",
+                                "example": 0.1881064
+                              },
+                              "followInfo": {
+                                "type": "object",
+                                "properties": {
+                                  "sourceOwner": {
+                                    "type": "string",
+                                    "example": "7KHx2Uc5qsqz652eXbu8Qtabi5KLxWJLgxFzcaBzP32i"
+                                  },
+                                  "sourceLabel": {
+                                    "type": "string",
+                                    "example": "cromatoforo"
+                                  },
+                                  "sourceTokenId": {
+                                    "type": "string",
+                                    "example": "9DJ1vtDHs3x8yQCoPRBwMqFsUQAa7VtufsnoPe11kU2Q"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "pagination": {
+                          "type": "object",
+                          "properties": {
+                            "currentPage": { "type": "integer", "example": 1 },
+                            "totalPages": { "type": "integer", "example": 111 },
+                            "totalCount": {
+                              "type": "integer",
+                              "example": 1329
+                            },
+                            "pageSize": { "type": "integer", "example": 12 }
                           }
                         }
                       }
@@ -224,10 +750,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "status": {
-                      "type": "string",
-                      "example": "error"
-                    },
+                    "status": { "type": "string", "example": "error" },
                     "message": {
                       "type": "string",
                       "example": "owner is required"
@@ -237,9 +760,7 @@
               }
             }
           },
-          "500": {
-            "description": "Internal server error"
-          }
+          "500": { "description": "Internal server error" }
         }
       }
     },
@@ -247,27 +768,20 @@
       "get": {
         "summary": "Get overview metrics for LP positions",
         "description": "Retrieves comprehensive overview and metrics for liquidity pool positions of a specific owner",
-        "tags": [
-          "positions"
-        ],
+        "tags": ["positions"],
         "parameters": [
           {
             "in": "query",
             "name": "owner",
             "required": true,
-            "schema": {
-              "type": "string"
-            },
+            "schema": { "type": "string" },
             "description": "Wallet address of the position owner",
             "example": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
           },
           {
             "in": "query",
             "name": "protocol",
-            "schema": {
-              "type": "string",
-              "default": "meteora"
-            },
+            "schema": { "type": "string", "default": "meteora" },
             "description": "Protocol to filter by (e.g., meteora, orca)"
           }
         ],
@@ -279,51 +793,478 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "status": {
-                      "type": "string",
-                      "example": "success"
-                    },
+                    "status": { "type": "string", "example": "success" },
                     "data": {
                       "type": "object",
                       "properties": {
-                        "totalValue": {
+                        "owner": {
+                          "type": "string",
+                          "description": "Wallet address of the owner",
+                          "example": "DMQ7mJ8DTXYLoc1g1NpSv7jtDdaCzsLUdzvvY8MA4hbX"
+                        },
+                        "chain": {
+                          "type": "string",
+                          "description": "Blockchain chain (e.g., SOL)",
+                          "example": "SOL"
+                        },
+                        "protocol": {
+                          "type": "string",
+                          "description": "Protocol name (e.g., meteora, orca)",
+                          "example": "meteora"
+                        },
+                        "total_inflow": {
                           "type": "number",
-                          "description": "Total value of all positions in USD"
+                          "description": "Total inflow amount",
+                          "example": 1586491.3551108437
                         },
-                        "totalPositions": {
-                          "type": "integer",
-                          "description": "Number of active positions"
-                        },
-                        "totalRevenue": {
-                          "type": "number",
-                          "description": "Total revenue generated"
-                        },
-                        "averageApr": {
-                          "type": "number",
-                          "description": "Average APR across all positions"
-                        },
-                        "topPositions": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "string"
-                              },
-                              "tokenName0": {
-                                "type": "string"
-                              },
-                              "tokenName1": {
-                                "type": "string"
-                              },
-                              "value": {
-                                "type": "number"
-                              },
-                              "apr": {
-                                "type": "number"
-                              }
+                        "avg_inflow": {
+                          "type": "object",
+                          "description": "Average inflow with time ranges",
+                          "properties": {
+                            "ALL": {
+                              "type": "number",
+                              "example": 1233.6635731810604
+                            },
+                            "7D": {
+                              "type": "number",
+                              "example": 1009.8441703184694
+                            },
+                            "1M": {
+                              "type": "number",
+                              "example": 1895.4839197467682
+                            },
+                            "3M": {
+                              "type": "number",
+                              "example": 1243.036011296495
+                            },
+                            "1Y": {
+                              "type": "number",
+                              "example": 1233.66357318106
+                            },
+                            "YTD": {
+                              "type": "number",
+                              "example": 1233.66357318106
                             }
                           }
+                        },
+                        "total_outflow": {
+                          "type": "number",
+                          "description": "Total outflow amount",
+                          "example": 1578323.345425783
+                        },
+                        "total_fee": {
+                          "type": "object",
+                          "description": "Total fees with time ranges",
+                          "properties": {
+                            "ALL": {
+                              "type": "number",
+                              "example": 12516.614685851924
+                            },
+                            "7D": {
+                              "type": "number",
+                              "example": 4.262212981880845
+                            },
+                            "1M": {
+                              "type": "number",
+                              "example": 7404.187815729953
+                            },
+                            "3M": {
+                              "type": "number",
+                              "example": 12498.147067807171
+                            },
+                            "1Y": {
+                              "type": "number",
+                              "example": 12516.614685851926
+                            },
+                            "YTD": {
+                              "type": "number",
+                              "example": 12516.614685851926
+                            }
+                          }
+                        },
+                        "total_reward": {
+                          "type": "number",
+                          "description": "Total rewards earned",
+                          "example": 0
+                        },
+                        "total_pnl": {
+                          "type": "object",
+                          "description": "Total profit and loss with time ranges",
+                          "properties": {
+                            "ALL": {
+                              "type": "number",
+                              "example": 4323.2505549474245
+                            },
+                            "7D": {
+                              "type": "number",
+                              "example": -85.02276020207705
+                            },
+                            "1M": {
+                              "type": "number",
+                              "example": 3502.31375643287
+                            },
+                            "3M": {
+                              "type": "number",
+                              "example": 4315.87760395399
+                            },
+                            "1Y": {
+                              "type": "number",
+                              "example": 4323.250554947427
+                            },
+                            "YTD": {
+                              "type": "number",
+                              "example": 4323.250554947427
+                            }
+                          }
+                        },
+                        "total_inflow_native": {
+                          "type": "number",
+                          "description": "Total inflow in native token",
+                          "example": 10585.562828397458
+                        },
+                        "avg_inflow_native": {
+                          "type": "object",
+                          "description": "Average inflow in native token with time ranges",
+                          "properties": {
+                            "ALL": {
+                              "type": "number",
+                              "example": 8.231386336234415
+                            },
+                            "7D": {
+                              "type": "number",
+                              "example": 5.388384469621412
+                            },
+                            "1M": {
+                              "type": "number",
+                              "example": 12.475841877745875
+                            },
+                            "3M": {
+                              "type": "number",
+                              "example": 8.29392670708921
+                            },
+                            "1Y": {
+                              "type": "number",
+                              "example": 8.231386336234413
+                            },
+                            "YTD": {
+                              "type": "number",
+                              "example": 8.231386336234413
+                            }
+                          }
+                        },
+                        "total_outflow_native": {
+                          "type": "number",
+                          "description": "Total outflow in native token",
+                          "example": 10529.299449727307
+                        },
+                        "total_fee_native": {
+                          "type": "object",
+                          "description": "Total fees in native token with time ranges",
+                          "properties": {
+                            "ALL": {
+                              "type": "number",
+                              "example": 83.4853120103325
+                            },
+                            "7D": {
+                              "type": "number",
+                              "example": 0.022746553186898555
+                            },
+                            "1M": {
+                              "type": "number",
+                              "example": 48.820621387493105
+                            },
+                            "3M": {
+                              "type": "number",
+                              "example": 83.36295390095411
+                            },
+                            "1Y": {
+                              "type": "number",
+                              "example": 83.48531201033254
+                            },
+                            "YTD": {
+                              "type": "number",
+                              "example": 83.48531201033254
+                            }
+                          }
+                        },
+                        "total_reward_native": {
+                          "type": "number",
+                          "description": "Total rewards in native token",
+                          "example": 0
+                        },
+                        "total_pnl_native": {
+                          "type": "object",
+                          "description": "Total PnL in native token with time ranges",
+                          "properties": {
+                            "ALL": {
+                              "type": "number",
+                              "example": 8.756756271321922
+                            },
+                            "7D": {
+                              "type": "number",
+                              "example": -0.02289659499999974
+                            },
+                            "1M": {
+                              "type": "number",
+                              "example": 11.766254518455375
+                            },
+                            "3M": {
+                              "type": "number",
+                              "example": 8.70741865915985
+                            },
+                            "1Y": {
+                              "type": "number",
+                              "example": 8.756756271321928
+                            },
+                            "YTD": {
+                              "type": "number",
+                              "example": 8.756756271321928
+                            }
+                          }
+                        },
+                        "avg_age_hour": {
+                          "type": "number",
+                          "description": "Average position age in hours",
+                          "example": 2.1423017107309485
+                        },
+                        "total_lp": {
+                          "type": "string",
+                          "description": "Total number of LP positions",
+                          "example": "1294"
+                        },
+                        "win_lp": {
+                          "type": "string",
+                          "description": "Number of winning LP positions",
+                          "example": "403"
+                        },
+                        "win_lp_native": {
+                          "type": "string",
+                          "description": "Number of winning LP positions in native token",
+                          "example": "229"
+                        },
+                        "closed_lp": {
+                          "type": "object",
+                          "description": "Closed LP positions with time ranges",
+                          "properties": {
+                            "ALL": { "type": "string", "example": "1286" },
+                            "7D": { "type": "integer", "example": 13 },
+                            "1M": { "type": "integer", "example": 515 },
+                            "3M": { "type": "integer", "example": 1276 },
+                            "1Y": { "type": "integer", "example": 1286 },
+                            "YTD": { "type": "integer", "example": 1286 }
+                          }
+                        },
+                        "opening_lp": {
+                          "type": "string",
+                          "description": "Number of opening LP positions",
+                          "example": "8"
+                        },
+                        "total_pool": {
+                          "type": "string",
+                          "description": "Total number of pools",
+                          "example": "188"
+                        },
+                        "win_rate": {
+                          "type": "object",
+                          "description": "Win rate with time ranges",
+                          "properties": {
+                            "ALL": {
+                              "type": "number",
+                              "example": 0.533068783068783
+                            },
+                            "7D": {
+                              "type": "number",
+                              "example": 0.16666666666666666
+                            },
+                            "1M": {
+                              "type": "number",
+                              "example": 0.5786163522012578
+                            },
+                            "3M": {
+                              "type": "number",
+                              "example": 0.5327102803738317
+                            },
+                            "1Y": {
+                              "type": "number",
+                              "example": 0.533068783068783
+                            },
+                            "YTD": {
+                              "type": "number",
+                              "example": 0.533068783068783
+                            }
+                          }
+                        },
+                        "win_rate_native": {
+                          "type": "object",
+                          "description": "Win rate in native token with time ranges",
+                          "properties": {
+                            "ALL": {
+                              "type": "number",
+                              "example": 0.6835820895522388
+                            },
+                            "7D": { "type": "number", "example": 0 },
+                            "1M": {
+                              "type": "number",
+                              "example": 0.6942675159235668
+                            },
+                            "3M": {
+                              "type": "number",
+                              "example": 0.6848484848484848
+                            },
+                            "1Y": {
+                              "type": "number",
+                              "example": 0.6835820895522388
+                            },
+                            "YTD": {
+                              "type": "number",
+                              "example": 0.6835820895522388
+                            }
+                          }
+                        },
+                        "expected_value": {
+                          "type": "object",
+                          "description": "Expected value with time ranges",
+                          "properties": {
+                            "ALL": {
+                              "type": "number",
+                              "example": 5.718585390142092
+                            },
+                            "7D": {
+                              "type": "number",
+                              "example": -14.17046003367951
+                            },
+                            "1M": {
+                              "type": "number",
+                              "example": 11.013565271801475
+                            },
+                            "3M": {
+                              "type": "number",
+                              "example": 5.762186387121481
+                            },
+                            "1Y": {
+                              "type": "number",
+                              "example": 5.7185853901420955
+                            },
+                            "YTD": {
+                              "type": "number",
+                              "example": 5.7185853901420955
+                            }
+                          }
+                        },
+                        "expected_value_native": {
+                          "type": "object",
+                          "description": "Expected value in native token with time ranges",
+                          "properties": {
+                            "ALL": {
+                              "type": "number",
+                              "example": 0.026139570959169856
+                            },
+                            "7D": {
+                              "type": "number",
+                              "example": -0.02289659499999974
+                            },
+                            "1M": {
+                              "type": "number",
+                              "example": 0.07494429629589411
+                            },
+                            "3M": {
+                              "type": "number",
+                              "example": 0.026386117148969213
+                            },
+                            "1Y": {
+                              "type": "number",
+                              "example": 0.02613957095916991
+                            },
+                            "YTD": {
+                              "type": "number",
+                              "example": 0.02613957095916991
+                            }
+                          }
+                        },
+                        "fee_percent": {
+                          "type": "number",
+                          "description": "Fee percentage",
+                          "example": 0.007889494415163342
+                        },
+                        "fee_percent_native": {
+                          "type": "number",
+                          "description": "Fee percentage in native token",
+                          "example": 0.0078867145152046
+                        },
+                        "apr": {
+                          "type": "number",
+                          "description": "Annual percentage rate",
+                          "example": 17678030.44344193
+                        },
+                        "roi": {
+                          "type": "number",
+                          "description": "Return on investment",
+                          "example": 0.0027250388355538006
+                        },
+                        "roi_avg_inflow": {
+                          "type": "number",
+                          "description": "ROI based on average inflow",
+                          "example": 0.004635449659420882
+                        },
+                        "roi_avg_inflow_native": {
+                          "type": "number",
+                          "description": "ROI based on average inflow in native token",
+                          "example": 0.0031755976322122067
+                        },
+                        "first_activity": {
+                          "type": "string",
+                          "description": "First activity timestamp",
+                          "example": "2025-04-25 01:37:08.000"
+                        },
+                        "last_activity": {
+                          "type": "string",
+                          "description": "Last activity timestamp",
+                          "example": "2025-07-30 16:03:45.000"
+                        },
+                        "avg_pos_profit": {
+                          "type": "number",
+                          "description": "Average position profit",
+                          "example": 5.7185853901420955
+                        },
+                        "avg_pos_profit_native": {
+                          "type": "number",
+                          "description": "Average position profit in native token",
+                          "example": 0.026139570959169918
+                        },
+                        "avg_monthly_profit_percent": {
+                          "type": "number",
+                          "description": "Average monthly profit percentage",
+                          "example": 0.004306823066304065
+                        },
+                        "avg_monthly_pnl": {
+                          "type": "number",
+                          "description": "Average monthly PnL",
+                          "example": 1080.8126387368566
+                        },
+                        "avg_monthly_inflow": {
+                          "type": "number",
+                          "description": "Average monthly inflow",
+                          "example": 396622.8387777108
+                        },
+                        "avg_monthly_profit_percent_native": {
+                          "type": "number",
+                          "description": "Average monthly profit percentage in native token",
+                          "example": 0.005537899372724309
+                        },
+                        "avg_monthly_pnl_native": {
+                          "type": "number",
+                          "description": "Average monthly PnL in native token",
+                          "example": 2.1891890678304833
+                        },
+                        "avg_monthly_inflow_native": {
+                          "type": "number",
+                          "description": "Average monthly inflow in native token",
+                          "example": 2646.390707099365
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "description": "Last update timestamp",
+                          "example": "2025-07-30 17:02:36"
                         }
                       }
                     }
@@ -339,10 +1280,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "status": {
-                      "type": "string",
-                      "example": "error"
-                    },
+                    "status": { "type": "string", "example": "error" },
                     "message": {
                       "type": "string",
                       "example": "owner is required"
@@ -359,10 +1297,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "status": {
-                      "type": "string",
-                      "example": "error"
-                    },
+                    "status": { "type": "string", "example": "error" },
                     "message": {
                       "type": "string",
                       "example": "Owner overview not found"
@@ -372,9 +1307,7 @@
               }
             }
           },
-          "500": {
-            "description": "Internal server error"
-          }
+          "500": { "description": "Internal server error" }
         }
       }
     }
