@@ -264,11 +264,11 @@
                           },
                           "logo0": {
                             "type": "string",
-                            "example": "https://token-logo.getnimbus.io/api/v1/logo?address=31k88G5Mq7ptbRDf3AM13HAq6wRQHXHikR8hik7wPygk&chain=SOL"
+                            "example": "https://token-logo.lpagent.io/api/v1/logo?address=31k88G5Mq7ptbRDf3AM13HAq6wRQHXHikR8hik7wPygk&chain=SOL"
                           },
                           "logo1": {
                             "type": "string",
-                            "example": "https://token-logo.getnimbus.io/api/v1/logo?address=So11111111111111111111111111111111111111112&chain=SOL"
+                            "example": "https://token-logo.lpagent.io/api/v1/logo?address=So11111111111111111111111111111111111111112&chain=SOL"
                           },
                           "tokenName0": { "type": "string", "example": "GP" },
                           "tokenName1": { "type": "string", "example": "SOL" },
@@ -641,11 +641,11 @@
                               },
                               "logo0": {
                                 "type": "string",
-                                "example": "https://token-logo.getnimbus.io/api/v1/logo?address=97PVGU2DzFqsAWaYU17ZBqGvQFmkqtdMywYBNPAfy8vy&chain=SOL"
+                                "example": "https://token-logo.lpagent.io/api/v1/logo?address=97PVGU2DzFqsAWaYU17ZBqGvQFmkqtdMywYBNPAfy8vy&chain=SOL"
                               },
                               "logo1": {
                                 "type": "string",
-                                "example": "https://token-logo.getnimbus.io/api/v1/logo?address=So11111111111111111111111111111111111111112&chain=SOL"
+                                "example": "https://token-logo.lpagent.io/api/v1/logo?address=So11111111111111111111111111111111111111112&chain=SOL"
                               },
                               "tokenName0": {
                                 "type": "string",
