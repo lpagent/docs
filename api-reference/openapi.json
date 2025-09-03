@@ -1310,6 +1310,185 @@
           "500": { "description": "Internal server error" }
         }
       }
+    },
+    "/open-api/v1/lp-positions/logs": {
+      "get": {
+        "summary": "Get logs for LP positions",
+        "description": "Retrieves transaction logs for LP positions. Can fetch logs for a specific position of an owner.",
+        "tags": ["positions"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "position",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Position ID (token ID)",
+            "example": "Ep22EwKegXis3bTC6P8JLgsHaT5J2beM2TncKe2Hmv24"
+          },
+          {
+            "in": "query",
+            "name": "chain",
+            "schema": {
+              "type": "string",
+              "default": "SOL"
+            },
+            "description": "Blockchain chain identifier",
+            "example": "SOL"
+          },
+          {
+            "in": "query",
+            "name": "owner",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Wallet address of the position owner",
+            "example": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved position logs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "count": {
+                      "type": "integer",
+                      "description": "Total number of logs",
+                      "example": 45
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "owner": {
+                            "type": "string",
+                            "description": "Position owner wallet address",
+                            "example": "7KHx2Uc5qsqz652eXbu8Qtabi5KLxWJLgxFzcaBzP32i"
+                          },
+                          "action": {
+                            "type": "string",
+                            "description": "Type of action performed",
+                            "example": "add_liquidity"
+                          },
+                          "amount0": {
+                            "type": "string",
+                            "description": "Amount of token0 involved in the transaction",
+                            "example": "1000000000"
+                          },
+                          "amount1": {
+                            "type": "string",
+                            "description": "Amount of token1 involved in the transaction",
+                            "example": "500000000"
+                          },
+                          "decimal0": {
+                            "type": "integer",
+                            "description": "Decimal places for token0",
+                            "example": 9
+                          },
+                          "decimal1": {
+                            "type": "integer",
+                            "description": "Decimal places for token1",
+                            "example": 9
+                          },
+                          "price0": {
+                            "type": "string",
+                            "description": "Price of token0 at time of transaction",
+                            "example": "3.844231933777601"
+                          },
+                          "price1": {
+                            "type": "string",
+                            "description": "Price of token1 at time of transaction",
+                            "example": "170.66710334453902"
+                          },
+                          "timestamp": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Transaction timestamp",
+                            "example": "2025-07-25T16:23:04.000Z"
+                          },
+                          "nativePrice": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Price in native currency (SOL)",
+                            "example": "178.45"
+                          },
+                          "strategyType": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Strategy type used for the position",
+                            "example": "BidAskImBalanced"
+                          },
+                          "tickUpper": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Upper tick boundary",
+                            "example": -333
+                          },
+                          "tickLower": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Lower tick boundary",
+                            "example": -402
+                          },
+                          "bps": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Basis points for fee calculation",
+                            "example": 100
+                          },
+                          "logo0": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Logo URL for token0",
+                            "example": "https://token-logo.lpagent.io/api/v1/logo?address=31k88G5Mq7ptbRDf3AM13HAq6wRQHXHikR8hik7wPygk&chain=SOL"
+                          },
+                          "logo1": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Logo URL for token1",
+                            "example": "https://token-logo.lpagent.io/api/v1/logo?address=So11111111111111111111111111111111111111112&chain=SOL"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - position or owner parameter is required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "position or owner parameter is required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
     }
   },
   "tags": []
