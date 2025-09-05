@@ -1311,6 +1311,579 @@
         }
       }
     },
+    "/open-api/v1/lp-positions/position": {
+      "get": {
+        "summary": "Get detailed information for a specific LP position",
+        "description": "Retrieves comprehensive details about a liquidity provider position including status, PnL, tokens, and transaction logs",
+        "tags": ["positions"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "position",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "The position ID/token ID to retrieve",
+            "example": "5tTjw7V7b5QV7xL6jj5RUfV45QWMugYzENSTLZYvp1TP"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved position details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "success" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "description": "Position status",
+                          "example": "Open"
+                        },
+                        "strategyType": {
+                          "type": "string",
+                          "description": "Strategy type for the position"
+                        },
+                        "tokenId": {
+                          "type": "string",
+                          "description": "Position token ID",
+                          "example": "5tTjw7V7b5QV7xL6jj5RUfV45QWMugYzENSTLZYvp1TP"
+                        },
+                        "pairName": {
+                          "type": "string",
+                          "description": "Trading pair name",
+                          "example": "STREAMER"
+                        },
+                        "currentValue": {
+                          "type": "string",
+                          "description": "Current USD value of the position",
+                          "example": "1945.43465917398"
+                        },
+                        "inputValue": {
+                          "type": "number",
+                          "description": "Initial USD value invested",
+                          "example": 1953.2696703928616
+                        },
+                        "inputNative": {
+                          "type": "number",
+                          "description": "Initial native token amount invested",
+                          "example": 9.578296184
+                        },
+                        "outputValue": {
+                          "type": "number",
+                          "description": "USD value of withdrawn amount",
+                          "example": 0
+                        },
+                        "outputNative": {
+                          "type": "number",
+                          "description": "Native token amount withdrawn",
+                          "example": 0
+                        },
+                        "collectedReward": {
+                          "type": "number",
+                          "description": "USD value of collected rewards",
+                          "example": 0
+                        },
+                        "collectedRewardNative": {
+                          "type": "number",
+                          "description": "Native token amount of collected rewards",
+                          "example": 0
+                        },
+                        "collectedFee": {
+                          "type": "number",
+                          "description": "USD value of collected fees",
+                          "example": 65.00620782123218
+                        },
+                        "collectedFeeNative": {
+                          "type": "number",
+                          "description": "Native token amount of collected fees",
+                          "example": 0.3177726158119659
+                        },
+                        "uncollectedFee": {
+                          "type": "string",
+                          "description": "USD value of uncollected fees",
+                          "example": "0"
+                        },
+                        "impermanentLoss": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "Impermanent loss amount"
+                        },
+                        "inputToken0": {
+                          "type": "number",
+                          "description": "Initial amount of token0",
+                          "example": 0
+                        },
+                        "inputToken1": {
+                          "type": "number",
+                          "description": "Initial amount of token1",
+                          "example": 9578296184
+                        },
+                        "tickLower": {
+                          "type": "number",
+                          "description": "Lower tick of the position range",
+                          "example": -341
+                        },
+                        "tickUpper": {
+                          "type": "number",
+                          "description": "Upper tick of the position range",
+                          "example": -243
+                        },
+                        "pool": {
+                          "type": "string",
+                          "description": "Pool address",
+                          "example": "CcyHh3WgYRpLMDgSRSsJ2ptneSHfrc73oR51r72pAHU7"
+                        },
+                        "liquidity": {
+                          "type": "string",
+                          "description": "Current liquidity amount",
+                          "example": "0"
+                        },
+                        "token0": {
+                          "type": "string",
+                          "description": "Token0 address",
+                          "example": "3arUrpH3nzaRJbbpVgY42dcqSq9A5BFgUxKozZ4npump"
+                        },
+                        "token1": {
+                          "type": "string",
+                          "description": "Token1 address",
+                          "example": "So11111111111111111111111111111111111111112"
+                        },
+                        "inRange": {
+                          "type": "boolean",
+                          "description": "Whether the position is in range",
+                          "example": true
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Position creation timestamp",
+                          "example": "2025-09-04T15:46:55.000Z"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Position last update timestamp",
+                          "example": "2025-09-04T23:08:19.000Z"
+                        },
+                        "pnl": {
+                          "type": "object",
+                          "description": "Profit and loss information",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "description": "PnL in USD",
+                              "example": -1.1084269291922126
+                            },
+                            "percent": {
+                              "type": "number",
+                              "description": "PnL percentage",
+                              "example": -0.05674725543499963
+                            },
+                            "valueNative": {
+                              "type": "number",
+                              "description": "PnL in native token",
+                              "example": 0.031181194298495987
+                            },
+                            "percentNative": {
+                              "type": "number",
+                              "description": "PnL percentage in native token",
+                              "example": 0.3255400929299138
+                            }
+                          }
+                        },
+                        "pnlNative": {
+                          "type": "number",
+                          "description": "Native token PnL",
+                          "example": -9.260523568188033
+                        },
+                        "upnl": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "Unrealized PnL"
+                        },
+                        "owner": {
+                          "type": "string",
+                          "description": "Position owner address",
+                          "example": "ACQTiYg2TMRRKo294PENtfqkBqWQ5u3D7NDpm8Te2tyG"
+                        },
+                        "dpr": {
+                          "type": "number",
+                          "description": "Daily percentage return in USD",
+                          "example": -0.001361934130439991
+                        },
+                        "dprNative": {
+                          "type": "number",
+                          "description": "Daily percentage return in native token",
+                          "example": 0.007812962230317931
+                        },
+                        "ageHour": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "Position age in hours"
+                        },
+                        "decimal0": {
+                          "type": "number",
+                          "description": "Token0 decimals",
+                          "example": 6
+                        },
+                        "decimal1": {
+                          "type": "number",
+                          "description": "Token1 decimals",
+                          "example": 9
+                        },
+                        "yield24h": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "24-hour yield"
+                        },
+                        "apr": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "Annual percentage rate"
+                        },
+                        "protocol": {
+                          "type": "string",
+                          "description": "Protocol name",
+                          "example": "meteora"
+                        },
+                        "token0Info": {
+                          "type": "object",
+                          "description": "Token0 information",
+                          "properties": {
+                            "token_symbol": {
+                              "type": "string",
+                              "example": "STREAMER"
+                            },
+                            "token_name": {
+                              "type": "string",
+                              "example": "StreamerCoin"
+                            },
+                            "token_decimals": {
+                              "type": "number",
+                              "example": 6
+                            },
+                            "token_address": {
+                              "type": "string",
+                              "example": "3arUrpH3nzaRJbbpVgY42dcqSq9A5BFgUxKozZ4npump"
+                            },
+                            "logo": {
+                              "type": "string",
+                              "nullable": true
+                            }
+                          }
+                        },
+                        "token1Info": {
+                          "type": "object",
+                          "description": "Token1 information",
+                          "properties": {
+                            "token_symbol": {
+                              "type": "string",
+                              "example": "SOL"
+                            },
+                            "token_name": {
+                              "type": "string",
+                              "example": "Wrapped SOL"
+                            },
+                            "token_decimals": {
+                              "type": "number",
+                              "example": 9
+                            },
+                            "token_address": {
+                              "type": "string",
+                              "example": "So11111111111111111111111111111111111111112"
+                            },
+                            "logo": {
+                              "type": "string",
+                              "example": "https://www.dextools.io/resources/tokens/logos/3/solana/So11111111111111111111111111111111111111112.jpg"
+                            }
+                          }
+                        },
+                        "poolInfo": {
+                          "type": "object",
+                          "description": "Pool information",
+                          "properties": {
+                            "fee": {
+                              "type": "number",
+                              "description": "Pool fee in basis points",
+                              "example": 100
+                            },
+                            "tickSpacing": {
+                              "type": "number",
+                              "description": "Tick spacing for the pool",
+                              "example": 125
+                            }
+                          }
+                        },
+                        "age": {
+                          "type": "string",
+                          "description": "Position age in days",
+                          "example": "0.45"
+                        },
+                        "position": {
+                          "type": "string",
+                          "description": "Position identifier",
+                          "example": "5tTjw7V7b5QV7xL6jj5RUfV45QWMugYzENSTLZYvp1TP"
+                        },
+                        "logo0": {
+                          "type": "string",
+                          "description": "Token0 logo URL",
+                          "example": "https://token-logo.getnimbus.io/api/v1/logo?address=3arUrpH3nzaRJbbpVgY42dcqSq9A5BFgUxKozZ4npump&chain=SOL"
+                        },
+                        "logo1": {
+                          "type": "string",
+                          "description": "Token1 logo URL",
+                          "example": "https://token-logo.getnimbus.io/api/v1/logo?address=So11111111111111111111111111111111111111112&chain=SOL"
+                        },
+                        "tokenName0": {
+                          "type": "string",
+                          "description": "Token0 name",
+                          "example": "STREAMER"
+                        },
+                        "tokenName1": {
+                          "type": "string",
+                          "description": "Token1 name",
+                          "example": "SOL"
+                        },
+                        "priceRange": {
+                          "type": "array",
+                          "description": "Price range array [lower, upper, current]",
+                          "items": { "type": "number" },
+                          "example": [
+                            0.0029376923002315727, 0.009924746662859895,
+                            0.005535449986126866
+                          ]
+                        },
+                        "range": {
+                          "type": "array",
+                          "description": "Tick range array [lower, upper, current]",
+                          "items": { "type": "number" },
+                          "example": [-341, -243, -290]
+                        },
+                        "value": {
+                          "type": "number",
+                          "description": "Current position value in USD",
+                          "example": 1870.0445330471607
+                        },
+                        "valueNative": {
+                          "type": "number",
+                          "description": "Current position value in native token",
+                          "example": 9.207458510615153
+                        },
+                        "current": {
+                          "type": "object",
+                          "description": "Current token amounts",
+                          "properties": {
+                            "amount0": {
+                              "type": "string",
+                              "description": "Current amount of token0 (raw)",
+                              "example": "68057177237"
+                            },
+                            "amount1": {
+                              "type": "string",
+                              "description": "Current amount of token1 (raw)",
+                              "example": "7356057600"
+                            },
+                            "amount0Adjusted": {
+                              "type": "number",
+                              "description": "Current amount of token0 (adjusted for decimals)",
+                              "example": 68057.177237
+                            },
+                            "amount1Adjusted": {
+                              "type": "number",
+                              "description": "Current amount of token1 (adjusted for decimals)",
+                              "example": 7.3560576
+                            }
+                          }
+                        },
+                        "unCollectedFee0": {
+                          "type": "number",
+                          "description": "Uncollected fees for token0",
+                          "example": 1752.90661
+                        },
+                        "unCollectedFee1": {
+                          "type": "number",
+                          "description": "Uncollected fees for token1",
+                          "example": 0.036560864
+                        },
+                        "unCollectedFee": {
+                          "type": "number",
+                          "description": "Total uncollected fees in USD",
+                          "example": 17.110502595276436
+                        },
+                        "unCollectedFeeNative": {
+                          "type": "number",
+                          "description": "Total uncollected fees in native token",
+                          "example": 0.08424625187137592
+                        },
+                        "price0": {
+                          "type": "number",
+                          "description": "Current price of token0",
+                          "example": 0.005525081888046805
+                        },
+                        "price1": {
+                          "type": "number",
+                          "description": "Current price of token1",
+                          "example": 203.10105453
+                        },
+                        "id": {
+                          "type": "string",
+                          "description": "Unique position identifier",
+                          "example": "26e3d33a2ba9a95f1021e0115e40f132:c8a2a48b6fab04a1781d0a1d515713d3c2d43ef1d4770665b95baf504e91f8aa78c8ef77fa5898db01fc9f0cda863796"
+                        },
+                        "creationType": {
+                          "type": "string",
+                          "description": "How the position was created",
+                          "example": "AUTO"
+                        },
+                        "followInfo": {
+                          "type": "object",
+                          "description": "Information about followed positions",
+                          "properties": {
+                            "sourceOwner": {
+                              "type": "string",
+                              "description": "Source owner identifier",
+                              "example": "bb7b777b80b3948b3910aac6cfb85a6b:554f1dcb15f76893c41d150c6ddaa1d44a117fcff191a75a2052e4980e3f00d213cf4b7374a1e1dd1392ead036a9cd60"
+                            },
+                            "sourceLabel": {
+                              "type": "string",
+                              "description": "Source label/name",
+                              "example": "Twenti"
+                            },
+                            "sourceTokenId": {
+                              "type": "string",
+                              "description": "Source token ID",
+                              "example": "651fa1c45f7188731b4e585c4131217e:ed5bdc892f6456accb1a79b4792efa841d385cb83967e12684950399de07892c2bc52028e6c6513df01a57ccc62f2ba9"
+                            }
+                          }
+                        },
+                        "settings": {
+                          "type": "object",
+                          "description": "Position management settings",
+                          "properties": {
+                            "autoCompound": {
+                              "type": "boolean",
+                              "description": "Whether auto-compound is enabled",
+                              "example": false
+                            },
+                            "compoundThreshold": {
+                              "type": "string",
+                              "description": "Threshold for auto-compound",
+                              "example": "0"
+                            },
+                            "autoRebalance": {
+                              "type": "boolean",
+                              "description": "Whether auto-rebalance is enabled",
+                              "example": false
+                            },
+                            "aiManage": {
+                              "type": "boolean",
+                              "description": "Whether AI management is enabled",
+                              "example": false
+                            },
+                            "rebalanceInterval": {
+                              "type": "number",
+                              "description": "Rebalance interval",
+                              "example": 1
+                            },
+                            "rebalanceUpOnly": {
+                              "type": "boolean",
+                              "description": "Whether to rebalance up only",
+                              "example": false
+                            },
+                            "takeProfitBps": {
+                              "type": "number",
+                              "description": "Take profit threshold in basis points",
+                              "example": 1000
+                            },
+                            "stopLossBps": {
+                              "type": "number",
+                              "description": "Stop loss threshold in basis points",
+                              "example": 2000
+                            },
+                            "preferNativeValue": {
+                              "type": "boolean",
+                              "description": "Whether to prefer native value display",
+                              "example": false
+                            },
+                            "positionCurrency": {
+                              "type": "string",
+                              "description": "Currency for position display",
+                              "example": "SOL"
+                            }
+                          }
+                        },
+                        "logs": {
+                          "type": "array",
+                          "description": "Position activity logs",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "position_id": {
+                                "type": "string",
+                                "description": "Position ID",
+                                "example": "5tTjw7V7b5QV7xL6jj5RUfV45QWMugYzENSTLZYvp1TP"
+                              },
+                              "trigger": {
+                                "type": "string",
+                                "description": "Event trigger type",
+                                "example": "COLLECT_FEE_SUCCESS"
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Log entry timestamp",
+                                "example": "2025-09-04T23:08:23.013Z"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - missing required parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "error" },
+                    "message": {
+                      "type": "string",
+                      "example": "position parameter is required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/open-api/v1/lp-positions/logs": {
       "get": {
         "summary": "Get logs for LP positions",
