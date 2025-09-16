@@ -383,20 +383,48 @@
             "in": "query",
             "name": "owner",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Wallet address of the position owner",
             "example": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
           },
           {
             "in": "query",
+            "name": "from_date",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Start date for filtering positions",
+            "example": "2025-01-01T00:00:00Z"
+          },
+          {
+            "in": "query",
+            "name": "to_date",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "End date for filtering positions",
+            "example": "2025-09-01T00:00:00Z"
+          },
+          {
+            "in": "query",
             "name": "page",
-            "schema": { "type": "integer", "default": 1 },
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
             "description": "Page number for pagination"
           },
           {
             "in": "query",
             "name": "limit",
-            "schema": { "type": "integer", "default": 20 },
+            "schema": {
+              "type": "integer",
+              "default": 20
+            },
             "description": "Number of items per page"
           }
         ],
@@ -408,11 +436,9 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "status": { "type": "string", "example": "success" },
-                    "count": {
-                      "type": "integer",
-                      "description": "Total number of positions",
-                      "example": 12
+                    "status": {
+                      "type": "string",
+                      "example": "success"
                     },
                     "data": {
                       "type": "object",
@@ -491,7 +517,10 @@
                                 "type": "string",
                                 "example": "UUVJ9rVGVtMyEnLi473xyS7teC1PLg3oCWhVs1c1jpU"
                               },
-                              "liquidity": { "type": "string", "example": "0" },
+                              "liquidity": {
+                                "type": "string",
+                                "example": "0"
+                              },
                               "token0": {
                                 "type": "string",
                                 "example": "97PVGU2DzFqsAWaYU17ZBqGvQFmkqtdMywYBNPAfy8vy"
@@ -500,7 +529,10 @@
                                 "type": "string",
                                 "example": "So11111111111111111111111111111111111111112"
                               },
-                              "inRange": { "type": "boolean", "example": true },
+                              "inRange": {
+                                "type": "boolean",
+                                "example": true
+                              },
                               "createdAt": {
                                 "type": "string",
                                 "format": "date-time",
@@ -557,8 +589,14 @@
                                 "type": "string",
                                 "example": "0.00305555555555555556"
                               },
-                              "decimal0": { "type": "integer", "example": 9 },
-                              "decimal1": { "type": "integer", "example": 9 },
+                              "decimal0": {
+                                "type": "integer",
+                                "example": 9
+                              },
+                              "decimal1": {
+                                "type": "integer",
+                                "example": 9
+                              },
                               "yield24h": {
                                 "type": "number",
                                 "nullable": true,
@@ -627,14 +665,20 @@
                               "poolInfo": {
                                 "type": "object",
                                 "properties": {
-                                  "fee": { "type": "integer", "example": 20 },
+                                  "fee": {
+                                    "type": "integer",
+                                    "example": 20
+                                  },
                                   "tickSpacing": {
                                     "type": "integer",
                                     "example": 20
                                   }
                                 }
                               },
-                              "age": { "type": "string", "example": "0.00" },
+                              "age": {
+                                "type": "string",
+                                "example": "0.00"
+                              },
                               "position": {
                                 "type": "string",
                                 "example": "EAKJUJDFjRNQ6guA3Q1xqkfZ2ArXxKGL2LUQn69nZ6w7"
@@ -657,7 +701,9 @@
                               },
                               "priceRange": {
                                 "type": "array",
-                                "items": { "type": "number" },
+                                "items": {
+                                  "type": "number"
+                                },
                                 "example": [
                                   0.02119779171413261, 0.024379855528418568,
                                   0.01839426300470885
@@ -681,9 +727,18 @@
                                 "format": "date-time",
                                 "example": "2025-07-30T16:03:45.000Z"
                               },
-                              "fee": { "type": "number", "example": 0 },
-                              "feeNative": { "type": "number", "example": 0 },
-                              "feePercent": { "type": "number", "example": 0 },
+                              "fee": {
+                                "type": "number",
+                                "example": 0
+                              },
+                              "feeNative": {
+                                "type": "number",
+                                "example": 0
+                              },
+                              "feePercent": {
+                                "type": "number",
+                                "example": 0
+                              },
                               "feePercentNative": {
                                 "type": "number",
                                 "example": 0
@@ -727,13 +782,22 @@
                         "pagination": {
                           "type": "object",
                           "properties": {
-                            "currentPage": { "type": "integer", "example": 1 },
-                            "totalPages": { "type": "integer", "example": 111 },
+                            "currentPage": {
+                              "type": "integer",
+                              "example": 1
+                            },
+                            "totalPages": {
+                              "type": "integer",
+                              "example": 111
+                            },
                             "totalCount": {
                               "type": "integer",
                               "example": 1329
                             },
-                            "pageSize": { "type": "integer", "example": 12 }
+                            "pageSize": {
+                              "type": "integer",
+                              "example": 12
+                            }
                           }
                         }
                       }
@@ -750,7 +814,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "status": { "type": "string", "example": "error" },
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
                     "message": {
                       "type": "string",
                       "example": "owner is required"
@@ -760,7 +827,9 @@
               }
             }
           },
-          "500": { "description": "Internal server error" }
+          "500": {
+            "description": "Internal server error"
+          }
         }
       }
     },
