@@ -47,13 +47,20 @@
         ]
       },
       {
+        "tab": "Tutorials",
+        "groups": [
+          {
+            "group": "Best Practices",
+            "pages": ["tutorials/copy-lp-best-practices"]
+          }
+        ]
+      },
+      {
         "tab": "API Reference",
         "groups": [
           {
             "group": "API",
-            "pages": [
-              "api-reference/introduction"
-            ]
+            "pages": ["api-reference/introduction"]
           }
         ],
         "openapi": "api-reference/openapi.json"
