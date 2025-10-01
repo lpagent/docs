@@ -8,36 +8,38 @@ description: "Simple and transparent fee structure for LP Agent services"
 LP Agent maintains a simple and transparent fee structure to ensure you always know exactly what you're paying.
 
 <Note>
-  We only charge a small fee when a swap is required during entry or exit -
-  there are no hidden fees or ongoing management charges.
+  We only charge 8% on your actual earnings - no upfront costs, no swap fees.
+  You only pay when you earn!
 </Note>
 
-### Fee
+### Fee Structure
 
-A small fee is applied only when a swap is necessary to facilitate your transaction.
+Our new pricing model is simple: you only pay when you earn.
 
 <CardGroup cols={2}>
-  <Card title="Swap Fee" icon="arrow-right-to-bracket">
+  <Card title="Swap Fee" icon="percent">
     <div className="mt-2">
-      <span className="text-2xl font-bold text-primary">
-        0.5% for Normal swap
-      </span>
-      <div className="mt-2 text-sm">Fee applied if you swapping tokens.</div>
+      <span className="text-2xl font-bold text-primary">0% Swap Fee</span>
+      <div className="mt-2 text-sm">
+        No charge when opening or closing positions.
+      </div>
     </div>
   </Card>
-  <Card title="Swap Fee" icon="arrow-right-to-bracket">
+  <Card title="Earnings Fee" icon="coins">
     <div className="mt-2">
       <span className="text-2xl font-bold text-primary">
-        0.62% for Jupiter Ultra
+        8% on Earnings Only
       </span>
-      <div className="mt-2 text-sm">Fee applied if you swapping tokens.</div>
+      <div className="mt-2 text-sm">
+        Fee only applied to your actual profits from LP fees.
+      </div>
     </div>
   </Card>
 </CardGroup>
 
-**Example:** If you Zap-In to a SOL/USDC pool using only SOL, no swap is needed, and thus no fee is charged by LP Agent. However, if you Zap-In using 2 sides, a swap from SOL to USD is required, and the 0.5% fee applies.
+**Example:** You open a position on SOL/USDC with any amount - there's no swap fee charged when entering or exiting the position.
 
-**Example:** You open a position on SOL/USDC with 1 SOL, 0.5 SOL need to swap into USDC, so the fee only apply to 0.5 SOL Swapped
+**Example:** Your position earns \$100 in LP fees over time. LP Agent takes 8% of those earnings (\$8), and you keep \$92. If your position doesn't earn any fees, you pay nothing at all.
 
 ## What's Included
 
@@ -63,8 +65,8 @@ A small fee is applied only when a swap is necessary to facilitate your transact
 <Check>No withdrawal lockups</Check>
 
 <Warning>
-  While LP Agent only charges the above fees **when swaps occur**, normal
-  protocol fees (like network gas fees and pool trading fees) still apply.
+  While LP Agent only charges 8% on your earnings, normal protocol fees (like
+  network gas fees and pool trading fees) still apply.
 </Warning>
 
 <Card title="Ready to Start?" icon="rocket" href="/quickstart">
