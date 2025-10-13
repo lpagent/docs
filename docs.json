@@ -43,6 +43,10 @@
               "features/take-profit-stop-loss",
               "features/dashboard"
             ]
+          },
+          {
+            "group": "Legal",
+            "pages": ["terms-of-service", "privacy-policy"]
           }
         ]
       },
