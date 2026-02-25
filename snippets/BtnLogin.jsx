@@ -1,5 +1,3 @@
-import { useState, useEffect } from "react";
-
 export const BtnLogin = () => {
   return (
     <button
@@ -33,7 +31,7 @@ export const BtnLogin = () => {
         )
       }
     >
-      Login
+      Manage your API key
       <span style={{ fontSize: "20px" }}>→</span>
     </button>
   );
