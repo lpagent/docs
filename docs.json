@@ -71,11 +71,11 @@
         "openapi": "api-reference/openapi.json"
       },
       {
-        "tab": "Testing",
+        "tab": "API Key Dashboard",
         "groups": [
           {
-            "group": "Dashboard",
-            "pages": ["testing/dashboard"]
+            "group": "API Key Dashboard",
+            "pages": ["api-key-dashboard/dashboard"]
           }
         ]
       }

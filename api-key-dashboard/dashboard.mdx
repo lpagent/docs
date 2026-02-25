@@ -1,0 +1,81 @@
+---
+title: "Dashboard"
+description: ""
+mode: "custom"
+---
+
+import { MetricCard } from "/snippets/MetricCard.jsx";
+import { BtnGenerator } from "/snippets/BtnGenerator.jsx";
+
+<div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900">
+  <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col gap-6">
+
+<div className="flex flex-col gap-4">
+<div className="flex flex-col gap-2">
+
+<div className="text-4xl text-black dark:text-white font-bold leading-[45px]">
+  Accelerate your <br /> development with Meteora
+  <br /> most complete data metrics and analytics
+</div>
+
+## Gain full visibility into the Meteora DLMM, DAMM V2 data with LP Agent Data Service - the most trusted independent data source.
+
+</div>
+
+<BtnGenerator />
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-8">
+  <MetricCard title="Total Volume" value="$1,079,825,250+" />
+  <MetricCard title="Opened Positions" value="2,208+" />
+  <MetricCard title="Profit Made" value="$1,645,861" />
+  <MetricCard title="Calls Per Months" value="300M+" />
+</div>
+
+<div className="flex flex-col gap-3">
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Real-time Updates" icon="clock">
+    Monitor your metrics in real-time with automatic updates every few seconds.
+  </Card>
+  <Card title="Interactive Charts" icon="chart-bar">
+    Visualize your data with beautiful, interactive charts and graphs.
+  </Card>
+  <Card title="Activity Tracking" icon="list-check">
+    Keep track of all important events and activities in your system.
+  </Card>
+  <Card title="Quick Actions" icon="bolt">
+    Access frequently used actions with a single click from the dashboard.
+  </Card>
+</CardGroup>
+</div>
+
+<div className="flex flex-col gap-3">
+## Performance Metrics
+
+<AccordionGroup>
+  <Accordion title="System Health" icon="heart-pulse">
+    - **CPU Usage**: 45% - **Memory**: 2.3 GB / 8 GB - **Storage**: 234 GB / 500
+    GB - **Network**: 123 MB/s
+  </Accordion>
+
+<Accordion title="API Performance" icon="globe">
+  - **Average Response Time**: 142ms - **Success Rate**: 99.8% -
+  **Requests/min**: 1,234 - **Error Rate**: 0.2%
+</Accordion>
+
+  <Accordion title="Database Stats" icon="database">
+    - **Connections**: 45 / 100 - **Query Time**: 23ms avg - **Cache Hit Rate**:
+    94.5% - **Storage Used**: 12.4 GB
+  </Accordion>
+</AccordionGroup>
+</div>
+
+<Note>
+  This dashboard updates in real-time. All metrics shown are for demonstration
+  purposes.
+</Note>
+
+  </div>
+</div>
