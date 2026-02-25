@@ -69,6 +69,15 @@
           }
         ],
         "openapi": "api-reference/openapi.json"
+      },
+      {
+        "tab": "Testing",
+        "groups": [
+          {
+            "group": "Dashboard",
+            "pages": ["testing/dashboard"]
+          }
+        ]
       }
     ]
   },
