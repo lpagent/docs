@@ -6,8 +6,12 @@ icon: "chart-line"
 mode: "custom"
 ---
 
-import { MetricCard, ActivityFeed, StatsChart, QuickActions } from '/snippets/Dashboard';
-import { Counter } from '/snippets/Counter';
+import { QuickActions } from "/snippets/QuickActions.jsx";
+import { StatsChart } from "/snippets/StatsChart.jsx";
+import { ActivityFeed } from "/snippets/ActivityFeed.jsx";
+import { MetricCard } from "/snippets/MetricCard.jsx";
+import { Counter } from "/snippets/Counter.jsx";
+import { ColorGenerator } from "/snippets/ColorGenerator.jsx";
 
 <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900">
   <div className="max-w-7xl mx-auto px-6 py-12">
@@ -15,36 +19,17 @@ import { Counter } from '/snippets/Counter';
 # Testing Dashboard
 
 <p className="text-xl text-zinc-600 dark:text-zinc-400 mb-8">
-  Welcome to your interactive dashboard. Monitor your metrics, track activities, and manage your operations all in one place.
+  Welcome to your interactive dashboard. Monitor your metrics, track activities,
+  and manage your operations all in one place.
 </p>
 
 ## Overview Metrics
 
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-8">
-  <MetricCard
-    title="Total Users"
-    value="12,543"
-    change={12.5}
-    icon="👥"
-  />
-  <MetricCard
-    title="Revenue"
-    value="$45,678"
-    change={8.3}
-    icon="💰"
-  />
-  <MetricCard
-    title="Active Sessions"
-    value="1,234"
-    change={-2.4}
-    icon="🔥"
-  />
-  <MetricCard
-    title="Conversion Rate"
-    value="3.45%"
-    change={5.2}
-    icon="📈"
-  />
+  <MetricCard title="Total Users" value="12,543" change={12.5} icon="👥" />
+  <MetricCard title="Revenue" value="$45,678" change={8.3} icon="💰" />
+  <MetricCard title="Active Sessions" value="1,234" change={-2.4} icon="🔥" />
+  <MetricCard title="Conversion Rate" value="3.45%" change={5.2} icon="📈" />
 </div>
 
 ## Quick Actions
@@ -92,34 +77,31 @@ Test the interactive counter component below:
 
 <AccordionGroup>
   <Accordion title="System Health" icon="heart-pulse">
-    - **CPU Usage**: 45%
-    - **Memory**: 2.3 GB / 8 GB
-    - **Storage**: 234 GB / 500 GB
-    - **Network**: 123 MB/s
+    - **CPU Usage**: 45% - **Memory**: 2.3 GB / 8 GB - **Storage**: 234 GB / 500
+    GB - **Network**: 123 MB/s
   </Accordion>
-  
-  <Accordion title="API Performance" icon="globe">
-    - **Average Response Time**: 142ms
-    - **Success Rate**: 99.8%
-    - **Requests/min**: 1,234
-    - **Error Rate**: 0.2%
-  </Accordion>
-  
+
+<Accordion title="API Performance" icon="globe">
+  - **Average Response Time**: 142ms - **Success Rate**: 99.8% -
+  **Requests/min**: 1,234 - **Error Rate**: 0.2%
+</Accordion>
+
   <Accordion title="Database Stats" icon="database">
-    - **Connections**: 45 / 100
-    - **Query Time**: 23ms avg
-    - **Cache Hit Rate**: 94.5%
-    - **Storage Used**: 12.4 GB
+    - **Connections**: 45 / 100 - **Query Time**: 23ms avg - **Cache Hit Rate**:
+    94.5% - **Storage Used**: 12.4 GB
   </Accordion>
 </AccordionGroup>
 
 <Note>
-  This dashboard updates in real-time. All metrics shown are for demonstration purposes.
+  This dashboard updates in real-time. All metrics shown are for demonstration
+  purposes.
 </Note>
 
 <Tip>
   Click on any metric card to view detailed analytics and historical data.
 </Tip>
+
+<ColorGenerator />
 
   </div>
 </div>
