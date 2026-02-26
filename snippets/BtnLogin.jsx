@@ -31,7 +31,7 @@ export const BtnLogin = () => {
         )
       }
     >
-      Manage your API key
+      Manage your API Key
       <span style={{ fontSize: "20px" }}>→</span>
     </button>
   );
