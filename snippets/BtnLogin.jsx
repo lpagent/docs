@@ -3,7 +3,6 @@ export const BtnLogin = () => {
     <button
       style={{
         backgroundColor: "transparent",
-        color: "#1a1a1a",
         padding: "8px 16px",
         fontSize: "14px",
         fontWeight: "600",

@@ -5,19 +5,18 @@ export const FreePlan = () => {
         position: "relative",
         maxWidth: "460px",
         padding: "32px",
-        border: "2px solid #E8E8E8",
         borderRadius: "24px",
-        backgroundColor: "white",
         fontFamily: "system-ui, -apple-system, sans-serif",
       }}
+      className="border bg-white dark:bg-zinc-900 border-[#E8E8E8] dark:border-zinc-800"
     >
       <h2
         style={{
           fontSize: "32px",
           fontWeight: "700",
           margin: "0 0 8px 0",
-          color: "#1a1a1a",
         }}
+        className="text-[#1a1a1a] dark:text-white"
       >
         Free
       </h2>
@@ -27,7 +26,10 @@ export const FreePlan = () => {
       </p>
 
       <div style={{ marginBottom: "32px" }}>
-        <span style={{ fontSize: "48px", fontWeight: "700", color: "#1a1a1a" }}>
+        <span 
+          style={{ fontSize: "48px", fontWeight: "700" }}
+          className="text-[#1a1a1a] dark:text-white"
+        >
           $0
         </span>
         <span style={{ fontSize: "18px", color: "#999" }}>/month</span>
@@ -52,7 +54,7 @@ export const FreePlan = () => {
             <span
               style={{
                 fontSize: "20px",
-                color: feature.muted ? "#CCC" : "#16A34A",
+                color: "#16A34A",
               }}
             >
               {feature.icon}
@@ -60,8 +62,8 @@ export const FreePlan = () => {
             <span
               style={{
                 fontSize: "16px",
-                color: feature.muted ? "#BBB" : "#666",
               }}
+              className="text-[#666] dark:text-[#999]"
             >
               {feature.text}
             </span>
