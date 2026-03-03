@@ -42,9 +42,8 @@ export const FreePlan = () => {
         }}
       >
         {[
-          { icon: "⚡", text: "3 RPM" },
+          { icon: "⚡", text: "5 RPM" },
           { icon: "🔌", text: "Access to full REST API" },
-          { icon: "🔄", text: "Upgrade, downgrade, cancel anytime" },
         ].map((feature, index) => (
           <div
             key={index}

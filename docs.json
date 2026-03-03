@@ -47,7 +47,10 @@
           },
           {
             "group": "Legal",
-            "pages": ["terms-of-service", "privacy-policy"]
+            "pages": [
+              "terms-of-service",
+              "privacy-policy"
+            ]
           }
         ]
       },
@@ -56,7 +59,9 @@
         "groups": [
           {
             "group": "Best Practices",
-            "pages": ["tutorials/copy-lp-best-practices"]
+            "pages": [
+              "tutorials/copy-lp-best-practices"
+            ]
           }
         ]
       },
@@ -65,17 +70,21 @@
         "groups": [
           {
             "group": "API",
-            "pages": ["api-reference/introduction"]
+            "pages": [
+              "api-reference/introduction"
+            ]
           }
         ],
         "openapi": "api-reference/openapi.json"
       },
       {
-        "tab": "API Key Dashboard",
+        "tab": "API Portal",
         "groups": [
           {
-            "group": "API Key Dashboard",
-            "pages": ["api-key-dashboard/dashboard"]
+            "group": "API Portal",
+            "pages": [
+              "api-key-dashboard/dashboard"
+            ]
           }
         ]
       }
@@ -90,6 +99,10 @@
       {
         "label": "Support",
         "href": "https://discord.gg/h8YDHtzmRU"
+      },
+      {
+        "label": "API Portal",
+        "href": "/api-key-dashboard/dashboard"
       }
     ],
     "primary": {
