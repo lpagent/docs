@@ -40,7 +40,7 @@ export const PremiumPlan = () => {
       </h2>
 
       <p style={{ fontSize: "16px", color: "#888", margin: "0 0 24px 0" }}>
-        For regular boating enthusiasts
+        Scale your volume access
       </p>
 
       <div style={{ marginBottom: "32px" }}>
@@ -59,10 +59,9 @@ export const PremiumPlan = () => {
         }}
       >
         {[
-          { icon: "👥", text: "8 bookings per month" },
-          { icon: "📅", text: "Book up to 14 days in advance" },
-          { icon: "⭐", text: "Priority booking" },
-          { icon: "🚤", text: "Access to premium fleet" },
+          { icon: "⚡", text: "6 RPM" },
+          { icon: "🔌", text: "Access to full REST API" },
+          { icon: "🔄", text: "Upgrade, downgrade, cancel anytime" },
         ].map((feature, index) => (
           <div
             key={index}
@@ -98,10 +97,11 @@ export const PremiumPlan = () => {
           e.currentTarget.style.backgroundColor = "#16A34A";
         }}
         onClick={() =>
-          window.open(
-            "https://sandbox-api.polar.sh/v1/checkout-links/polar_cl_BujkWNZXUiFwdVVn9WprfojL2w8mK0YQx7eew4Ma9GX/redirect",
-            "_blank",
-          )
+          // window.open(
+          //   "https://sandbox-api.polar.sh/v1/checkout-links/polar_cl_BujkWNZXUiFwdVVn9WprfojL2w8mK0YQx7eew4Ma9GX/redirect",
+          //   "_blank",
+          // )
+          console.log("Premium plan selected")
         }
       >
         Select Premium

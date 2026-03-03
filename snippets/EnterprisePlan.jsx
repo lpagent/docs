@@ -1,4 +1,4 @@
-export const ElitePlan = () => {
+export const EnterprisePlan = () => {
   return (
     <div
       style={{
@@ -19,11 +19,11 @@ export const ElitePlan = () => {
           color: "#1a1a1a",
         }}
       >
-        Elite
+        Enterprise
       </h2>
 
       <p style={{ fontSize: "16px", color: "#999", margin: "0 0 24px 0" }}>
-        The ultimate boating experience
+        High volume access
       </p>
 
       <div style={{ marginBottom: "32px" }}>
@@ -42,10 +42,9 @@ export const ElitePlan = () => {
         }}
       >
         {[
-          { icon: "👥", text: "Unlimited bookings" },
-          { icon: "📅", text: "Book up to 30 days in advance" },
-          { icon: "⭐", text: "VIP events and perks" },
-          { icon: "🚤", text: "Access to entire fleet" },
+          { icon: "⚡", text: "9 RPM" },
+          { icon: "🔌", text: "Access to full REST API" },
+          { icon: "🔄", text: "Upgrade, downgrade, cancel anytime" },
         ].map((feature, index) => (
           <div
             key={index}
@@ -91,13 +90,14 @@ export const ElitePlan = () => {
           e.currentTarget.style.backgroundColor = "#16A34A";
         }}
         onClick={() =>
-          window.open(
-            "https://sandbox-api.polar.sh/v1/checkout-links/polar_cl_1KmlltqPeSiQxRMgO3ywgnGlzaDmnQldwvEnP3lBkQ7/redirect",
-            "_blank",
-          )
+          // window.open(
+          //   "https://sandbox-api.polar.sh/v1/checkout-links/polar_cl_1KmlltqPeSiQxRMgO3ywgnGlzaDmnQldwvEnP3lBkQ7/redirect",
+          //   "_blank",
+          // )
+          console.log("Enterprise plan selected")
         }
       >
-        Select Elite
+        Select Enterprise
       </button>
     </div>
   );

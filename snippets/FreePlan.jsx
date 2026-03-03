@@ -1,4 +1,4 @@
-export const StandardPlan = () => {
+export const FreePlan = () => {
   return (
     <div
       style={{
@@ -19,11 +19,11 @@ export const StandardPlan = () => {
           color: "#1a1a1a",
         }}
       >
-        Standard
+        Free
       </h2>
 
       <p style={{ fontSize: "16px", color: "#999", margin: "0 0 24px 0" }}>
-        Perfect for occasional boaters
+        Limit volume access
       </p>
 
       <div style={{ marginBottom: "32px" }}>
@@ -42,10 +42,9 @@ export const StandardPlan = () => {
         }}
       >
         {[
-          { icon: "👥", text: "4 bookings per month", muted: false },
-          { icon: "📅", text: "Book up to 7 days in advance", muted: false },
-          { icon: "⭐", text: "No priority booking", muted: true },
-          { icon: "🚤", text: "Access to standard fleet", muted: false },
+          { icon: "⚡", text: "3 RPM" },
+          { icon: "🔌", text: "Access to full REST API" },
+          { icon: "🔄", text: "Upgrade, downgrade, cancel anytime" },
         ].map((feature, index) => (
           <div
             key={index}
@@ -91,10 +90,11 @@ export const StandardPlan = () => {
           e.currentTarget.style.backgroundColor = "#16A34A";
         }}
         onClick={() =>
-          window.open(
-            "https://sandbox-api.polar.sh/v1/checkout-links/polar_cl_SSnD8UpTJLaSkA3iAQe0BFAXUiEh3Sz5coHDo2OdAk4/redirect",
-            "_blank",
-          )
+          // window.open(
+          //   "https://sandbox-api.polar.sh/v1/checkout-links/polar_cl_SSnD8UpTJLaSkA3iAQe0BFAXUiEh3Sz5coHDo2OdAk4/redirect",
+          //   "_blank",
+          // )
+          console.log("Free plan selected")
         }
       >
         Select Standard
