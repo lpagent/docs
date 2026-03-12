@@ -26,7 +26,7 @@ export const EnterprisePlan = () => {
       </p>
 
       <div style={{ marginBottom: "32px" }}>
-        <span 
+        <span
           style={{ fontSize: "48px", fontWeight: "700" }}
           className="text-[#1a1a1a] dark:text-white"
         >
@@ -83,8 +83,6 @@ export const EnterprisePlan = () => {
           border: "none",
           cursor: "pointer",
           transition: "all 0.2s ease",
-          opacity: 0.5,
-          cursor: "not-allowed",
         }}
         disabled={true}
         onMouseEnter={(e) => {
@@ -93,13 +91,7 @@ export const EnterprisePlan = () => {
         onMouseLeave={(e) => {
           e.currentTarget.style.backgroundColor = "#16A34A";
         }}
-        onClick={() =>
-          // window.open(
-          //   "https://sandbox-api.polar.sh/v1/checkout-links/polar_cl_1KmlltqPeSiQxRMgO3ywgnGlzaDmnQldwvEnP3lBkQ7/redirect",
-          //   "_blank",
-          // )
-          console.log("Enterprise plan selected")
-        }
+        onClick={() => window.open("https://portal.lpagent.io/", "_blank")}
       >
         Select Enterprise
       </button>
