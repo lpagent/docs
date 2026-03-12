@@ -15,7 +15,6 @@ export const BtnLogin = () => {
         transition: "all 0.2s ease",
         width: "max-content",
       }}
-      disabled={true}
       onMouseEnter={(e) => {
         e.currentTarget.style.backgroundColor = "#f5f5f5";
         e.currentTarget.style.borderColor = "#d4d4d4";

@@ -84,7 +84,6 @@ export const EnterprisePlan = () => {
           cursor: "pointer",
           transition: "all 0.2s ease",
         }}
-        disabled={true}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = "#15803D";
         }}
