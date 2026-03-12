@@ -14,8 +14,6 @@ export const BtnLogin = () => {
         gap: "8px",
         transition: "all 0.2s ease",
         width: "max-content",
-        opacity: 0.5,
-        cursor: "not-allowed",
       }}
       disabled={true}
       onMouseEnter={(e) => {
@@ -26,13 +24,7 @@ export const BtnLogin = () => {
         e.currentTarget.style.backgroundColor = "transparent";
         e.currentTarget.style.borderColor = "#e5e5e5";
       }}
-      onClick={() =>
-        // window.open(
-        //   "https://sandbox.polar.sh/lp-agent/portal/request",
-        //   "_blank",
-        // )
-        console.log("Login clicked")
-      }
+      onClick={() => window.open("https://portal.lpagent.io/", "_blank")}
     >
       Manage your API Key
       <span style={{ fontSize: "20px" }}>→</span>
