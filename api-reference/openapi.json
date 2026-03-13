@@ -32,7 +32,7 @@
         "summary": "Get opening LP positions for an owner",
         "description": "Retrieves current liquidity pool positions that are open for a specific wallet owner",
         "tags": [
-          "positions"
+          "Positions"
         ],
         "parameters": [
           {
@@ -444,7 +444,7 @@
         "summary": "Get historical LP positions for an owner",
         "description": "Retrieves historical liquidity pool positions for a specific wallet owner",
         "tags": [
-          "positions"
+          "Positions"
         ],
         "parameters": [
           {
@@ -907,7 +907,7 @@
         "summary": "Get overview metrics for LP positions",
         "description": "Retrieves comprehensive overview and metrics for liquidity pool positions of a specific owner",
         "tags": [
-          "positions"
+          "Positions"
         ],
         "parameters": [
           {
@@ -1493,7 +1493,7 @@
         "summary": "Get logs for LP positions",
         "description": "Retrieves transaction logs for liquidity pool positions. Can fetch logs for a specific position or for all positions of an owner.",
         "tags": [
-          "positions"
+          "Positions"
         ],
         "parameters": [
           {
