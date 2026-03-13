@@ -3024,7 +3024,7 @@
         "summary": "Get LP positions revenue for an owner",
         "description": "Retrieve revenue and PnL data over time for a specific wallet owner. Only 7D and 1M ranges are available.",
         "tags": [
-          "positions"
+          "Positions"
         ],
         "parameters": [
           {
