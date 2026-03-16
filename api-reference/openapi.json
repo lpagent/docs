@@ -3594,6 +3594,104 @@
           }
         }
       }
+    },
+    "/position/landing-decrease-tx": {
+      "post": {
+        "summary": "Zap-Out — Submit and land zap-out transactions",
+        "description": "Submit signed zap-out (decrease position) transactions via Jito bundles for on-chain execution. Provides better landing rate than direct RPC submission.",
+        "tags": [
+          "Position"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "lastValidBlockHeight",
+                  "closeTxsWithJito"
+                ],
+                "properties": {
+                  "lastValidBlockHeight": {
+                    "type": "integer",
+                    "description": "Last valid block height for the transactions"
+                  },
+                  "closeTxs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Close position transactions (base64)",
+                    "default": []
+                  },
+                  "swapTxs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Swap transactions (base64)",
+                    "default": []
+                  },
+                  "closeTxsWithJito": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Close position transactions with Jito tips (base64)"
+                  },
+                  "swapTxsWithJito": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Swap transactions with Jito tips (base64)",
+                    "default": []
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully submitted and landed transactions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "method": {
+                          "type": "string",
+                          "enum": [
+                            "JITO"
+                          ]
+                        },
+                        "signature": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters or transaction execution failed"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
     }
   },
   "tags": []

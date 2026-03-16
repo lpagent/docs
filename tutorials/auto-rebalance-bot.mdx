@@ -41,17 +41,13 @@ npm install @solana/web3.js bs58
 ## Complete Bot Script
 
 ```typescript
-import {
-  Keypair, Connection, Transaction, VersionedTransaction,
-  sendAndConfirmRawTransaction,
-} from "@solana/web3.js";
+import { Keypair, Transaction, VersionedTransaction } from "@solana/web3.js";
 import bs58 from "bs58";
 
 // ===================== CONFIG =====================
 const CONFIG = {
   API_BASE: "https://api.lpagent.io/open-api/v1",
   API_KEY: "your-api-key-here",
-  RPC_URL: "https://api.mainnet-beta.solana.com",
   PRIVATE_KEY: "your-base58-private-key",
 
   // Bot settings
@@ -67,7 +63,6 @@ const CONFIG = {
 
 const wallet = Keypair.fromSecretKey(bs58.decode(CONFIG.PRIVATE_KEY));
 const OWNER = wallet.publicKey.toBase58();
-const connection = new Connection(CONFIG.RPC_URL, "confirmed");
 
 // ===================== HELPERS =====================
 async function apiCall(method: string, path: string, body?: object) {
@@ -96,12 +91,6 @@ function signTx(base64Tx: string): string {
   }
 }
 
-async function sendTx(base64Tx: string): Promise<string> {
-  return sendAndConfirmRawTransaction(connection, Buffer.from(base64Tx, "base64"), {
-    skipPreflight: true,
-  });
-}
-
 function log(msg: string) {
   console.log(`[${new Date().toISOString()}] ${msg}`);
 }
@@ -125,16 +114,17 @@ async function zapOut(positionId: string, bps: number = 10000): Promise<void> {
   const signedCloseTxs = decreaseTx.data.closeTxsWithJito.map(signTx);
   const signedSwapTxs = decreaseTx.data.swapTxsWithJito.map(signTx);
 
-  for (const tx of signedCloseTxs) {
-    const sig = await sendTx(tx);
-    log(`  Close tx confirmed: ${sig}`);
-  }
-  for (const tx of signedSwapTxs) {
-    const sig = await sendTx(tx);
-    log(`  Swap tx confirmed: ${sig}`);
-  }
+  // Land via LP Agent's Jito integration (better landing rate than direct RPC — free!)
+  const result = await apiCall("POST", "/position/landing-decrease-tx", {
+    lastValidBlockHeight: decreaseTx.data.lastValidBlockHeight,
+    closeTxs: [],
+    swapTxs: [],
+    closeTxsWithJito: signedCloseTxs,
+    swapTxsWithJito: signedSwapTxs,
+  });
 
-  log("  Zap-Out complete");
+  log(`  Zap-Out complete: ${result.data?.signature || "success"}`);
+
 }
 
 // ===================== ZAP-IN =====================
@@ -304,7 +294,7 @@ Position out of range detected
     │
     ├─ 1. Zap-Out: POST /position/decrease-tx
     │     Sign close transactions
-    │     Submit via RPC
+    │     Land via POST /position/landing-decrease-tx
     │
     ├─ 2. Calculate reinvestment amount
     │     Check SOL balance via GET /token/balance
@@ -422,6 +412,7 @@ const CONFIG = {
 | `GET /token/balance` | Check SOL balance for reinvestment |
 | `GET /pools/{poolId}/info` | Get active bin for new position range |
 | `POST /position/decrease-tx` | Generate zap-out transactions |
+| `POST /position/landing-decrease-tx` | Land zap-out transactions via Jito |
 | `POST /pools/{poolId}/add-tx` | Generate zap-in transactions |
 | `POST /pools/landing-add-tx` | Land zap-in transactions via Jito |
 
