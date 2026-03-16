@@ -56,7 +56,7 @@
         "groups": [
           {
             "group": "API Tutorials",
-            "pages": ["tutorials/add-liquidity-api"]
+            "pages": ["tutorials/add-liquidity-api", "tutorials/auto-rebalance-bot"]
           },
           {
             "group": "Best Practices",
