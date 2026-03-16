@@ -3162,6 +3162,438 @@
           }
         }
       }
+    },
+    "/pools/{poolId}/add-tx": {
+      "post": {
+        "summary": "Generate add liquidity transaction for a DLMM pool",
+        "description": "Generate serialized transactions to add liquidity to a DLMM pool based on strategy and parameters. Returns both normal transactions and Jito bundle transactions.",
+        "tags": [
+          "Pools"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "poolId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The pool address"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "stratergy",
+                  "owner"
+                ],
+                "properties": {
+                  "stratergy": {
+                    "type": "string",
+                    "enum": [
+                      "Spot",
+                      "Curve",
+                      "BidAsk"
+                    ],
+                    "description": "The distribution strategy to use"
+                  },
+                  "inputSOL": {
+                    "type": "number",
+                    "description": "Amount of SOL to input"
+                  },
+                  "percentX": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "Percentage of capital to allocate to token X (0-1)"
+                  },
+                  "fromBinId": {
+                    "type": "integer",
+                    "description": "Starting bin ID for liquidity distribution"
+                  },
+                  "toBinId": {
+                    "type": "integer",
+                    "description": "Ending bin ID for liquidity distribution"
+                  },
+                  "amountX": {
+                    "type": "number",
+                    "description": "Specific amount of token X (alternative to percentX)"
+                  },
+                  "amountY": {
+                    "type": "number",
+                    "description": "Specific amount of token Y (required with amountX)"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "description": "Owner wallet address"
+                  },
+                  "slippage_bps": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10000,
+                    "default": 500,
+                    "description": "Slippage tolerance in basis points (e.g., 500 = 5%)"
+                  },
+                  "provider": {
+                    "type": "string",
+                    "enum": [
+                      "OKX",
+                      "JUPITER_ULTRA"
+                    ],
+                    "default": "JUPITER_ULTRA",
+                    "description": "Swap provider to use for token swaps"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "normal",
+                      "zap-in"
+                    ],
+                    "default": "zap-in",
+                    "description": "Add liquidity mode"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully generated add liquidity transactions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "lastValidBlockHeight": {
+                          "type": "number"
+                        },
+                        "swapTxsWithJito": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "addLiquidityTxsWithJito": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "meta": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters provided"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/pools/landing-add-tx": {
+      "post": {
+        "summary": "Submit and land add liquidity transactions",
+        "description": "Submit add liquidity transactions via Jito bundles",
+        "tags": [
+          "Pools"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "lastValidBlockHeight",
+                  "addLiquidityTxsWithJito"
+                ],
+                "properties": {
+                  "lastValidBlockHeight": {
+                    "type": "integer",
+                    "description": "Last valid block height for the transactions"
+                  },
+                  "swapTxsWithJito": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Serialized swap transactions with Jito tips (base64)",
+                    "default": []
+                  },
+                  "addLiquidityTxsWithJito": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Serialized add liquidity transactions with Jito tips (base64)"
+                  },
+                  "meta": {
+                    "type": "object",
+                    "description": "Optional metadata"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully submitted and landed transactions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "method": {
+                          "type": "string",
+                          "enum": [
+                            "JITO"
+                          ]
+                        },
+                        "signature": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters provided"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/position/decrease-quotes": {
+      "post": {
+        "summary": "Get quotes for decreasing a position",
+        "description": "Returns quotes for converting position tokens to different combinations (token0 to token1, token1 to token0, etc.)",
+        "tags": [
+          "Position"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "bps"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "The encrypted position ID"
+                  },
+                  "bps": {
+                    "type": "integer",
+                    "description": "The percentage of position to close in basis points (0-10000)",
+                    "minimum": 0,
+                    "maximum": 10000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Quotes for different token combinations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success",
+                        "error"
+                      ]
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/position/decrease-tx": {
+      "post": {
+        "summary": "Create decrease position transaction",
+        "description": "Prepares decrease position transactions for both RPC and Jito submission methods",
+        "tags": [
+          "Position"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "position_id",
+                  "bps",
+                  "owner",
+                  "slippage_bps"
+                ],
+                "properties": {
+                  "position_id": {
+                    "type": "string",
+                    "description": "The position ID"
+                  },
+                  "bps": {
+                    "type": "integer",
+                    "description": "Basis points for the amount to decrease (0-10000)",
+                    "minimum": 0,
+                    "maximum": 10000
+                  },
+                  "owner": {
+                    "type": "string",
+                    "description": "The owner's wallet address"
+                  },
+                  "slippage_bps": {
+                    "type": "integer",
+                    "description": "Slippage tolerance in basis points (0-10000)",
+                    "minimum": 0,
+                    "maximum": 10000
+                  },
+                  "output": {
+                    "type": "string",
+                    "enum": [
+                      "allToken0",
+                      "allToken1",
+                      "both",
+                      "allBaseToken"
+                    ],
+                    "description": "The output token for the swap"
+                  },
+                  "provider": {
+                    "type": "string",
+                    "enum": [
+                      "OKX",
+                      "JUPITER_ULTRA"
+                    ],
+                    "description": "The swap provider to use"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "meteora",
+                      "meteora_damm_v2"
+                    ],
+                    "default": "meteora",
+                    "description": "The pool type"
+                  },
+                  "fromBinId": {
+                    "type": "number",
+                    "description": "Starting bin ID"
+                  },
+                  "toBinId": {
+                    "type": "number",
+                    "description": "Ending bin ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transaction data prepared successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "lastValidBlock": {
+                          "type": "number"
+                        },
+                        "closeTxs": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "swapTxs": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "closeTxsWithJito": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "swapTxsWithJito": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters or position-related errors"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
     }
   },
   "tags": []
