@@ -55,6 +55,10 @@
         "tab": "Tutorials",
         "groups": [
           {
+            "group": "API Tutorials",
+            "pages": ["tutorials/add-liquidity-api", "tutorials/auto-rebalance-bot"]
+          },
+          {
             "group": "Best Practices",
             "pages": ["tutorials/copy-lp-best-practices"]
           }

@@ -1,0 +1,452 @@
+---
+title: "Zap-In & Zap-Out via API"
+description: "End-to-end guide: add liquidity (zap-in) and withdraw liquidity (zap-out) using the LP Agent Open API"
+---
+
+## Overview
+
+This tutorial covers the full liquidity lifecycle using the LP Agent Open API:
+
+- **Zap-In** — Add liquidity to a Meteora pool (DLMM or DAMM V2)
+- **Zap-Out** — Withdraw liquidity from an existing position
+
+Both flows follow the same pattern: generate transactions → sign locally → submit on-chain.
+
+## Prerequisites
+
+- An LP Agent API key (get one from the [API Dashboard](https://app.lpagent.io/open-api))
+- A Solana wallet keypair
+- Node.js >= 18 and the following packages:
+
+```bash
+npm install @solana/web3.js bs58
+```
+
+## Setup
+
+```typescript
+import {
+  Keypair,
+  Connection,
+  Transaction,
+  VersionedTransaction,
+  sendAndConfirmRawTransaction,
+} from "@solana/web3.js";
+import bs58 from "bs58";
+
+const API_BASE = "https://api.lpagent.io/open-api/v1";
+const API_KEY = "your-api-key-here";
+const RPC_URL = "https://api.mainnet-beta.solana.com";
+
+// Load your wallet keypair
+const wallet = Keypair.fromSecretKey(bs58.decode("your-base58-private-key"));
+const OWNER = wallet.publicKey.toBase58();
+const connection = new Connection(RPC_URL, "confirmed");
+
+// Helper for API calls
+async function apiCall(method: string, path: string, body?: object) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(`API error: ${JSON.stringify(error)}`);
+  }
+
+  return res.json();
+}
+
+// Sign a base64-encoded transaction
+function signTransaction(base64Tx: string): string {
+  const buffer = Buffer.from(base64Tx, "base64");
+
+  try {
+    const tx = VersionedTransaction.deserialize(buffer);
+    tx.sign([wallet]);
+    return Buffer.from(tx.serialize()).toString("base64");
+  } catch {
+    const tx = Transaction.from(buffer);
+    tx.partialSign(wallet);
+    return tx
+      .serialize({ requireAllSignatures: false, verifySignatures: false })
+      .toString("base64");
+  }
+}
+
+// Send a signed base64 transaction via RPC
+async function sendTransaction(base64Tx: string): Promise<string> {
+  const buffer = Buffer.from(base64Tx, "base64");
+  const signature = await sendAndConfirmRawTransaction(connection, buffer, {
+    skipPreflight: true,
+  });
+  return signature;
+}
+```
+
+---
+
+## Part 1: Zap-In (Add Liquidity)
+
+### Step 1: Discover a Pool
+
+```typescript
+const discoverRes = await apiCall("GET",
+  "/pools/discover?" + new URLSearchParams({
+    chain: "SOL",
+    sortBy: "vol_24h",
+    sortOrder: "desc",
+    pageSize: "5",
+    min_market_cap: "5",       // min $5M market cap
+    min_liquidity: "50",       // min $50K TVL
+  }).toString()
+);
+
+const pool = discoverRes.data[0];
+console.log(`Pool: ${pool.token0_symbol}/${pool.token1_symbol} (${pool.pool})`);
+console.log(`Protocol: ${pool.protocol}`); // "meteora" or "meteora_damm_v2"
+```
+
+### Step 2: Get Pool Info
+
+Fetch the active bin to decide your liquidity range.
+
+```typescript
+const poolInfoRes = await apiCall("GET", `/pools/${pool.pool}/info`);
+const activeBin = poolInfoRes.data.liquidityViz?.activeBin;
+
+const RANGE = 34;
+const fromBinId = activeBin.binId - RANGE;
+const toBinId = activeBin.binId + RANGE;
+console.log(`Active bin: ${activeBin.binId}, range: ${fromBinId}-${toBinId}`);
+```
+
+### Step 3: Generate Zap-In Transactions
+
+Provide SOL and the API auto-swaps to the correct token ratio:
+
+```typescript
+const addTxRes = await apiCall("POST", `/pools/${pool.pool}/add-tx`, {
+  stratergy: "Spot",           // "Spot" | "Curve" | "BidAsk"
+  inputSOL: 0.1,               // Amount of SOL to deposit
+  percentX: 0.5,               // 50% allocation to token X
+  fromBinId,
+  toBinId,
+  owner: OWNER,
+  slippage_bps: 500,           // 5% slippage
+  mode: "zap-in",
+});
+
+console.log(`Position: ${addTxRes.data.meta.positionPubKey}`);
+```
+
+<Note>
+You can also use `mode: "normal"` with `amountX` and `amountY` if you already hold both tokens.
+</Note>
+
+### Step 4: Sign and Land
+
+```typescript
+const { lastValidBlockHeight, swapTxsWithJito, addLiquidityTxsWithJito, meta } = addTxRes.data;
+
+// Sign all transactions
+const signedSwapTxs = swapTxsWithJito.map(signTransaction);
+const signedAddTxs = addLiquidityTxsWithJito.map(signTransaction);
+
+// Land via Jito bundles
+const landRes = await apiCall("POST", "/pools/landing-add-tx", {
+  lastValidBlockHeight,
+  swapTxsWithJito: signedSwapTxs,
+  addLiquidityTxsWithJito: signedAddTxs,
+  meta,
+});
+
+console.log(`Zap-In Success! Tx: https://solscan.io/tx/${landRes.data.signature}`);
+```
+
+---
+
+## Part 2: Zap-Out (Withdraw Liquidity)
+
+### Step 1: Get Your Open Positions
+
+```typescript
+const positionsRes = await apiCall("GET",
+  `/lp-positions/opening?owner=${OWNER}`
+);
+
+const positions = positionsRes.data;
+console.log(`Found ${positionsRes.count} open positions`);
+
+// Display positions
+for (const pos of positions) {
+  console.log(`- ${pos.pairName} | Value: $${pos.currentValue} | PnL: ${pos.pnl.percent.toFixed(2)}% | In Range: ${pos.inRange}`);
+}
+```
+
+**Response shape:**
+
+```json
+{
+  "status": "success",
+  "count": 3,
+  "data": [
+    {
+      "id": "encrypted-position-id",
+      "pairName": "SOL/USDC",
+      "pool": "PoolAddressBase58",
+      "currentValue": "150.50",
+      "inRange": true,
+      "pnl": { "value": 5.2, "percent": 3.5 },
+      "token0Info": { "token_symbol": "SOL" },
+      "token1Info": { "token_symbol": "USDC" }
+    }
+  ]
+}
+```
+
+### Step 2: Get Zap-Out Quotes
+
+Before withdrawing, check the quotes to see how much you'll receive:
+
+```typescript
+const positionId = positions[0].id; // encrypted position ID
+
+const quotesRes = await apiCall("POST", "/position/decrease-quotes", {
+  id: positionId,
+  bps: 10000,    // 10000 = 100% (full withdrawal), 5000 = 50%, etc.
+});
+
+const quotes = quotesRes.data;
+console.log("Swap options:");
+console.log(`  All to Token0: ${quotes.token0ToToken1.success ? "available" : "N/A"}`);
+console.log(`  All to Token1: ${quotes.token1ToToken0.success ? "available" : "N/A"}`);
+console.log(`  Both tokens:   always available`);
+console.log(`Token prices: ${quotes.price.token0} / ${quotes.price.token1}`);
+```
+
+### Step 3: Generate Zap-Out Transactions
+
+```typescript
+const decreaseTxRes = await apiCall("POST", "/position/decrease-tx", {
+  position_id: positionId,
+  bps: 10000,                  // 100% withdrawal
+  owner: OWNER,
+  slippage_bps: 500,           // 5% slippage
+  output: "both",              // "allToken0" | "allToken1" | "both" | "allBaseToken"
+  provider: "JUPITER_ULTRA",
+});
+
+const txData = decreaseTxRes.data;
+console.log(`Generated ${txData.closeTxsWithJito.length} close txs`);
+```
+
+**Output options:**
+
+| Output | Description |
+|--------|-------------|
+| `both` | Receive both tokens as-is (no swap) |
+| `allToken0` | Swap all to token X |
+| `allToken1` | Swap all to token Y |
+| `allBaseToken` | Swap all to SOL |
+
+### Step 4: Sign and Submit
+
+Sign the transactions and submit them via RPC:
+
+```typescript
+// Sign close transactions
+const signedCloseTxs = txData.closeTxsWithJito.map(signTransaction);
+
+// Sign swap transactions (if output is not "both")
+const signedSwapTxs = txData.swapTxsWithJito.map(signTransaction);
+
+// Submit close transactions first, then swaps
+for (const tx of signedCloseTxs) {
+  const sig = await sendTransaction(tx);
+  console.log(`Close tx: https://solscan.io/tx/${sig}`);
+}
+
+for (const tx of signedSwapTxs) {
+  const sig = await sendTransaction(tx);
+  console.log(`Swap tx: https://solscan.io/tx/${sig}`);
+}
+
+console.log("Zap-Out complete!");
+```
+
+---
+
+## Complete Example
+
+Here's the full zap-in + zap-out flow in a single script:
+
+```typescript
+import {
+  Keypair, Connection, Transaction, VersionedTransaction,
+  sendAndConfirmRawTransaction,
+} from "@solana/web3.js";
+import bs58 from "bs58";
+
+const API_BASE = "https://api.lpagent.io/open-api/v1";
+const API_KEY = "your-api-key-here";
+const RPC_URL = "https://api.mainnet-beta.solana.com";
+const wallet = Keypair.fromSecretKey(bs58.decode("your-base58-private-key"));
+const OWNER = wallet.publicKey.toBase58();
+const connection = new Connection(RPC_URL, "confirmed");
+
+async function apiCall(method: string, path: string, body?: object) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: { "Content-Type": "application/json", "x-api-key": API_KEY },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) throw new Error(`API error: ${await res.text()}`);
+  return res.json();
+}
+
+function signTx(base64Tx: string): string {
+  const buffer = Buffer.from(base64Tx, "base64");
+  try {
+    const tx = VersionedTransaction.deserialize(buffer);
+    tx.sign([wallet]);
+    return Buffer.from(tx.serialize()).toString("base64");
+  } catch {
+    const tx = Transaction.from(buffer);
+    tx.partialSign(wallet);
+    return tx.serialize({ requireAllSignatures: false, verifySignatures: false }).toString("base64");
+  }
+}
+
+async function sendTx(base64Tx: string): Promise<string> {
+  return sendAndConfirmRawTransaction(connection, Buffer.from(base64Tx, "base64"), {
+    skipPreflight: true,
+  });
+}
+
+// ===================== ZAP-IN =====================
+async function zapIn(poolAddress: string, amountSOL: number) {
+  // Get pool info for active bin
+  const info = await apiCall("GET", `/pools/${poolAddress}/info`);
+  const activeBin = info.data.liquidityViz?.activeBin;
+  const fromBinId = activeBin.binId - 34;
+  const toBinId = activeBin.binId + 34;
+
+  // Generate zap-in transactions
+  const addTx = await apiCall("POST", `/pools/${poolAddress}/add-tx`, {
+    stratergy: "Spot",
+    inputSOL: amountSOL,
+    percentX: 0.5,
+    fromBinId,
+    toBinId,
+    owner: OWNER,
+    slippage_bps: 500,
+    mode: "zap-in",
+  });
+
+  // Sign and land
+  const signedSwapTxs = addTx.data.swapTxsWithJito.map(signTx);
+  const signedAddTxs = addTx.data.addLiquidityTxsWithJito.map(signTx);
+
+  const result = await apiCall("POST", "/pools/landing-add-tx", {
+    lastValidBlockHeight: addTx.data.lastValidBlockHeight,
+    swapTxsWithJito: signedSwapTxs,
+    addLiquidityTxsWithJito: signedAddTxs,
+    meta: addTx.data.meta,
+  });
+
+  console.log(`Zap-In done: https://solscan.io/tx/${result.data.signature}`);
+  return addTx.data.meta.positionPubKey;
+}
+
+// ===================== ZAP-OUT =====================
+async function zapOut(positionId: string, bps: number = 10000) {
+  // Generate zap-out transactions
+  const decreaseTx = await apiCall("POST", "/position/decrease-tx", {
+    position_id: positionId,
+    bps,
+    owner: OWNER,
+    slippage_bps: 500,
+    output: "both",
+  });
+
+  // Sign and submit
+  const signedCloseTxs = decreaseTx.data.closeTxsWithJito.map(signTx);
+  const signedSwapTxs = decreaseTx.data.swapTxsWithJito.map(signTx);
+
+  for (const tx of signedCloseTxs) {
+    const sig = await sendTx(tx);
+    console.log(`Close tx: https://solscan.io/tx/${sig}`);
+  }
+  for (const tx of signedSwapTxs) {
+    const sig = await sendTx(tx);
+    console.log(`Swap tx: https://solscan.io/tx/${sig}`);
+  }
+
+  console.log("Zap-Out done!");
+}
+
+// ===================== MAIN =====================
+async function main() {
+  // Discover a pool
+  const discover = await apiCall("GET", "/pools/discover?" + new URLSearchParams({
+    chain: "SOL", sortBy: "vol_24h", sortOrder: "desc", pageSize: "1",
+  }));
+  const pool = discover.data[0];
+  console.log(`Pool: ${pool.token0_symbol}/${pool.token1_symbol}`);
+
+  // Zap-In: add 0.1 SOL of liquidity
+  const positionKey = await zapIn(pool.pool, 0.1);
+  console.log(`Position created: ${positionKey}`);
+
+  // Check position status
+  const positions = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}`);
+  const position = positions.data.find((p: any) => p.pool === pool.pool);
+  if (position) {
+    console.log(`Position value: $${position.currentValue}, PnL: ${position.pnl.percent}%`);
+
+    // Zap-Out: withdraw 100%
+    await zapOut(position.id, 10000);
+  }
+}
+
+main().catch(console.error);
+```
+
+---
+
+## Strategy Types
+
+| Strategy | Description |
+|----------|-------------|
+| `Spot` | Uniform distribution across all bins in the range. Best for stable pairs. |
+| `Curve` | Bell curve distribution concentrated around the active bin. Best for range-bound markets. |
+| `BidAsk` | Heavier allocation at the edges of the range. Best for volatile pairs where you expect mean reversion. |
+
+## Tips
+
+- **Bin range**: A wider range (more bins) means less impermanent loss risk but lower fee APR. Start with 30-70 bins on each side.
+- **Slippage**: Use 300-500 bps (3-5%) for most pairs. Increase for low-liquidity tokens.
+- **Zap-in mode**: Recommended for simplicity. Just provide SOL and the API handles swapping to the correct token ratio automatically.
+- **Transaction expiry**: Transactions expire after `lastValidBlockHeight`. Generate and land them promptly -- don't wait more than ~60 seconds.
+- **DAMM V2 pools**: Both zap-in and zap-out auto-detect pool types. The same flow works for DLMM and DAMM V2.
+- **Partial zap-out**: Use `bps` less than 10000 to withdraw only a portion (e.g., `5000` = 50%).
+
+## Error Handling
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `Token X price unavailable` | Price feed missing for one of the tokens | Try again later or use a different pool |
+| `Insufficient balance` | Not enough tokens in your wallet | Reduce `inputSOL` or `amountX`/`amountY` |
+| `Missing amount to ZapIn` | `inputSOL` not provided in zap-in mode | Add `inputSOL` to the request body |
+| Transaction expired | `lastValidBlockHeight` has passed | Re-generate and re-sign the transactions |
+
+## Next Steps
+
+- [Auto-Rebalancing Bot](/tutorials/auto-rebalance-bot) — Build a bot that monitors and rebalances positions automatically
+- Explore the full [API Reference](/api-reference/introduction) for all available endpoints

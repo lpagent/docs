@@ -1,0 +1,440 @@
+---
+title: "Auto-Rebalancing Bot"
+description: "Build a bot that monitors your LP positions and automatically rebalances when they go out of range"
+---
+
+## Overview
+
+This tutorial shows you how to build an auto-rebalancing bot that:
+
+1. **Monitors** your open LP positions on a regular interval
+2. **Detects** when a position goes out of range
+3. **Zap-Out** the old position (withdraw liquidity)
+4. **Zap-In** a new position centered around the current price
+
+The bot uses the LP Agent Open API for all operations -- no direct smart contract interaction needed.
+
+## How Rebalancing Works
+
+When the price moves outside your position's bin range, the position stops earning fees. A rebalance closes the old position and opens a new one centered around the current price.
+
+```
+Price moves out of range:
+  [-----old position-----]
+                              ^ current price
+
+After rebalance:
+                     [-----new position-----]
+                              ^ current price
+```
+
+## Prerequisites
+
+- An LP Agent API key
+- A Solana wallet with SOL for transaction fees
+- Node.js >= 18
+
+```bash
+npm install @solana/web3.js bs58
+```
+
+## Complete Bot Script
+
+```typescript
+import {
+  Keypair, Connection, Transaction, VersionedTransaction,
+  sendAndConfirmRawTransaction,
+} from "@solana/web3.js";
+import bs58 from "bs58";
+
+// ===================== CONFIG =====================
+const CONFIG = {
+  API_BASE: "https://api.lpagent.io/open-api/v1",
+  API_KEY: "your-api-key-here",
+  RPC_URL: "https://api.mainnet-beta.solana.com",
+  PRIVATE_KEY: "your-base58-private-key",
+
+  // Bot settings
+  CHECK_INTERVAL_MS: 60_000,      // Check every 60 seconds
+  SLIPPAGE_BPS: 500,              // 5% slippage tolerance
+  BIN_RANGE: 34,                  // Bins on each side of active bin
+  STRATEGY: "Spot" as const,      // "Spot" | "Curve" | "BidAsk"
+  ZAP_OUT_OUTPUT: "both" as const,
+
+  // Optional filters — only rebalance positions matching these
+  POOL_FILTER: undefined as string | undefined,  // specific pool address, or undefined for all
+};
+
+const wallet = Keypair.fromSecretKey(bs58.decode(CONFIG.PRIVATE_KEY));
+const OWNER = wallet.publicKey.toBase58();
+const connection = new Connection(CONFIG.RPC_URL, "confirmed");
+
+// ===================== HELPERS =====================
+async function apiCall(method: string, path: string, body?: object) {
+  const res = await fetch(`${CONFIG.API_BASE}${path}`, {
+    method,
+    headers: { "Content-Type": "application/json", "x-api-key": CONFIG.API_KEY },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`API ${method} ${path} failed: ${text}`);
+  }
+  return res.json();
+}
+
+function signTx(base64Tx: string): string {
+  const buffer = Buffer.from(base64Tx, "base64");
+  try {
+    const tx = VersionedTransaction.deserialize(buffer);
+    tx.sign([wallet]);
+    return Buffer.from(tx.serialize()).toString("base64");
+  } catch {
+    const tx = Transaction.from(buffer);
+    tx.partialSign(wallet);
+    return tx.serialize({ requireAllSignatures: false, verifySignatures: false }).toString("base64");
+  }
+}
+
+async function sendTx(base64Tx: string): Promise<string> {
+  return sendAndConfirmRawTransaction(connection, Buffer.from(base64Tx, "base64"), {
+    skipPreflight: true,
+  });
+}
+
+function log(msg: string) {
+  console.log(`[${new Date().toISOString()}] ${msg}`);
+}
+
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// ===================== ZAP-OUT =====================
+async function zapOut(positionId: string, bps: number = 10000): Promise<void> {
+  log(`  Zap-Out: withdrawing ${bps / 100}% of position...`);
+
+  const decreaseTx = await apiCall("POST", "/position/decrease-tx", {
+    position_id: positionId,
+    bps,
+    owner: OWNER,
+    slippage_bps: CONFIG.SLIPPAGE_BPS,
+    output: CONFIG.ZAP_OUT_OUTPUT,
+  });
+
+  const signedCloseTxs = decreaseTx.data.closeTxsWithJito.map(signTx);
+  const signedSwapTxs = decreaseTx.data.swapTxsWithJito.map(signTx);
+
+  for (const tx of signedCloseTxs) {
+    const sig = await sendTx(tx);
+    log(`  Close tx confirmed: ${sig}`);
+  }
+  for (const tx of signedSwapTxs) {
+    const sig = await sendTx(tx);
+    log(`  Swap tx confirmed: ${sig}`);
+  }
+
+  log("  Zap-Out complete");
+}
+
+// ===================== ZAP-IN =====================
+async function zapIn(poolAddress: string, amountSOL: number): Promise<string> {
+  log(`  Zap-In: adding ${amountSOL} SOL to pool ${poolAddress}...`);
+
+  // Get current active bin
+  const info = await apiCall("GET", `/pools/${poolAddress}/info`);
+  const activeBin = info.data.liquidityViz?.activeBin;
+
+  if (!activeBin) {
+    throw new Error("Could not get active bin for pool");
+  }
+
+  const fromBinId = activeBin.binId - CONFIG.BIN_RANGE;
+  const toBinId = activeBin.binId + CONFIG.BIN_RANGE;
+  log(`  New range: bin ${fromBinId} to ${toBinId} (active: ${activeBin.binId})`);
+
+  // Generate zap-in transactions
+  const addTx = await apiCall("POST", `/pools/${poolAddress}/add-tx`, {
+    stratergy: CONFIG.STRATEGY,
+    inputSOL: amountSOL,
+    percentX: 0.5,
+    fromBinId,
+    toBinId,
+    owner: OWNER,
+    slippage_bps: CONFIG.SLIPPAGE_BPS,
+    mode: "zap-in",
+  });
+
+  // Sign and land
+  const signedSwapTxs = addTx.data.swapTxsWithJito.map(signTx);
+  const signedAddTxs = addTx.data.addLiquidityTxsWithJito.map(signTx);
+
+  const result = await apiCall("POST", "/pools/landing-add-tx", {
+    lastValidBlockHeight: addTx.data.lastValidBlockHeight,
+    swapTxsWithJito: signedSwapTxs,
+    addLiquidityTxsWithJito: signedAddTxs,
+    meta: addTx.data.meta,
+  });
+
+  log(`  Zap-In complete: https://solscan.io/tx/${result.data.signature}`);
+  return addTx.data.meta.positionPubKey;
+}
+
+// ===================== REBALANCE LOGIC =====================
+async function checkAndRebalance() {
+  log("Checking positions...");
+
+  const positionsRes = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}`);
+  const positions = positionsRes.data;
+
+  if (!positions || positions.length === 0) {
+    log("No open positions found");
+    return;
+  }
+
+  log(`Found ${positions.length} open position(s)`);
+
+  for (const pos of positions) {
+    // Skip if pool filter is set and doesn't match
+    if (CONFIG.POOL_FILTER && pos.pool !== CONFIG.POOL_FILTER) {
+      continue;
+    }
+
+    const pair = pos.pairName || `${pos.token0Info?.token_symbol}/${pos.token1Info?.token_symbol}`;
+    const value = parseFloat(pos.currentValue) || 0;
+    const pnlPercent = pos.pnl?.percent || 0;
+
+    log(`Position: ${pair} | Value: $${value.toFixed(2)} | PnL: ${pnlPercent.toFixed(2)}% | In Range: ${pos.inRange}`);
+
+    if (pos.inRange) {
+      log("  Position is in range, skipping");
+      continue;
+    }
+
+    log("  Position is OUT OF RANGE — rebalancing...");
+
+    try {
+      // Step 1: Zap-Out (close the old position)
+      await zapOut(pos.id);
+
+      // Brief pause to let state settle
+      await sleep(2000);
+
+      // Step 2: Estimate how much SOL we recovered
+      // Fetch the SOL balance to use for the new position
+      const balanceRes = await apiCall("GET", `/token/balance?owner=${OWNER}`);
+      const solBalance = balanceRes.data?.find(
+        (t: any) => t.address === "So11111111111111111111111111111111111111112"
+      );
+
+      const availableSOL = solBalance ? parseFloat(solBalance.uiAmount) : 0;
+
+      // Keep some SOL for transaction fees, use the rest
+      const reserveSOL = 0.05;
+      const reinvestSOL = Math.max(0, value / (solBalance?.price || 150) * 0.95); // rough estimate
+      const zapInAmount = Math.min(reinvestSOL, availableSOL - reserveSOL);
+
+      if (zapInAmount <= 0.001) {
+        log("  Not enough SOL to re-enter position, skipping zap-in");
+        continue;
+      }
+
+      log(`  Re-entering with ${zapInAmount.toFixed(4)} SOL...`);
+
+      // Step 3: Zap-In (open new position)
+      const newPosition = await zapIn(pos.pool, zapInAmount);
+      log(`  Rebalance complete! New position: ${newPosition}`);
+    } catch (error: any) {
+      log(`  ERROR during rebalance: ${error.message}`);
+      // Continue to next position instead of crashing
+    }
+  }
+}
+
+// ===================== BOT LOOP =====================
+async function main() {
+  log("=== LP Agent Auto-Rebalance Bot ===");
+  log(`Owner: ${OWNER}`);
+  log(`Check interval: ${CONFIG.CHECK_INTERVAL_MS / 1000}s`);
+  log(`Bin range: +/- ${CONFIG.BIN_RANGE} bins`);
+  log(`Strategy: ${CONFIG.STRATEGY}`);
+  log(`Pool filter: ${CONFIG.POOL_FILTER || "all pools"}`);
+  log("");
+
+  while (true) {
+    try {
+      await checkAndRebalance();
+    } catch (error: any) {
+      log(`ERROR in check loop: ${error.message}`);
+    }
+
+    log(`Next check in ${CONFIG.CHECK_INTERVAL_MS / 1000}s...\n`);
+    await sleep(CONFIG.CHECK_INTERVAL_MS);
+  }
+}
+
+main().catch(console.error);
+```
+
+## Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `CHECK_INTERVAL_MS` | `60000` | How often to check positions (ms) |
+| `SLIPPAGE_BPS` | `500` | Slippage tolerance (500 = 5%) |
+| `BIN_RANGE` | `34` | Number of bins on each side of active bin |
+| `STRATEGY` | `Spot` | Distribution strategy: `Spot`, `Curve`, or `BidAsk` |
+| `ZAP_OUT_OUTPUT` | `both` | How to receive withdrawn tokens |
+| `POOL_FILTER` | `undefined` | Filter to a specific pool address |
+
+## How It Works
+
+### Check Loop
+
+Every `CHECK_INTERVAL_MS` milliseconds, the bot:
+
+1. Fetches all open positions via `GET /lp-positions/opening`
+2. For each position, checks the `inRange` field
+3. If out of range, triggers a rebalance
+
+### Rebalance Flow
+
+```
+Position out of range detected
+    │
+    ├─ 1. Zap-Out: POST /position/decrease-tx
+    │     Sign close transactions
+    │     Submit via RPC
+    │
+    ├─ 2. Calculate reinvestment amount
+    │     Check SOL balance via GET /token/balance
+    │     Reserve SOL for fees
+    │
+    └─ 3. Zap-In: POST /pools/{poolId}/add-tx
+          Sign transactions
+          Land via POST /pools/landing-add-tx
+```
+
+## Customization Ideas
+
+### Add a Stop-Loss
+
+Exit positions that have lost too much value instead of rebalancing:
+
+```typescript
+const STOP_LOSS_PERCENT = -15; // -15% PnL threshold
+
+if (pnlPercent < STOP_LOSS_PERCENT) {
+  log(`  PnL ${pnlPercent}% below stop-loss, closing without re-entry`);
+  await zapOut(pos.id);
+  continue; // skip zap-in
+}
+```
+
+### Add Notifications
+
+Send alerts to Discord or Telegram when a rebalance happens:
+
+```typescript
+async function notify(message: string) {
+  await fetch("https://discord.com/api/webhooks/YOUR_WEBHOOK", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content: message }),
+  });
+}
+
+// In the rebalance flow:
+await notify(`Rebalanced ${pair}: closed old position, opened new one at bins ${fromBinId}-${toBinId}`);
+```
+
+### Filter by Pool Type
+
+Only rebalance DLMM positions (skip DAMM V2):
+
+```typescript
+if (pos.protocol !== "meteora") {
+  log("  Skipping non-DLMM position");
+  continue;
+}
+```
+
+### Dynamic Bin Range
+
+Adjust the bin range based on the pool's volatility:
+
+```typescript
+// Wider range for volatile pools, tighter for stable
+const binStep = pos.poolInfo?.tickSpacing || 1;
+const dynamicRange = binStep > 5 ? 20 : 50;
+
+const fromBinId = activeBin.binId - dynamicRange;
+const toBinId = activeBin.binId + dynamicRange;
+```
+
+## Running in Production
+
+### With PM2
+
+```bash
+npm install -g pm2
+
+# Start the bot
+pm2 start bot.ts --name "lp-rebalance-bot" --interpreter ts-node
+
+# View logs
+pm2 logs lp-rebalance-bot
+
+# Restart / Stop
+pm2 restart lp-rebalance-bot
+pm2 stop lp-rebalance-bot
+```
+
+### With Docker
+
+```dockerfile
+FROM node:22-slim
+WORKDIR /app
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+COPY . .
+CMD ["npx", "ts-node", "bot.ts"]
+```
+
+### Environment Variables
+
+For production, load secrets from environment variables instead of hardcoding:
+
+```typescript
+const CONFIG = {
+  API_KEY: process.env.LP_AGENT_API_KEY!,
+  PRIVATE_KEY: process.env.SOLANA_PRIVATE_KEY!,
+  RPC_URL: process.env.RPC_URL || "https://api.mainnet-beta.solana.com",
+  // ...
+};
+```
+
+## API Endpoints Used
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /lp-positions/opening` | Fetch open positions and check if in range |
+| `GET /token/balance` | Check SOL balance for reinvestment |
+| `GET /pools/{poolId}/info` | Get active bin for new position range |
+| `POST /position/decrease-tx` | Generate zap-out transactions |
+| `POST /pools/{poolId}/add-tx` | Generate zap-in transactions |
+| `POST /pools/landing-add-tx` | Land zap-in transactions via Jito |
+
+## Tips
+
+- **Check interval**: 60s is a good starting point. Too frequent = unnecessary API calls. Too slow = missed fee earnings while out of range.
+- **Bin range**: Wider = fewer rebalances but lower APR. Tighter = more fees but more frequent rebalances (each costing gas).
+- **Gas costs**: Each rebalance costs ~0.01-0.03 SOL in transaction fees. Factor this into your profitability calculations.
+- **RPC choice**: Use a premium RPC (Helius, Triton, QuickNode) for better reliability in production.
+- **Error handling**: The bot continues to the next position on error. Check logs regularly for recurring issues.
+
+## Next Steps
+
+- [Zap-In & Zap-Out Tutorial](/tutorials/add-liquidity-api) — Understand the underlying API flows
+- [Copy LP Best Practices](/tutorials/copy-lp-best-practices) — Learn from top LPers
+- Explore the full [API Reference](/api-reference/introduction)
