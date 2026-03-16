@@ -3165,8 +3165,8 @@
     },
     "/pools/{poolId}/add-tx": {
       "post": {
-        "summary": "Generate add liquidity transaction for a DLMM pool",
-        "description": "Generate serialized transactions to add liquidity to a DLMM pool based on strategy and parameters. Returns both normal transactions and Jito bundle transactions.",
+        "summary": "Zap-In — Generate transaction to add liquidity to a pool",
+        "description": "Generate serialized zap-in transactions to add liquidity to a pool. Supports both DLMM and DAMM V2 pools (auto-detected by pool address). In zap-in mode, provide SOL and the API auto-swaps to the correct token ratio. Returns serialized transactions ready to be signed and landed.",
         "tags": [
           "Pools"
         ],
@@ -3263,7 +3263,7 @@
         },
         "responses": {
           "200": {
-            "description": "Successfully generated add liquidity transactions",
+            "description": "Successfully generated zap-in transactions",
             "content": {
               "application/json": {
                 "schema": {
@@ -3312,8 +3312,8 @@
     },
     "/pools/landing-add-tx": {
       "post": {
-        "summary": "Submit and land add liquidity transactions",
-        "description": "Submit add liquidity transactions via Jito bundles",
+        "summary": "Zap-In — Submit and land zap-in transactions",
+        "description": "Submit signed zap-in transactions via Jito bundles for on-chain execution",
         "tags": [
           "Pools"
         ],
@@ -3398,8 +3398,8 @@
     },
     "/position/decrease-quotes": {
       "post": {
-        "summary": "Get quotes for decreasing a position",
-        "description": "Returns quotes for converting position tokens to different combinations (token0 to token1, token1 to token0, etc.)",
+        "summary": "Zap-Out — Get quotes for withdrawing liquidity",
+        "description": "Returns quotes for converting position tokens to different output combinations (token0 to token1, token1 to token0, to base token, etc.) before executing a zap-out",
         "tags": [
           "Position"
         ],
@@ -3463,8 +3463,8 @@
     },
     "/position/decrease-tx": {
       "post": {
-        "summary": "Create decrease position transaction",
-        "description": "Prepares decrease position transactions for both RPC and Jito submission methods",
+        "summary": "Zap-Out — Generate transaction to withdraw liquidity",
+        "description": "Generates serialized zap-out transactions to withdraw liquidity from a position. Supports both Meteora DLMM and DAMM V2 positions.",
         "tags": [
           "Position"
         ],
