@@ -10,7 +10,11 @@ This tutorial covers the full liquidity lifecycle using the LP Agent Open API:
 - **Zap-In** — Add liquidity to a Meteora pool (DLMM or DAMM V2)
 - **Zap-Out** — Withdraw liquidity from an existing position
 
-Both flows follow the same pattern: generate transactions → sign locally → submit on-chain.
+Both flows follow the same pattern: generate transactions → sign locally → land via LP Agent's Jito integration.
+
+<Tip>
+LP Agent provides built-in transaction landing via Jito bundles for both zap-in and zap-out. This gives you a **significantly better landing rate** than submitting transactions directly via RPC — and it's free to use.
+</Tip>
 
 ## Prerequisites
 
@@ -25,23 +29,15 @@ npm install @solana/web3.js bs58
 ## Setup
 
 ```typescript
-import {
-  Keypair,
-  Connection,
-  Transaction,
-  VersionedTransaction,
-  sendAndConfirmRawTransaction,
-} from "@solana/web3.js";
+import { Keypair, Transaction, VersionedTransaction } from "@solana/web3.js";
 import bs58 from "bs58";
 
 const API_BASE = "https://api.lpagent.io/open-api/v1";
 const API_KEY = "your-api-key-here";
-const RPC_URL = "https://api.mainnet-beta.solana.com";
 
 // Load your wallet keypair
 const wallet = Keypair.fromSecretKey(bs58.decode("your-base58-private-key"));
 const OWNER = wallet.publicKey.toBase58();
-const connection = new Connection(RPC_URL, "confirmed");
 
 // Helper for API calls
 async function apiCall(method: string, path: string, body?: object) {
@@ -77,15 +73,6 @@ function signTransaction(base64Tx: string): string {
       .serialize({ requireAllSignatures: false, verifySignatures: false })
       .toString("base64");
   }
-}
-
-// Send a signed base64 transaction via RPC
-async function sendTransaction(base64Tx: string): Promise<string> {
-  const buffer = Buffer.from(base64Tx, "base64");
-  const signature = await sendAndConfirmRawTransaction(connection, buffer, {
-    skipPreflight: true,
-  });
-  return signature;
 }
 ```
 
@@ -158,7 +145,7 @@ const { lastValidBlockHeight, swapTxsWithJito, addLiquidityTxsWithJito, meta } =
 const signedSwapTxs = swapTxsWithJito.map(signTransaction);
 const signedAddTxs = addLiquidityTxsWithJito.map(signTransaction);
 
-// Land via Jito bundles
+// Land via LP Agent's Jito integration (better landing rate than direct RPC)
 const landRes = await apiCall("POST", "/pools/landing-add-tx", {
   lastValidBlockHeight,
   swapTxsWithJito: signedSwapTxs,
@@ -255,30 +242,33 @@ console.log(`Generated ${txData.closeTxsWithJito.length} close txs`);
 | `allToken1` | Swap all to token Y |
 | `allBaseToken` | Swap all to SOL |
 
-### Step 4: Sign and Submit
+### Step 4: Sign and Land
 
-Sign the transactions and submit them via RPC:
+Sign the transactions and land them via LP Agent's Jito integration:
 
 ```typescript
-// Sign close transactions
-const signedCloseTxs = txData.closeTxsWithJito.map(signTransaction);
+const { lastValidBlockHeight: zapOutBlockHeight, closeTxsWithJito, swapTxsWithJito } = txData;
 
-// Sign swap transactions (if output is not "both")
-const signedSwapTxs = txData.swapTxsWithJito.map(signTransaction);
+// Sign all transactions
+const signedCloseTxs = closeTxsWithJito.map(signTransaction);
+const signedSwapTxs = swapTxsWithJito.map(signTransaction);
 
-// Submit close transactions first, then swaps
-for (const tx of signedCloseTxs) {
-  const sig = await sendTransaction(tx);
-  console.log(`Close tx: https://solscan.io/tx/${sig}`);
-}
+// Land via LP Agent (better landing rate than direct RPC — free!)
+const landRes = await apiCall("POST", "/position/landing-decrease-tx", {
+  lastValidBlockHeight: zapOutBlockHeight,
+  closeTxs: [],
+  swapTxs: [],
+  closeTxsWithJito: signedCloseTxs,
+  swapTxsWithJito: signedSwapTxs,
+});
 
-for (const tx of signedSwapTxs) {
-  const sig = await sendTransaction(tx);
-  console.log(`Swap tx: https://solscan.io/tx/${sig}`);
-}
-
-console.log("Zap-Out complete!");
+console.log(`Zap-Out Success! Signature: ${landRes.data.signature}`);
+console.log(`View on Solscan: https://solscan.io/tx/${landRes.data.signature}`);
 ```
+
+<Tip>
+Always use the `landing-decrease-tx` endpoint instead of submitting transactions directly via RPC. LP Agent's Jito integration provides a **much better landing rate** and it's completely **free**.
+</Tip>
 
 ---
 
@@ -287,18 +277,13 @@ console.log("Zap-Out complete!");
 Here's the full zap-in + zap-out flow in a single script:
 
 ```typescript
-import {
-  Keypair, Connection, Transaction, VersionedTransaction,
-  sendAndConfirmRawTransaction,
-} from "@solana/web3.js";
+import { Keypair, Transaction, VersionedTransaction } from "@solana/web3.js";
 import bs58 from "bs58";
 
 const API_BASE = "https://api.lpagent.io/open-api/v1";
 const API_KEY = "your-api-key-here";
-const RPC_URL = "https://api.mainnet-beta.solana.com";
 const wallet = Keypair.fromSecretKey(bs58.decode("your-base58-private-key"));
 const OWNER = wallet.publicKey.toBase58();
-const connection = new Connection(RPC_URL, "confirmed");
 
 async function apiCall(method: string, path: string, body?: object) {
   const res = await fetch(`${API_BASE}${path}`, {
@@ -323,12 +308,6 @@ function signTx(base64Tx: string): string {
   }
 }
 
-async function sendTx(base64Tx: string): Promise<string> {
-  return sendAndConfirmRawTransaction(connection, Buffer.from(base64Tx, "base64"), {
-    skipPreflight: true,
-  });
-}
-
 // ===================== ZAP-IN =====================
 async function zapIn(poolAddress: string, amountSOL: number) {
   // Get pool info for active bin
@@ -349,7 +328,7 @@ async function zapIn(poolAddress: string, amountSOL: number) {
     mode: "zap-in",
   });
 
-  // Sign and land
+  // Sign and land via Jito
   const signedSwapTxs = addTx.data.swapTxsWithJito.map(signTx);
   const signedAddTxs = addTx.data.addLiquidityTxsWithJito.map(signTx);
 
@@ -375,20 +354,19 @@ async function zapOut(positionId: string, bps: number = 10000) {
     output: "both",
   });
 
-  // Sign and submit
+  // Sign and land via Jito
   const signedCloseTxs = decreaseTx.data.closeTxsWithJito.map(signTx);
   const signedSwapTxs = decreaseTx.data.swapTxsWithJito.map(signTx);
 
-  for (const tx of signedCloseTxs) {
-    const sig = await sendTx(tx);
-    console.log(`Close tx: https://solscan.io/tx/${sig}`);
-  }
-  for (const tx of signedSwapTxs) {
-    const sig = await sendTx(tx);
-    console.log(`Swap tx: https://solscan.io/tx/${sig}`);
-  }
+  const result = await apiCall("POST", "/position/landing-decrease-tx", {
+    lastValidBlockHeight: decreaseTx.data.lastValidBlockHeight,
+    closeTxs: [],
+    swapTxs: [],
+    closeTxsWithJito: signedCloseTxs,
+    swapTxsWithJito: signedSwapTxs,
+  });
 
-  console.log("Zap-Out done!");
+  console.log(`Zap-Out done: https://solscan.io/tx/${result.data.signature}`);
 }
 
 // ===================== MAIN =====================
@@ -433,6 +411,7 @@ main().catch(console.error);
 - **Bin range**: A wider range (more bins) means less impermanent loss risk but lower fee APR. Start with 30-70 bins on each side.
 - **Slippage**: Use 300-500 bps (3-5%) for most pairs. Increase for low-liquidity tokens.
 - **Zap-in mode**: Recommended for simplicity. Just provide SOL and the API handles swapping to the correct token ratio automatically.
+- **Transaction landing**: Always use LP Agent's landing endpoints (`landing-add-tx` and `landing-decrease-tx`) instead of submitting via RPC directly. They provide better landing rates via Jito bundles — for free.
 - **Transaction expiry**: Transactions expire after `lastValidBlockHeight`. Generate and land them promptly -- don't wait more than ~60 seconds.
 - **DAMM V2 pools**: Both zap-in and zap-out auto-detect pool types. The same flow works for DLMM and DAMM V2.
 - **Partial zap-out**: Use `bps` less than 10000 to withdraw only a portion (e.g., `5000` = 50%).
