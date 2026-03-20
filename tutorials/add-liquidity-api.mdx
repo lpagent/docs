@@ -3,30 +3,92 @@ title: "Zap-In & Zap-Out via API"
 description: "End-to-end guide: add liquidity (zap-in) and withdraw liquidity (zap-out) using the LP Agent Open API"
 ---
 
-## Overview
+## What You'll Build
 
-This tutorial covers the full liquidity lifecycle using the LP Agent Open API:
+By the end of this tutorial, you'll know how to programmatically:
 
-- **Zap-In** — Add liquidity to a Meteora pool (DLMM or DAMM V2)
-- **Zap-Out** — Withdraw liquidity from an existing position
+- **Zap-In** — Find a pool and add liquidity with a single token (SOL)
+- **Zap-Out** — Withdraw your liquidity back to your wallet
 
-Both flows follow the same pattern: generate transactions → sign locally → land via LP Agent's Jito integration.
+No smart contract knowledge required — LP Agent handles everything through simple REST APIs.
 
 <Tip>
 LP Agent provides built-in transaction landing via Jito bundles for both zap-in and zap-out. This gives you a **significantly better landing rate** than submitting transactions directly via RPC — and it's free to use.
 </Tip>
 
+---
+
+## How It Works
+
+### The Zap-In Flow
+
+Adding liquidity to a Meteora pool involves 4 steps:
+
+```
+1. DISCOVER       Find a pool that matches your criteria
+   GET /pools/discover
+        ↓
+2. GET POOL INFO   Get the current active bin (price) to set your range
+   GET /pools/{poolId}/info
+        ↓
+3. GENERATE TXS   API creates unsigned transactions for you
+   POST /pools/{poolId}/add-tx
+        ↓
+4. SIGN & LAND     Sign with your wallet, submit via Jito
+   POST /pools/landing-add-tx
+```
+
+**What is "zap-in"?** You provide just SOL, and the API automatically swaps it into the correct ratio of both tokens before adding liquidity. No need to manually buy tokens first.
+
+### The Zap-Out Flow
+
+Withdrawing liquidity follows a similar pattern:
+
+```
+1. GET POSITIONS   Find your open positions
+   GET /lp-positions/opening
+        ↓
+2. GET QUOTES      (Optional) Preview what you'll receive
+   POST /position/decrease-quotes
+        ↓
+3. GENERATE TXS   API creates unsigned withdrawal transactions
+   POST /position/decrease-tx
+        ↓
+4. SIGN & LAND     Sign with your wallet, submit via Jito
+   POST /position/landing-decrease-tx
+```
+
+### Understanding Key Concepts
+
+Before diving into code, here are the key concepts:
+
+| Concept | What It Means |
+|---------|---------------|
+| **Bin** | A price point in a Meteora DLMM pool. Liquidity is placed across a range of bins. |
+| **Active Bin** | The bin where the current price sits. Your position earns fees when the price is within your bin range. |
+| **Strategy** | How liquidity is distributed across bins — `Spot` (uniform), `Curve` (concentrated in middle), or `BidAsk` (concentrated at edges). |
+| **BPS** | Basis points. 10000 = 100%, 5000 = 50%, 500 = 5%. Used for slippage and withdrawal amounts. |
+| **Landing** | Submitting signed transactions on-chain. LP Agent uses Jito bundles for better success rates. |
+
+---
+
 ## Prerequisites
 
 - An LP Agent API key (get one from the [API Dashboard](https://app.lpagent.io/open-api))
 - A Solana wallet keypair
-- Node.js >= 18 and the following packages:
+- Node.js >= 18
 
 ```bash
 npm install @solana/web3.js bs58
 ```
 
-## Setup
+---
+
+## Step-by-Step: Zap-In
+
+### Step 1: Setup
+
+First, set up your API client and wallet:
 
 ```typescript
 import { Keypair, Transaction, VersionedTransaction } from "@solana/web3.js";
@@ -35,7 +97,6 @@ import bs58 from "bs58";
 const API_BASE = "https://api.lpagent.io/open-api/v1";
 const API_KEY = "your-api-key-here";
 
-// Load your wallet keypair
 const wallet = Keypair.fromSecretKey(bs58.decode("your-base58-private-key"));
 const OWNER = wallet.publicKey.toBase58();
 
@@ -58,7 +119,7 @@ async function apiCall(method: string, path: string, body?: object) {
   return res.json();
 }
 
-// Sign a base64-encoded transaction
+// Sign a base64-encoded transaction (handles both legacy and versioned)
 function signTransaction(base64Tx: string): string {
   const buffer = Buffer.from(base64Tx, "base64");
 
@@ -76,17 +137,15 @@ function signTransaction(base64Tx: string): string {
 }
 ```
 
----
+### Step 2: Discover a Pool
 
-## Part 1: Zap-In (Add Liquidity)
-
-### Step 1: Discover a Pool
+Browse available pools and filter by your criteria. The API returns pools sorted by your chosen metric.
 
 ```typescript
 const discoverRes = await apiCall("GET",
   "/pools/discover?" + new URLSearchParams({
     chain: "SOL",
-    sortBy: "vol_24h",
+    sortBy: "vol_24h",        // sort by 24h volume
     sortOrder: "desc",
     pageSize: "5",
     min_market_cap: "5",       // min $5M market cap
@@ -99,53 +158,66 @@ console.log(`Pool: ${pool.token0_symbol}/${pool.token1_symbol} (${pool.pool})`);
 console.log(`Protocol: ${pool.protocol}`); // "meteora" or "meteora_damm_v2"
 ```
 
-### Step 2: Get Pool Info
+**What you get back:** A list of pools with their addresses, token pairs, TVL, volume, and protocol type. The API supports both Meteora DLMM and DAMM V2 pools — the same code works for both.
 
-Fetch the active bin to decide your liquidity range.
+### Step 3: Get Pool Info & Set Your Range
+
+Fetch the pool's current state to find the **active bin** (where the current price is). You'll place liquidity around this bin.
 
 ```typescript
 const poolInfoRes = await apiCall("GET", `/pools/${pool.pool}/info`);
 const activeBin = poolInfoRes.data.liquidityViz?.activeBin;
 
+// Place liquidity 34 bins on each side of the current price
 const RANGE = 34;
 const fromBinId = activeBin.binId - RANGE;
 const toBinId = activeBin.binId + RANGE;
-console.log(`Active bin: ${activeBin.binId}, range: ${fromBinId}-${toBinId}`);
+
+console.log(`Active bin: ${activeBin.binId}`);
+console.log(`Your range: bin ${fromBinId} to ${toBinId} (${RANGE * 2 + 1} bins)`);
 ```
 
-### Step 3: Generate Zap-In Transactions
+**How to choose your range:** Wider = less risk of going out of range, but lower fee APR. Tighter = higher fees but more frequent rebalancing needed. Start with 30-70 bins on each side.
 
-Provide SOL and the API auto-swaps to the correct token ratio:
+### Step 4: Generate Zap-In Transactions
+
+Tell the API how much SOL you want to deposit. It generates unsigned transactions that swap your SOL into the right token ratio and add liquidity.
 
 ```typescript
 const addTxRes = await apiCall("POST", `/pools/${pool.pool}/add-tx`, {
-  stratergy: "Spot",           // "Spot" | "Curve" | "BidAsk"
-  inputSOL: 0.1,               // Amount of SOL to deposit
-  percentX: 0.5,               // 50% allocation to token X
+  stratergy: "Spot",           // distribution strategy
+  inputSOL: 0.1,               // amount of SOL to deposit
+  percentX: 0.5,               // 50/50 split between tokens
   fromBinId,
   toBinId,
   owner: OWNER,
-  slippage_bps: 500,           // 5% slippage
-  mode: "zap-in",
+  slippage_bps: 500,           // 5% slippage tolerance
+  mode: "zap-in",              // auto-swap SOL to both tokens
 });
 
-console.log(`Position: ${addTxRes.data.meta.positionPubKey}`);
+console.log(`Position key: ${addTxRes.data.meta.positionPubKey}`);
+console.log(`Swap txs: ${addTxRes.data.swapTxsWithJito.length}`);
+console.log(`Add txs: ${addTxRes.data.addLiquidityTxsWithJito.length}`);
 ```
 
 <Note>
-You can also use `mode: "normal"` with `amountX` and `amountY` if you already hold both tokens.
+Already holding both tokens? Use `mode: "normal"` with `amountX` and `amountY` instead of `inputSOL` to skip the swap step.
 </Note>
 
-### Step 4: Sign and Land
+**What you get back:** Base64-encoded unsigned transactions, split into swap transactions (to convert SOL) and add-liquidity transactions. Plus metadata about your new position.
+
+### Step 5: Sign & Land
+
+Sign the transactions with your wallet and submit them via LP Agent's Jito landing endpoint.
 
 ```typescript
 const { lastValidBlockHeight, swapTxsWithJito, addLiquidityTxsWithJito, meta } = addTxRes.data;
 
-// Sign all transactions
+// Sign all transactions with your wallet
 const signedSwapTxs = swapTxsWithJito.map(signTransaction);
 const signedAddTxs = addLiquidityTxsWithJito.map(signTransaction);
 
-// Land via LP Agent's Jito integration (better landing rate than direct RPC)
+// Submit via LP Agent's Jito integration (better landing rate — free!)
 const landRes = await apiCall("POST", "/pools/landing-add-tx", {
   lastValidBlockHeight,
   swapTxsWithJito: signedSwapTxs,
@@ -156,81 +228,61 @@ const landRes = await apiCall("POST", "/pools/landing-add-tx", {
 console.log(`Zap-In Success! Tx: https://solscan.io/tx/${landRes.data.signature}`);
 ```
 
+**That's it!** Your liquidity is now live and earning fees.
+
 ---
 
-## Part 2: Zap-Out (Withdraw Liquidity)
+## Step-by-Step: Zap-Out
 
-### Step 1: Get Your Open Positions
+### Step 1: Find Your Open Positions
+
+Query your wallet to see all open LP positions.
 
 ```typescript
 const positionsRes = await apiCall("GET",
   `/lp-positions/opening?owner=${OWNER}`
 );
 
-const positions = positionsRes.data;
 console.log(`Found ${positionsRes.count} open positions`);
 
-// Display positions
-for (const pos of positions) {
+for (const pos of positionsRes.data) {
   console.log(`- ${pos.pairName} | Value: $${pos.currentValue} | PnL: ${pos.pnl.percent.toFixed(2)}% | In Range: ${pos.inRange}`);
 }
 ```
 
-**Response shape:**
+**What you get back:** Each position includes its encrypted ID (needed for withdrawal), current value, PnL, whether it's in range, and token details.
 
-```json
-{
-  "status": "success",
-  "count": 3,
-  "data": [
-    {
-      "id": "encrypted-position-id",
-      "pairName": "SOL/USDC",
-      "pool": "PoolAddressBase58",
-      "currentValue": "150.50",
-      "inRange": true,
-      "pnl": { "value": 5.2, "percent": 3.5 },
-      "token0Info": { "token_symbol": "SOL" },
-      "token1Info": { "token_symbol": "USDC" }
-    }
-  ]
-}
-```
+### Step 2: Get Quotes (Optional)
 
-### Step 2: Get Zap-Out Quotes
-
-Before withdrawing, check the quotes to see how much you'll receive:
+Preview what you'll receive before withdrawing. The API shows quotes for different output options.
 
 ```typescript
-const positionId = positions[0].id; // encrypted position ID
+const positionId = positionsRes.data[0].id; // encrypted position ID
 
 const quotesRes = await apiCall("POST", "/position/decrease-quotes", {
   id: positionId,
-  bps: 10000,    // 10000 = 100% (full withdrawal), 5000 = 50%, etc.
+  bps: 10000,    // 10000 = 100% withdrawal, 5000 = 50%, etc.
 });
 
 const quotes = quotesRes.data;
-console.log("Swap options:");
-console.log(`  All to Token0: ${quotes.token0ToToken1.success ? "available" : "N/A"}`);
-console.log(`  All to Token1: ${quotes.token1ToToken0.success ? "available" : "N/A"}`);
-console.log(`  Both tokens:   always available`);
-console.log(`Token prices: ${quotes.price.token0} / ${quotes.price.token1}`);
+console.log(`Token prices: $${quotes.price.token0} / $${quotes.price.token1}`);
 ```
 
 ### Step 3: Generate Zap-Out Transactions
+
+Choose how much to withdraw and what token(s) to receive.
 
 ```typescript
 const decreaseTxRes = await apiCall("POST", "/position/decrease-tx", {
   position_id: positionId,
   bps: 10000,                  // 100% withdrawal
   owner: OWNER,
-  slippage_bps: 500,           // 5% slippage
-  output: "both",              // "allToken0" | "allToken1" | "both" | "allBaseToken"
+  slippage_bps: 500,
+  output: "both",              // how to receive tokens (see table below)
   provider: "JUPITER_ULTRA",
 });
 
-const txData = decreaseTxRes.data;
-console.log(`Generated ${txData.closeTxsWithJito.length} close txs`);
+console.log(`Generated ${decreaseTxRes.data.closeTxsWithJito.length} close txs`);
 ```
 
 **Output options:**
@@ -238,32 +290,29 @@ console.log(`Generated ${txData.closeTxsWithJito.length} close txs`);
 | Output | Description |
 |--------|-------------|
 | `both` | Receive both tokens as-is (no swap) |
-| `allToken0` | Swap all to token X |
-| `allToken1` | Swap all to token Y |
-| `allBaseToken` | Swap all to SOL |
+| `allToken0` | Swap everything to token X |
+| `allToken1` | Swap everything to token Y |
+| `allBaseToken` | Swap everything to SOL |
 
-### Step 4: Sign and Land
-
-Sign the transactions and land them via LP Agent's Jito integration:
+### Step 4: Sign & Land
 
 ```typescript
-const { lastValidBlockHeight: zapOutBlockHeight, closeTxsWithJito, swapTxsWithJito } = txData;
+const { lastValidBlockHeight: blockHeight, closeTxsWithJito, swapTxsWithJito } = decreaseTxRes.data;
 
 // Sign all transactions
 const signedCloseTxs = closeTxsWithJito.map(signTransaction);
 const signedSwapTxs = swapTxsWithJito.map(signTransaction);
 
-// Land via LP Agent (better landing rate than direct RPC — free!)
+// Submit via LP Agent's Jito integration
 const landRes = await apiCall("POST", "/position/landing-decrease-tx", {
-  lastValidBlockHeight: zapOutBlockHeight,
+  lastValidBlockHeight: blockHeight,
   closeTxs: [],
   swapTxs: [],
   closeTxsWithJito: signedCloseTxs,
   swapTxsWithJito: signedSwapTxs,
 });
 
-console.log(`Zap-Out Success! Signature: ${landRes.data.signature}`);
-console.log(`View on Solscan: https://solscan.io/tx/${landRes.data.signature}`);
+console.log(`Zap-Out Success! Tx: https://solscan.io/tx/${landRes.data.signature}`);
 ```
 
 <Tip>
@@ -272,9 +321,38 @@ Always use the `landing-decrease-tx` endpoint instead of submitting transactions
 
 ---
 
-## Complete Example
+## Reference
 
-Here's the full zap-in + zap-out flow in a single script:
+### Strategy Types
+
+| Strategy | Description | Best For |
+|----------|-------------|----------|
+| `Spot` | Uniform distribution across all bins | Stable pairs (SOL/USDC) |
+| `Curve` | Bell curve concentrated around active bin | Range-bound markets |
+| `BidAsk` | Heavier allocation at the edges | Volatile pairs with mean reversion |
+
+### Common Errors
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `Token X price unavailable` | Price feed missing | Try again later or use a different pool |
+| `Insufficient balance` | Not enough tokens | Reduce `inputSOL` or `amountX`/`amountY` |
+| `Missing amount to ZapIn` | `inputSOL` not provided in zap-in mode | Add `inputSOL` to the request body |
+| Transaction expired | `lastValidBlockHeight` has passed | Re-generate and re-sign (don't wait more than ~60s) |
+
+### Tips
+
+- **Transaction landing**: Always use LP Agent's landing endpoints instead of direct RPC. Better success rates via Jito — for free.
+- **DAMM V2 pools**: Both zap-in and zap-out auto-detect pool types. The same code works for DLMM and DAMM V2.
+- **Partial zap-out**: Use `bps` less than 10000 to withdraw only a portion (e.g., `5000` = 50%).
+
+---
+
+## Complete Script
+
+Here's everything above combined into a single copy-paste-ready script:
+
+<Accordion title="Full zap-in + zap-out script">
 
 ```typescript
 import { Keypair, Transaction, VersionedTransaction } from "@solana/web3.js";
@@ -310,13 +388,11 @@ function signTx(base64Tx: string): string {
 
 // ===================== ZAP-IN =====================
 async function zapIn(poolAddress: string, amountSOL: number) {
-  // Get pool info for active bin
   const info = await apiCall("GET", `/pools/${poolAddress}/info`);
   const activeBin = info.data.liquidityViz?.activeBin;
   const fromBinId = activeBin.binId - 34;
   const toBinId = activeBin.binId + 34;
 
-  // Generate zap-in transactions
   const addTx = await apiCall("POST", `/pools/${poolAddress}/add-tx`, {
     stratergy: "Spot",
     inputSOL: amountSOL,
@@ -328,7 +404,6 @@ async function zapIn(poolAddress: string, amountSOL: number) {
     mode: "zap-in",
   });
 
-  // Sign and land via Jito
   const signedSwapTxs = addTx.data.swapTxsWithJito.map(signTx);
   const signedAddTxs = addTx.data.addLiquidityTxsWithJito.map(signTx);
 
@@ -345,7 +420,6 @@ async function zapIn(poolAddress: string, amountSOL: number) {
 
 // ===================== ZAP-OUT =====================
 async function zapOut(positionId: string, bps: number = 10000) {
-  // Generate zap-out transactions
   const decreaseTx = await apiCall("POST", "/position/decrease-tx", {
     position_id: positionId,
     bps,
@@ -354,7 +428,6 @@ async function zapOut(positionId: string, bps: number = 10000) {
     output: "both",
   });
 
-  // Sign and land via Jito
   const signedCloseTxs = decreaseTx.data.closeTxsWithJito.map(signTx);
   const signedSwapTxs = decreaseTx.data.swapTxsWithJito.map(signTx);
 
@@ -396,34 +469,7 @@ async function main() {
 main().catch(console.error);
 ```
 
----
-
-## Strategy Types
-
-| Strategy | Description |
-|----------|-------------|
-| `Spot` | Uniform distribution across all bins in the range. Best for stable pairs. |
-| `Curve` | Bell curve distribution concentrated around the active bin. Best for range-bound markets. |
-| `BidAsk` | Heavier allocation at the edges of the range. Best for volatile pairs where you expect mean reversion. |
-
-## Tips
-
-- **Bin range**: A wider range (more bins) means less impermanent loss risk but lower fee APR. Start with 30-70 bins on each side.
-- **Slippage**: Use 300-500 bps (3-5%) for most pairs. Increase for low-liquidity tokens.
-- **Zap-in mode**: Recommended for simplicity. Just provide SOL and the API handles swapping to the correct token ratio automatically.
-- **Transaction landing**: Always use LP Agent's landing endpoints (`landing-add-tx` and `landing-decrease-tx`) instead of submitting via RPC directly. They provide better landing rates via Jito bundles — for free.
-- **Transaction expiry**: Transactions expire after `lastValidBlockHeight`. Generate and land them promptly -- don't wait more than ~60 seconds.
-- **DAMM V2 pools**: Both zap-in and zap-out auto-detect pool types. The same flow works for DLMM and DAMM V2.
-- **Partial zap-out**: Use `bps` less than 10000 to withdraw only a portion (e.g., `5000` = 50%).
-
-## Error Handling
-
-| Error | Cause | Fix |
-|-------|-------|-----|
-| `Token X price unavailable` | Price feed missing for one of the tokens | Try again later or use a different pool |
-| `Insufficient balance` | Not enough tokens in your wallet | Reduce `inputSOL` or `amountX`/`amountY` |
-| `Missing amount to ZapIn` | `inputSOL` not provided in zap-in mode | Add `inputSOL` to the request body |
-| Transaction expired | `lastValidBlockHeight` has passed | Re-generate and re-sign the transactions |
+</Accordion>
 
 ## Next Steps
 
