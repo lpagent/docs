@@ -2013,7 +2013,7 @@
               "type": "string",
               "default": "all"
             },
-            "description": "Pool type filter"
+            "description": "Pool type filter. `meteora` for dlmm and `meteora_damm_v2` for DAMM V2"
           },
           {
             "in": "query",
