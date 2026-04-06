@@ -62,7 +62,7 @@ export const PremiumPlan = () => {
       >
         {[
           { icon: "⚡", text: "10 RPM" },
-          { icon: "🔌", text: "Premium API endpoints" },
+          { icon: "💎", text: "Premium API endpoints" },
         ].map((feature, index) => (
           <div
             key={index}

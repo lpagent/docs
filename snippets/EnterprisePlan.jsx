@@ -45,7 +45,7 @@ export const EnterprisePlan = () => {
       >
         {[
           { icon: "⚡", text: "20 RPM" },
-          { icon: "🔌", text: "Premium API endpoints" },
+          { icon: "💎", text: "Premium API endpoints" },
         ].map((feature, index) => (
           <div
             key={index}
