@@ -1,0 +1,173 @@
+---
+title: "AI API Guide"
+description: "Agent-ready guide to LP Agent API capabilities, endpoints, and automation flows"
+---
+
+## Purpose
+
+This page is written for AI systems and developers who want one place to understand what LP Agent API can do and how to execute complete workflows.
+
+If you are building an agent, start here, then follow links into detailed tutorials and API reference pages.
+
+<Note>
+Fastest machine-readable docs entry: [`https://docs.lpagent.io/llms.txt`](https://docs.lpagent.io/llms.txt)
+</Note>
+
+## Base URL and Authentication
+
+- **Base URL**: `https://api.lpagent.io/open-api/v1`
+- **Authentication**: API key in request header
+- **Header name**: `x-api-key`
+
+```bash
+curl -X GET "https://api.lpagent.io/open-api/v1/pools/discover?chain=SOL&pageSize=5" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+<Warning>
+Never expose API keys or private keys in frontend code, shared prompts, screenshots, or logs. Use a secure backend for production agents.
+</Warning>
+
+## Capability Map
+
+### 1) Discover pools and market state
+
+- `GET /pools/discover` → find pools with filters/sorting
+- `GET /pools/{poolId}/info` → inspect pool state and active bin context
+- `GET /pools/{poolId}/onchain-stats` → on-chain pool metrics
+- `GET /pools/{poolId}/top-lpers` → top liquidity providers
+
+### 2) Track positions and portfolio analytics
+
+- `GET /lp-positions/opening` → open positions for owner
+- `GET /lp-positions/historical` → historical/closed positions
+- `GET /lp-positions/overview` → aggregated portfolio metrics
+- `GET /lp-positions/logs` → position activity logs
+- `GET /lp-positions/revenue/{owner}` → revenue/pnl time data
+
+### 3) Execute liquidity operations (zap-in / zap-out)
+
+- `POST /pools/{poolId}/add-tx` → generate unsigned zap-in txs
+- `POST /pools/landing-add-tx` → submit signed zap-in txs
+- `POST /position/decrease-quotes` → preview zap-out outputs
+- `POST /position/decrease-tx` → generate unsigned zap-out txs
+- `POST /position/landing-decrease-tx` → submit signed zap-out txs
+
+### 4) Wallet utility
+
+- `GET /token/balance` → wallet token balances
+
+## End-to-End Flows
+
+## Flow A: Discover -> Zap-In
+
+Use this when your AI wants to open a new LP position from SOL input.
+
+<Steps>
+  <Step title="1) Discover candidate pools">
+    Call `GET /pools/discover` with your chain, liquidity, market cap, and volume filters.
+  </Step>
+  <Step title="2) Read selected pool info">
+    Call `GET /pools/{poolId}/info` and use active bin data to define `fromBinId` / `toBinId`.
+  </Step>
+  <Step title="3) Generate add transactions">
+    Call `POST /pools/{poolId}/add-tx` with `stratergy`, `owner`, range, slippage, and input amount.
+  </Step>
+  <Step title="4) Sign locally">
+    Sign base64 transactions with the user wallet in your runtime.
+  </Step>
+  <Step title="5) Land transactions">
+    Submit signed txs to `POST /pools/landing-add-tx`.
+  </Step>
+</Steps>
+
+### Flow B: List positions -> Quote -> Zap-Out
+
+Use this when your AI wants to close all or part of an LP position.
+
+<Steps>
+  <Step title="1) Get open positions">
+    Call `GET /lp-positions/opening?owner=<wallet>` and choose a target position `id`.
+  </Step>
+  <Step title="2) Preview withdrawal outputs (optional)">
+    Call `POST /position/decrease-quotes` with `id` and `bps`.
+  </Step>
+  <Step title="3) Generate withdraw transactions">
+    Call `POST /position/decrease-tx` with `position_id`, `bps`, `owner`, `slippage_bps`, and `output` mode.
+  </Step>
+  <Step title="4) Sign locally">
+    Sign base64 transactions with the owner wallet.
+  </Step>
+  <Step title="5) Land transactions">
+    Submit signed txs to `POST /position/landing-decrease-tx`.
+  </Step>
+</Steps>
+
+### Flow C: Auto-rebalancing loop
+
+Use this when your AI should continuously keep positions in-range.
+
+1. Poll `GET /lp-positions/opening?owner=...`
+2. For each position with `inRange=false`:
+   - zap-out old position (`decrease-tx` + `landing-decrease-tx`)
+   - check available SOL (`GET /token/balance`)
+   - get pool active bin (`GET /pools/{poolId}/info`)
+   - zap-in new position (`add-tx` + `landing-add-tx`)
+3. Repeat every interval (for example, every 60s)
+
+## Critical Parameters and Constraints
+
+- `bps`: `0..10000` (10000 = 100%)
+- `slippage_bps`: `0..10000`
+- `percentX`: `0..1`
+- strategy enum: `Spot`, `Curve`, `BidAsk`
+- add mode enum: `normal`, `zap-in`
+- zap-out output enum: `allToken0`, `allToken1`, `both`, `allBaseToken`
+- provider enum (where supported): `OKX`, `JUPITER_ULTRA`
+
+<Note>
+In request bodies, the add-liquidity field name is currently `stratergy` (spelling as defined by the API).
+</Note>
+
+## Operational Guidance for Agent Builders
+
+- Use landing endpoints for better transaction success handling
+- Keep signing and secret handling in trusted runtime only
+- Re-generate transactions if they expire (block height window passed)
+- Add retries with backoff for transient API/network failures
+- Always log request IDs, endpoint, and owner (without leaking keys)
+
+## Minimal TypeScript API wrapper
+
+```typescript
+const API_BASE = "https://api.lpagent.io/open-api/v1";
+
+async function apiCall(method: string, path: string, apiKey: string, body?: object) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  if (!res.ok) {
+    throw new Error(`API ${method} ${path} failed: ${res.status} ${await res.text()}`);
+  }
+
+  return res.json();
+}
+```
+
+## Recommended Read Order
+
+1. [API Reference Introduction](/api-reference/introduction)
+2. [Zap-In & Zap-Out via API](/tutorials/add-liquidity-api)
+3. [Auto-Rebalancing Bot](/tutorials/auto-rebalance-bot)
+4. [Prompts](/prompts)
+5. [AI page](/ai)
+
+<Card title="Need complete endpoint schemas?" icon="book" href="/api-reference/introduction">
+  Open the API Reference tab for full OpenAPI-generated endpoint details.
+</Card>
