@@ -21,7 +21,6 @@
               "architecture",
               "security",
               "automation-model",
-              "prompts",
               "fee",
               "referral",
               "data-methodology"
@@ -47,7 +46,10 @@
           },
           {
             "group": "Legal",
-            "pages": ["terms-of-service", "privacy-policy"]
+            "pages": [
+              "terms-of-service",
+              "privacy-policy"
+            ]
           }
         ]
       },
@@ -56,20 +58,30 @@
         "groups": [
           {
             "group": "API Tutorials",
-            "pages": ["tutorials/add-liquidity-api", "tutorials/auto-rebalance-bot"]
+            "pages": [
+              "tutorials/add-liquidity-api",
+              "tutorials/auto-rebalance-bot"
+            ]
           },
           {
             "group": "Best Practices",
-            "pages": ["tutorials/copy-lp-best-practices"]
+            "pages": [
+              "tutorials/copy-lp-best-practices"
+            ]
           }
         ]
       },
       {
-        "tab": "AI",
+        "tab": "AI Get Started",
         "groups": [
           {
             "group": "AI",
-            "pages": ["ai", "llms-txt", "ai-api-guide", "cli"]
+            "pages": [
+              "ai",
+              "llms-txt",
+              "ai-api-guide",
+              "cli"
+            ]
           }
         ]
       },
@@ -78,7 +90,9 @@
         "groups": [
           {
             "group": "API",
-            "pages": ["api-reference/introduction"]
+            "pages": [
+              "api-reference/introduction"
+            ]
           }
         ],
         "openapi": "api-reference/openapi.json"
@@ -88,7 +102,9 @@
         "groups": [
           {
             "group": "API Pricing",
-            "pages": ["api-key-dashboard/dashboard"]
+            "pages": [
+              "api-key-dashboard/dashboard"
+            ]
           }
         ]
       }
