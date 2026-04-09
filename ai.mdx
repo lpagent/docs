@@ -15,7 +15,7 @@ The right setup depends on where your agent runs and what it needs to do.
 
 | Goal | Local coding agents (OpenCode, Claude Code, Cursor, Codex) | Hosted agents (ChatGPT, Claude web, other hosted runtimes) |
 | --- | --- | --- |
-| **Read docs and learn capabilities** | Use this docs site + `docs.json` navigation + API reference pages | Use this docs site and API reference directly |
+| **Read docs and learn capabilities** | Use `https://docs.lpagent.io/llms.txt` first, then this docs site + `docs.json` navigation + API reference pages | Use `https://docs.lpagent.io/llms.txt` and this docs site + API reference |
 | **Generate API integrations** | Use `api-reference/openapi.json` and `/api-reference/introduction` | Use `/api-reference/introduction` and endpoint pages generated from OpenAPI |
 | **Execute LP operations** | Call LP Agent REST APIs with your `x-api-key` | Call LP Agent REST APIs from your server/backend with your `x-api-key` |
 
@@ -26,6 +26,10 @@ Local coding agents can also inspect repository files directly (`docs.json`, `.m
 ## Read the Docs Effectively
 
 For agents that need to understand LP Agent before writing code or taking actions.
+
+<Note>
+Start with [`https://docs.lpagent.io/llms.txt`](https://docs.lpagent.io/llms.txt). It is the fastest machine-readable entry point for agents that want a compact index of the docs before following deeper links.
+</Note>
 
 <CardGroup cols={3}>
   <Card title="Getting Started" icon="rocket" href="/quickstart">
