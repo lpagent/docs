@@ -1,0 +1,147 @@
+---
+title: "CLI"
+description: "Use LP Agent from terminal or inside AI agent workflows"
+---
+
+## LP Agent CLI
+
+`lpagent` is the command-line interface for LP Agent.
+
+It lets users and AI agents discover pools, inspect positions, and execute zap-in/zap-out transaction workflows from terminal scripts.
+
+- Works as a standalone CLI
+- Works well in coding-agent environments
+- JSON output for automation, table output for humans
+
+<Card title="CLI Repository" icon="github" href="https://github.com/lpagent/cli">
+  Source code, releases, and issue tracking for the LP Agent CLI.
+</Card>
+
+## Install
+
+### Quick install script
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/lpagent/cli/main/install.sh | bash
+```
+
+### Alternative install methods
+
+```bash
+# Go install
+go install github.com/lpagent/cli/cmd/lpagent@latest
+
+# Build from source
+git clone https://github.com/lpagent/cli.git && cd cli
+make build
+./bin/lpagent --help
+```
+
+## Initial setup
+
+```bash
+lpagent auth set-key
+lpagent auth set-default-owner <wallet-address>
+```
+
+Then verify access:
+
+```bash
+lpagent positions open -o table --native
+```
+
+## Core command groups
+
+### Positions
+
+```bash
+lpagent positions open --owner <addr>
+lpagent positions historical --owner <addr> --from 2025-01-01
+lpagent positions overview -o table --native
+lpagent positions logs --position <id>
+lpagent positions get --position <id>
+lpagent positions revenue <addr>
+```
+
+### Pools
+
+```bash
+lpagent pools discover --chain SOL --sort-by tvl
+lpagent pools info <poolId>
+lpagent pools positions <poolId> --status Open
+lpagent pools onchain-stats <poolId>
+lpagent pools top-lpers <poolId>
+```
+
+### Zap-In / Zap-Out transaction flow
+
+```bash
+# Zap-In
+lpagent pools add-tx <poolId> --owner <addr> --strategy Spot --input-sol 1
+lpagent pools landing-add-tx --file signed-tx.json
+
+# Zap-Out
+lpagent tx decrease-quotes --id <id> --bps 10000
+lpagent tx decrease-tx --position-id <id> --bps 10000 --owner <addr> --slippage-bps 500
+lpagent tx landing-decrease-tx --file signed-tx.json
+```
+
+### Token and raw API access
+
+```bash
+lpagent token balance --owner <addr>
+
+lpagent api get /lp-positions/opening --query "owner=<addr>"
+lpagent api post /position/decrease-quotes --data '{"id":"...","bps":5000}'
+```
+
+## Output modes
+
+All commands support:
+
+- `json` (default)
+- `table`
+- `quiet`
+
+Use:
+
+```bash
+lpagent positions open -o json
+lpagent positions open -o table --native
+```
+
+## Configuration
+
+Config file path:
+
+- `~/.lpagent/config.json`
+
+Override sources:
+
+| Variable | Flag | Description |
+| --- | --- | --- |
+| `LPAGENT_API_KEY` | `--api-key` | API key |
+| `LPAGENT_API_URL` | - | Base API URL |
+| `LPAGENT_DEFAULT_OWNER` | `--owner` | Default wallet address |
+
+Priority order:
+
+1. CLI flags
+2. Environment variables
+3. Config file
+
+## AI Agent usage pattern
+
+When integrating `lpagent` into AI workflows:
+
+1. prefer `-o json` for machine parsing
+2. keep wallet signing in trusted runtime boundaries
+3. run a dry read step (`positions open`, `pools info`) before execution commands
+4. use generated transaction + landing command pairs for reliability
+
+## Related docs
+
+- [AI API Guide](/ai-api-guide)
+- [API Reference](/api-reference/introduction)
+- [Zap-In & Zap-Out Tutorial](/tutorials/add-liquidity-api)
+- [Auto-Rebalancing Bot Tutorial](/tutorials/auto-rebalance-bot)

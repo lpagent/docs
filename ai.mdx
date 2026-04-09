@@ -1,0 +1,109 @@
+---
+title: "Overview"
+description: "Connect AI agents to LP Agent docs and APIs"
+---
+
+## AI Integration for LP Agent
+
+LP Agent is AI-friendly by design: clear docs, OpenAPI-powered API reference, and simple REST endpoints with API key authentication.
+
+Use this page to choose the right integration path for your AI agent.
+
+## Pick the Right Tool
+
+The right setup depends on where your agent runs and what it needs to do.
+
+| Goal | Local coding agents (OpenCode, Claude Code, Cursor, Codex) | Hosted agents (ChatGPT, Claude web, other hosted runtimes) |
+| --- | --- | --- |
+| **Read docs and learn capabilities** | Use `https://docs.lpagent.io/llms.txt` first, then this docs site + `docs.json` navigation + API reference pages | Use `https://docs.lpagent.io/llms.txt` and this docs site + API reference |
+| **Generate API integrations** | Use `api-reference/openapi.json` and `/api-reference/introduction` | Use `/api-reference/introduction` and endpoint pages generated from OpenAPI |
+| **Execute LP operations** | Call LP Agent REST APIs with your `x-api-key` | Call LP Agent REST APIs from your server/backend with your `x-api-key` |
+
+<Note>
+Local coding agents can also inspect repository files directly (`docs.json`, `.mdx`, and `api-reference/openapi.json`) to build accurate integrations faster.
+</Note>
+
+## Read the Docs Effectively
+
+For agents that need to understand LP Agent before writing code or taking actions.
+
+<Note>
+Start with [`https://docs.lpagent.io/llms.txt`](https://docs.lpagent.io/llms.txt). It is the fastest machine-readable entry point for agents that want a compact index of the docs before following deeper links.
+</Note>
+
+<CardGroup cols={3}>
+  <Card title="Getting Started" icon="rocket" href="/quickstart">
+    Product overview, onboarding flow, and core concepts.
+  </Card>
+
+  <Card title="Prompts" icon="message" href="/prompts">
+    Ready-to-use natural language prompts for common LP Agent actions.
+  </Card>
+
+  <Card title="API Reference" icon="code" href="/api-reference/introduction">
+    Authentication and full endpoint reference generated from OpenAPI.
+  </Card>
+</CardGroup>
+
+## Execute Operations via API
+
+For AI systems that need to perform real actions (discover pools, create liquidity transactions, manage positions).
+
+<Steps>
+  <Step title="1) Get an API key">
+    Create an API key from the [LP Agent Portal](https://portal.lpagent.io/).
+  </Step>
+  <Step title="2) Authenticate requests">
+    Send your API key in the `x-api-key` header for every API request.
+  </Step>
+  <Step title="3) Follow endpoint workflows">
+    Use the API tutorials for end-to-end flows, then adapt to your agent runtime.
+  </Step>
+</Steps>
+
+<CardGroup cols={2}>
+  <Card title="Zap-In & Zap-Out Tutorial" icon="book" href="/tutorials/add-liquidity-api">
+    End-to-end API flow for adding and removing liquidity.
+  </Card>
+
+  <Card title="Auto Rebalance Tutorial" icon="arrows-rotate" href="/tutorials/auto-rebalance-bot">
+    Build an automated bot workflow on top of LP Agent APIs.
+  </Card>
+</CardGroup>
+
+## Minimal API Request Pattern
+
+```bash
+curl -X GET "https://api.lpagent.io/open-api/v1/pools/discover?chain=SOL&pageSize=5" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+```typescript
+const res = await fetch("https://api.lpagent.io/open-api/v1/pools/discover?chain=SOL&pageSize=5", {
+  headers: {
+    "x-api-key": process.env.LPAGENT_API_KEY!,
+  },
+});
+
+if (!res.ok) {
+  throw new Error(`Request failed: ${res.status}`);
+}
+
+const data = await res.json();
+```
+
+<Warning>
+Do not expose API keys in client-side apps, prompts, screenshots, or shared logs. Route production calls through a secure backend.
+</Warning>
+
+## Recommended Learning Path for Agents
+
+1. Start at [Introduction](/introduction) and [Architecture](/architecture)
+2. Read [Prompts](/prompts) for task phrasing patterns
+3. Read [API Reference Introduction](/api-reference/introduction) for auth
+4. Implement one flow from [Zap-In & Zap-Out tutorial](/tutorials/add-liquidity-api)
+5. Expand to automation with [Auto Rebalance Bot](/tutorials/auto-rebalance-bot)
+
+<Card title="Need help?" icon="headset" href="https://discord.gg/h8YDHtzmRU">
+  Join the LP Agent community Discord for support.
+</Card>

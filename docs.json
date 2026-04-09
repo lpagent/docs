@@ -65,6 +65,15 @@
         ]
       },
       {
+        "tab": "AI",
+        "groups": [
+          {
+            "group": "AI",
+            "pages": ["ai", "llms-txt", "ai-api-guide", "cli"]
+          }
+        ]
+      },
+      {
         "tab": "API Reference",
         "groups": [
           {
