@@ -21,9 +21,6 @@
               "architecture",
               "security",
               "automation-model",
-              "ai",
-              "ai-api-guide",
-              "cli",
               "prompts",
               "fee",
               "referral",
@@ -64,6 +61,15 @@
           {
             "group": "Best Practices",
             "pages": ["tutorials/copy-lp-best-practices"]
+          }
+        ]
+      },
+      {
+        "tab": "AI",
+        "groups": [
+          {
+            "group": "AI",
+            "pages": ["ai", "llms-txt", "ai-api-guide", "cli"]
           }
         ]
       },
