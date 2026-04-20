@@ -18,7 +18,7 @@ export const FreePlan = () => {
         }}
         className="text-[#1a1a1a] dark:text-white"
       >
-        Free
+        Basic
       </h2>
 
       <p style={{ fontSize: "16px", color: "#999", margin: "0 0 24px 0" }}>
@@ -92,7 +92,7 @@ export const FreePlan = () => {
         }}
         onClick={() => window.open("https://portal.lpagent.io/", "_blank")}
       >
-        Select Standard
+        Select Basic
       </button>
     </div>
   );
