@@ -70,7 +70,7 @@ Every check interval, the bot follows this flow:
 | Decision | How It's Handled |
 |----------|------------------|
 | **When to compound?** | When `uncollectedFee` (USD) crosses `MIN_FEE_USD` |
-| **Should I swap to SOL first?** | Yes — `claim-fee-tx` does it in one round-trip with `swapToSol: true` |
+| **Should I swap to SOL first?** | Yes — `claim-fee-tx` does it in one round-trip with `swapToNative: true` |
 | **How much to re-deposit?** | The post-claim SOL balance gain, minus a small reserve for fees |
 
 ---
@@ -162,7 +162,7 @@ Fees are claimable regardless of whether the position is in range — accrued fe
 
 ### Step 3: Generate Claim + Swap-to-SOL Transactions
 
-The `claim-fee-tx` endpoint can return both the claim and the swap-to-SOL transactions in one call when you pass `swapToSol: true`.
+The `claim-fee-tx` endpoint can return both the claim and the swap-to-SOL transactions in one call when you pass `swapToNative: true`.
 
 ```typescript
 const pos = compoundable[0];
@@ -171,7 +171,7 @@ const claimRes = await apiCall("POST", "/position/claim-fee-tx", {
   position_id: pos.id,
   owner: OWNER,
   slippage_bps: 500,
-  swapToSol: true,                    // claim AND swap to SOL in one round-trip
+  swapToNative: true,                    // claim AND swap to SOL in one round-trip
   type: pos.protocol === "meteora_damm_v2" ? "meteora_damm_v2" : "meteora",
 });
 
@@ -185,7 +185,7 @@ console.log(`Raw fee0: ${claimRes.data.meta.rawFee0}, raw fee1: ${claimRes.data.
 | Field | Description |
 |-------|-------------|
 | `claimTxsWithJito[]` | Unsigned claim-fee txs (base64), Jito tip already attached |
-| `swapTxsWithJito[]` | Unsigned swap txs (base64). Empty if `swapToSol: false`. Otherwise: one swap per non-SOL fee token, plus a final Jito-tip tx. |
+| `swapTxsWithJito[]` | Unsigned swap txs (base64). Empty if `swapToNative: false`. Otherwise: one swap per non-SOL fee token, plus a final Jito-tip tx. |
 | `lastValidBlockHeight` | Submit before this block height passes (≈ 60s) |
 | `meta` | Position metadata, including raw fee amounts at build time |
 
@@ -280,7 +280,7 @@ Each compound cycle costs roughly **0.01–0.03 SOL** in transaction fees (claim
 | Error | Cause | Fix |
 |-------|-------|-----|
 | `No claim fee transactions to build` | Position has 0 fees to claim | Wait for fees to accrue |
-| `Token X price unavailable` | Price feed missing for swap | Try again later or skip swap (`swapToSol: false`) |
+| `Token X price unavailable` | Price feed missing for swap | Try again later or skip swap (`swapToNative: false`) |
 | Transaction expired | `lastValidBlockHeight` has passed | Re-generate and re-sign within ~60s |
 | `Fees claimed, but swap execution failed` | Swap leg failed on-chain | Fees are still claimed in your wallet — you can swap manually or retry |
 
@@ -366,13 +366,13 @@ const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
 // ===================== CLAIM + SWAP =====================
 async function claimAndSwap(pos: any): Promise<void> {
-  log(`  Claim: requesting claim-fee-tx (swapToSol=true)...`);
+  log(`  Claim: requesting claim-fee-tx (swapToNative=true)...`);
 
   const claimRes = await apiCall("POST", "/position/claim-fee-tx", {
     position_id: pos.id,
     owner: OWNER,
     slippage_bps: CONFIG.SLIPPAGE_BPS,
-    swapToSol: true,
+    swapToNative: true,
     type: pos.protocol === "meteora_damm_v2" ? "meteora_damm_v2" : "meteora",
   });
 

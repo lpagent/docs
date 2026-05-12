@@ -3696,7 +3696,7 @@
     "/position/claim-fee-tx": {
       "post": {
         "summary": "Claim Fees — Generate transaction(s) to claim accrued LP fees",
-        "description": "Generates serialized claim-fee transactions for a Meteora DLMM or DAMM V2 position. When `swapToSol` is true, the response also includes swap transactions that convert the claimed fees into SOL using the supplied slippage tolerance. A swap commission is taken via the swap aggregator only when `swapToSol` is true.",
+        "description": "Generates serialized claim-fee transactions for a Meteora DLMM or DAMM V2 position. When `swapToNative` is true, the response also includes swap transactions that convert the claimed fees into SOL using the supplied slippage tolerance. A swap commission is taken via the swap aggregator only when `swapToNative` is true.",
         "tags": [
           "Position"
         ],
@@ -3722,11 +3722,11 @@
                   },
                   "slippage_bps": {
                     "type": "integer",
-                    "description": "Slippage tolerance in basis points used by the swap-to-SOL transactions (0-10000). Ignored when swapToSol is false.",
+                    "description": "Slippage tolerance in basis points used by the swap-to-SOL transactions (0-10000). Ignored when swapToNative is false.",
                     "minimum": 0,
                     "maximum": 10000
                   },
-                  "swapToSol": {
+                  "swapToNative": {
                     "type": "boolean",
                     "default": false,
                     "description": "When true, the response includes swap transactions that convert the claimed fees into SOL."
@@ -3737,7 +3737,7 @@
                       "OKX",
                       "JUPITER_ULTRA"
                     ],
-                    "description": "The swap provider to use (only relevant when swapToSol is true)"
+                    "description": "The swap provider to use (only relevant when swapToNative is true)"
                   },
                   "type": {
                     "type": "string",
@@ -3779,7 +3779,7 @@
                           "items": {
                             "type": "string"
                           },
-                          "description": "Unsigned swap-to-SOL transactions (base64). Empty when swapToSol is false. Otherwise contains one swap tx per non-SOL fee token plus a trailing Jito-tip-only transaction."
+                          "description": "Unsigned swap-to-SOL transactions (base64). Empty when swapToNative is false. Otherwise contains one swap tx per non-SOL fee token plus a trailing Jito-tip-only transaction."
                         },
                         "meta": {
                           "type": "object",
@@ -3794,7 +3794,7 @@
                                 "meteora_damm_v2"
                               ]
                             },
-                            "swapToSol": {
+                            "swapToNative": {
                               "type": "boolean"
                             },
                             "token0": {
@@ -3867,7 +3867,7 @@
                     "items": {
                       "type": "string"
                     },
-                    "description": "Signed swap-to-SOL transactions with trailing Jito-tip transaction (base64). Empty when swapToSol was false at build time.",
+                    "description": "Signed swap-to-SOL transactions with trailing Jito-tip transaction (base64). Empty when swapToNative was false at build time.",
                     "default": []
                   }
                 }
