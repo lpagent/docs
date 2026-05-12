@@ -1,0 +1,519 @@
+---
+title: "Compound LP Fees"
+description: "Build a bot that claims accrued LP fees from your positions and re-deposits them as SOL to compound your yield"
+---
+
+## What You'll Build
+
+A compound bot that runs on a loop and:
+
+1. **Monitors** your open LP positions for accrued fees
+2. **Claims** fees once they cross a configurable threshold
+3. **Swaps** the claimed tokens into SOL in the same flow
+4. **Re-deposits** the SOL back into the same pool to compound your yield
+
+No smart contract knowledge needed — the bot uses LP Agent's Open API end-to-end.
+
+<Tip>
+The new `claim-fee-tx` endpoint can return swap-to-SOL transactions in the same response, so you don't need a separate swap step before re-depositing. All transactions are landed via Jito for a much higher landing rate — for free.
+</Tip>
+
+---
+
+## How Compounding Works
+
+LP fees accrue inside your position but don't earn additional fees on their own — they sit idle until you claim and redeploy them. A compound cycle turns those idle fees into more liquidity:
+
+```
+Fees accrue inside your position:
+  [-----your position-----]
+                  $$$ uncollected fees (idle)
+
+After compounding:
+  [-------your position-------]
+   ↑ liquidity grows, earning fees on a larger base
+```
+
+### The Bot's Decision Loop
+
+Every check interval, the bot follows this flow:
+
+```
+ ┌──────────────────────────────┐
+ │  Fetch all open positions    │
+ │  GET /lp-positions/opening   │
+ └──────────┬───────────────────┘
+            │
+            ▼
+ ┌──────────────────────────────┐
+ │  For each position:          │
+ │  uncollectedFee >= threshold │
+ │  AND in range?               │
+ └──────┬────────────┬──────────┘
+        │ NO         │ YES
+        ▼            ▼
+    Skip it    ┌──────────────────────────────────┐
+               │ 1. CLAIM fees + swap to SOL      │
+               │    POST /position/claim-fee-tx   │
+               │    POST /position/landing-...    │
+               │                                  │
+               │ 2. Check SOL balance             │
+               │    GET /token/balance            │
+               │                                  │
+               │ 3. ADD liquidity back to pool    │
+               │    POST /pools/{id}/add-tx       │
+               │    POST /pools/landing-add-tx    │
+               └──────────────────────────────────┘
+```
+
+### Key Decisions the Bot Makes
+
+| Decision | How It's Handled |
+|----------|------------------|
+| **When to compound?** | When `uncollectedFee` (USD) crosses `MIN_FEE_USD` |
+| **Which positions to skip?** | Skip out-of-range positions (no point compounding into idle liquidity) |
+| **Should I swap to SOL first?** | Yes — `claim-fee-tx` does it in one round-trip with `swapToSol: true` |
+| **How much to re-deposit?** | The post-claim SOL balance gain, minus a small reserve for fees |
+
+---
+
+## Prerequisites
+
+- An LP Agent API key (get one from the [API Dashboard](https://app.lpagent.io/open-api))
+- A Solana wallet with SOL for transaction fees
+- Node.js >= 18
+
+```bash
+npm install @solana/web3.js bs58
+```
+
+---
+
+## Configuration
+
+Tune these settings before running the bot:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `CHECK_INTERVAL_MS` | `300000` | How often to check positions (ms). 5 min is a good starting point — fees accrue slowly. |
+| `MIN_FEE_USD` | `1` | Minimum uncollected fee value (USD) before claiming. Below this, the gas cost outweighs the gain. |
+| `SLIPPAGE_BPS` | `500` | Slippage tolerance for the swap-to-SOL leg (500 = 5%) |
+| `RESERVE_SOL` | `0.05` | SOL kept in the wallet for future tx fees |
+| `STRATEGY` | `Spot` | Re-deposit distribution: `Spot`, `Curve`, or `BidAsk` |
+| `BIN_RANGE` | `34` | Bins on each side of active bin for the re-deposit |
+| `POOL_FILTER` | `undefined` | Only compound a specific pool, or `undefined` for all |
+
+---
+
+## Step-by-Step
+
+### Step 1: Setup
+
+Set up your API client and wallet (same boilerplate as the [zap-in tutorial](/tutorials/add-liquidity-api)):
+
+```typescript
+import { Keypair, Transaction, VersionedTransaction } from "@solana/web3.js";
+import bs58 from "bs58";
+
+const API_BASE = "https://api.lpagent.io/open-api/v1";
+const API_KEY = "your-api-key-here";
+
+const wallet = Keypair.fromSecretKey(bs58.decode("your-base58-private-key"));
+const OWNER = wallet.publicKey.toBase58();
+
+async function apiCall(method: string, path: string, body?: object) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: { "Content-Type": "application/json", "x-api-key": API_KEY },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) throw new Error(`API ${method} ${path} failed: ${await res.text()}`);
+  return res.json();
+}
+
+function signTx(base64Tx: string): string {
+  const buffer = Buffer.from(base64Tx, "base64");
+  try {
+    const tx = VersionedTransaction.deserialize(buffer);
+    tx.sign([wallet]);
+    return Buffer.from(tx.serialize()).toString("base64");
+  } catch {
+    const tx = Transaction.from(buffer);
+    tx.partialSign(wallet);
+    return tx.serialize({ requireAllSignatures: false, verifySignatures: false }).toString("base64");
+  }
+}
+```
+
+### Step 2: Find Positions With Accrued Fees
+
+Query your open positions and pick the ones whose uncollected fees are worth claiming.
+
+```typescript
+const positionsRes = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}`);
+
+const compoundable = positionsRes.data.filter((pos: any) => {
+  const uncollected = parseFloat(pos.uncollectedFee || "0");
+  return uncollected >= 1 && pos.inRange; // $1 threshold + in range
+});
+
+console.log(`${compoundable.length} of ${positionsRes.count} positions ready to compound`);
+```
+
+**Why filter on `inRange`?** Out-of-range positions aren't earning new fees, so it's usually better to rebalance them ([see the rebalance tutorial](/tutorials/auto-rebalance-bot)) instead of compounding into a dead range.
+
+### Step 3: Generate Claim + Swap-to-SOL Transactions
+
+The `claim-fee-tx` endpoint can return both the claim and the swap-to-SOL transactions in one call when you pass `swapToSol: true`.
+
+```typescript
+const pos = compoundable[0];
+
+const claimRes = await apiCall("POST", "/position/claim-fee-tx", {
+  position_id: pos.id,
+  owner: OWNER,
+  slippage_bps: 500,
+  swapToSol: true,                    // claim AND swap to SOL in one round-trip
+  type: pos.protocol === "meteora_damm_v2" ? "meteora_damm_v2" : "meteora",
+});
+
+console.log(`Claim txs: ${claimRes.data.claimTxsWithJito.length}`);
+console.log(`Swap-to-SOL txs: ${claimRes.data.swapTxsWithJito.length}`);
+console.log(`Raw fee0: ${claimRes.data.meta.rawFee0}, raw fee1: ${claimRes.data.meta.rawFee1}`);
+```
+
+**What you get back:**
+
+| Field | Description |
+|-------|-------------|
+| `claimTxsWithJito[]` | Unsigned claim-fee txs (base64), Jito tip already attached |
+| `swapTxsWithJito[]` | Unsigned swap txs (base64). Empty if `swapToSol: false`. Otherwise: one swap per non-SOL fee token, plus a final Jito-tip tx. |
+| `lastValidBlockHeight` | Submit before this block height passes (≈ 60s) |
+| `meta` | Position metadata, including raw fee amounts at build time |
+
+<Note>
+If a fee token is already SOL, no swap tx is generated for it — it's transferred to your wallet directly by the claim tx.
+</Note>
+
+### Step 4: Sign & Land
+
+Sign every tx and submit them via the landing endpoint. The landing endpoint sends the claim bundle first, then the swap bundle.
+
+```typescript
+const { lastValidBlockHeight, claimTxsWithJito, swapTxsWithJito } = claimRes.data;
+
+const signedClaimTxs = claimTxsWithJito.map(signTx);
+const signedSwapTxs = swapTxsWithJito.map(signTx);
+
+const landRes = await apiCall("POST", "/position/landing-claim-fee-tx", {
+  lastValidBlockHeight,
+  claimTxsWithJito: signedClaimTxs,
+  swapTxsWithJito: signedSwapTxs,
+});
+
+console.log(`Claim landed: https://solscan.io/tx/${landRes.data.signature}`);
+```
+
+<Tip>
+Always use `landing-claim-fee-tx` instead of submitting the txs yourself via RPC. LP Agent's Jito integration provides a much better landing rate — for free.
+</Tip>
+
+### Step 5: Re-Deposit Into the Same Pool
+
+After the claim lands, your wallet has more SOL. Read the new SOL balance, set aside a reserve for future fees, and zap the rest into the same pool.
+
+```typescript
+// Wait briefly for balance to settle
+await new Promise(r => setTimeout(r, 3000));
+
+const balanceRes = await apiCall("GET", `/token/balance?owner=${OWNER}`);
+const sol = balanceRes.data?.find(
+  (t: any) => t.address === "So11111111111111111111111111111111111111112"
+);
+const availableSOL = sol ? parseFloat(sol.uiAmount) : 0;
+const depositSOL = Math.max(0, availableSOL - 0.05); // keep 0.05 SOL reserve
+
+if (depositSOL <= 0.001) {
+  console.log("Not enough SOL to compound, skipping zap-in");
+  return;
+}
+
+// Get the active bin for the new range
+const info = await apiCall("GET", `/pools/${pos.pool}/info`);
+const activeBin = info.data.liquidityViz?.activeBin;
+const fromBinId = activeBin.binId - 34;
+const toBinId = activeBin.binId + 34;
+
+const addTx = await apiCall("POST", `/pools/${pos.pool}/add-tx`, {
+  stratergy: "Spot",
+  inputSOL: depositSOL,
+  percentX: 0.5,
+  fromBinId,
+  toBinId,
+  owner: OWNER,
+  slippage_bps: 500,
+  mode: "zap-in",
+});
+
+const addLandRes = await apiCall("POST", "/pools/landing-add-tx", {
+  lastValidBlockHeight: addTx.data.lastValidBlockHeight,
+  swapTxsWithJito: addTx.data.swapTxsWithJito.map(signTx),
+  addLiquidityTxsWithJito: addTx.data.addLiquidityTxsWithJito.map(signTx),
+  meta: addTx.data.meta,
+});
+
+console.log(`Compounded! New deposit tx: https://solscan.io/tx/${addLandRes.data.signature}`);
+```
+
+<Note>
+This example opens a fresh position centered on the current price rather than topping up the original position. Most strategies prefer this — it keeps your range tight around the current price even as the market moves.
+</Note>
+
+---
+
+## Reference
+
+### Choosing `MIN_FEE_USD`
+
+Each compound cycle costs roughly **0.01–0.03 SOL** in transaction fees (claim + swap-to-SOL + zap-in). At ~$150/SOL, that's $1.50–$4.50. Set `MIN_FEE_USD` so the gain comfortably covers the cost — `$5` is a safe default for most users.
+
+### Common Errors
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `No claim fee transactions to build` | Position has 0 fees to claim | Wait for fees to accrue |
+| `Token X price unavailable` | Price feed missing for swap | Try again later or skip swap (`swapToSol: false`) |
+| Transaction expired | `lastValidBlockHeight` has passed | Re-generate and re-sign within ~60s |
+| `Fees claimed, but swap execution failed` | Swap leg failed on-chain | Fees are still claimed in your wallet — you can swap manually or retry |
+
+### Tips
+
+- **Run on a slow cadence**: Fees accrue over hours, not seconds. Checking every 5–15 minutes is plenty and keeps API usage low.
+- **Don't compound out-of-range positions**: If a position is out of range, rebalancing yields more than compounding.
+- **Consider tax implications**: Each claim is a taxable event in many jurisdictions — check with your local rules.
+- **DAMM V2 support**: The same code works for DLMM and DAMM V2 — the only difference is the `type` field in the request body.
+
+---
+
+## API Endpoints Used
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /lp-positions/opening` | Fetch open positions and their `uncollectedFee` |
+| `POST /position/claim-fee-tx` | Generate claim-fee + optional swap-to-SOL transactions |
+| `POST /position/landing-claim-fee-tx` | Land claim + swap transactions via Jito |
+| `GET /token/balance` | Read post-claim SOL balance |
+| `GET /pools/{poolId}/info` | Get active bin for the new deposit range |
+| `POST /pools/{poolId}/add-tx` | Generate zap-in transactions for the re-deposit |
+| `POST /pools/landing-add-tx` | Land the zap-in via Jito |
+
+---
+
+## Complete Bot Script
+
+Here's the full bot ready to copy-paste and run:
+
+<Accordion title="Full auto-compound bot script">
+
+```typescript
+import { Keypair, Transaction, VersionedTransaction } from "@solana/web3.js";
+import bs58 from "bs58";
+
+// ===================== CONFIG =====================
+const CONFIG = {
+  API_BASE: "https://api.lpagent.io/open-api/v1",
+  API_KEY: "your-api-key-here",
+  PRIVATE_KEY: "your-base58-private-key",
+
+  CHECK_INTERVAL_MS: 5 * 60_000,  // 5 minutes
+  MIN_FEE_USD: 1,                  // only claim when >= $1 in fees
+  SLIPPAGE_BPS: 500,
+  RESERVE_SOL: 0.05,               // keep this much SOL in wallet
+  STRATEGY: "Spot" as const,
+  BIN_RANGE: 34,
+
+  POOL_FILTER: undefined as string | undefined, // or a specific pool address
+};
+
+const SOL_MINT = "So11111111111111111111111111111111111111112";
+const wallet = Keypair.fromSecretKey(bs58.decode(CONFIG.PRIVATE_KEY));
+const OWNER = wallet.publicKey.toBase58();
+
+// ===================== HELPERS =====================
+async function apiCall(method: string, path: string, body?: object) {
+  const res = await fetch(`${CONFIG.API_BASE}${path}`, {
+    method,
+    headers: { "Content-Type": "application/json", "x-api-key": CONFIG.API_KEY },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) throw new Error(`API ${method} ${path} failed: ${await res.text()}`);
+  return res.json();
+}
+
+function signTx(base64Tx: string): string {
+  const buffer = Buffer.from(base64Tx, "base64");
+  try {
+    const tx = VersionedTransaction.deserialize(buffer);
+    tx.sign([wallet]);
+    return Buffer.from(tx.serialize()).toString("base64");
+  } catch {
+    const tx = Transaction.from(buffer);
+    tx.partialSign(wallet);
+    return tx.serialize({ requireAllSignatures: false, verifySignatures: false }).toString("base64");
+  }
+}
+
+const log = (msg: string) => console.log(`[${new Date().toISOString()}] ${msg}`);
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+// ===================== CLAIM + SWAP =====================
+async function claimAndSwap(pos: any): Promise<void> {
+  log(`  Claim: requesting claim-fee-tx (swapToSol=true)...`);
+
+  const claimRes = await apiCall("POST", "/position/claim-fee-tx", {
+    position_id: pos.id,
+    owner: OWNER,
+    slippage_bps: CONFIG.SLIPPAGE_BPS,
+    swapToSol: true,
+    type: pos.protocol === "meteora_damm_v2" ? "meteora_damm_v2" : "meteora",
+  });
+
+  const { lastValidBlockHeight, claimTxsWithJito, swapTxsWithJito } = claimRes.data;
+  const signedClaim = claimTxsWithJito.map(signTx);
+  const signedSwap = swapTxsWithJito.map(signTx);
+
+  const landRes = await apiCall("POST", "/position/landing-claim-fee-tx", {
+    lastValidBlockHeight,
+    claimTxsWithJito: signedClaim,
+    swapTxsWithJito: signedSwap,
+  });
+
+  log(`  Claim landed: ${landRes.data?.signature || "success"}`);
+}
+
+// ===================== ZAP-IN (RE-DEPOSIT) =====================
+async function reDeposit(poolAddress: string, amountSOL: number): Promise<void> {
+  log(`  Re-deposit: zapping ${amountSOL.toFixed(4)} SOL back into pool...`);
+
+  const info = await apiCall("GET", `/pools/${poolAddress}/info`);
+  const activeBin = info.data.liquidityViz?.activeBin;
+  if (!activeBin) throw new Error("Could not get active bin");
+
+  const fromBinId = activeBin.binId - CONFIG.BIN_RANGE;
+  const toBinId = activeBin.binId + CONFIG.BIN_RANGE;
+
+  const addTx = await apiCall("POST", `/pools/${poolAddress}/add-tx`, {
+    stratergy: CONFIG.STRATEGY,
+    inputSOL: amountSOL,
+    percentX: 0.5,
+    fromBinId,
+    toBinId,
+    owner: OWNER,
+    slippage_bps: CONFIG.SLIPPAGE_BPS,
+    mode: "zap-in",
+  });
+
+  const result = await apiCall("POST", "/pools/landing-add-tx", {
+    lastValidBlockHeight: addTx.data.lastValidBlockHeight,
+    swapTxsWithJito: addTx.data.swapTxsWithJito.map(signTx),
+    addLiquidityTxsWithJito: addTx.data.addLiquidityTxsWithJito.map(signTx),
+    meta: addTx.data.meta,
+  });
+
+  log(`  Re-deposit done: https://solscan.io/tx/${result.data.signature}`);
+}
+
+// ===================== COMPOUND LOGIC =====================
+async function checkAndCompound() {
+  log("Checking positions for compoundable fees...");
+
+  const positionsRes = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}`);
+  const positions = positionsRes.data || [];
+
+  if (positions.length === 0) {
+    log("No open positions found");
+    return;
+  }
+
+  for (const pos of positions) {
+    if (CONFIG.POOL_FILTER && pos.pool !== CONFIG.POOL_FILTER) continue;
+
+    const pair = pos.pairName || `${pos.token0Info?.token_symbol}/${pos.token1Info?.token_symbol}`;
+    const uncollectedUsd = parseFloat(pos.uncollectedFee || "0");
+
+    log(`Position: ${pair} | Uncollected: $${uncollectedUsd.toFixed(2)} | In Range: ${pos.inRange}`);
+
+    if (!pos.inRange) {
+      log("  Out of range, consider rebalancing instead — skipping");
+      continue;
+    }
+    if (uncollectedUsd < CONFIG.MIN_FEE_USD) {
+      log(`  Below threshold ($${CONFIG.MIN_FEE_USD}), skipping`);
+      continue;
+    }
+
+    log("  COMPOUNDING...");
+
+    try {
+      // Snapshot SOL balance before the claim
+      const before = await apiCall("GET", `/token/balance?owner=${OWNER}`);
+      const beforeSol = before.data?.find((t: any) => t.address === SOL_MINT);
+      const beforeAmount = beforeSol ? parseFloat(beforeSol.uiAmount) : 0;
+
+      // 1. Claim + swap to SOL in one round-trip
+      await claimAndSwap(pos);
+      await sleep(3000);
+
+      // 2. Read post-claim balance
+      const after = await apiCall("GET", `/token/balance?owner=${OWNER}`);
+      const afterSol = after.data?.find((t: any) => t.address === SOL_MINT);
+      const afterAmount = afterSol ? parseFloat(afterSol.uiAmount) : 0;
+
+      const gained = afterAmount - beforeAmount;
+      log(`  Gained ${gained.toFixed(4)} SOL from claim`);
+
+      const depositSOL = Math.max(0, afterAmount - CONFIG.RESERVE_SOL);
+      if (depositSOL <= 0.001) {
+        log("  Not enough SOL to re-deposit, skipping");
+        continue;
+      }
+
+      // 3. Re-deposit into the same pool
+      await reDeposit(pos.pool, depositSOL);
+      log("  Compound complete!");
+    } catch (error: any) {
+      log(`  ERROR: ${error.message}`);
+    }
+  }
+}
+
+// ===================== BOT LOOP =====================
+async function main() {
+  log("=== LP Agent Auto-Compound Bot ===");
+  log(`Owner: ${OWNER}`);
+  log(`Check interval: ${CONFIG.CHECK_INTERVAL_MS / 1000}s`);
+  log(`Min fee threshold: $${CONFIG.MIN_FEE_USD}`);
+  log(`Pool filter: ${CONFIG.POOL_FILTER || "all pools"}`);
+  log("");
+
+  while (true) {
+    try {
+      await checkAndCompound();
+    } catch (error: any) {
+      log(`ERROR: ${error.message}`);
+    }
+    log(`Next check in ${CONFIG.CHECK_INTERVAL_MS / 1000}s...\n`);
+    await sleep(CONFIG.CHECK_INTERVAL_MS);
+  }
+}
+
+main().catch(console.error);
+```
+
+</Accordion>
+
+## Next Steps
+
+- [Auto-Rebalancing Bot](/tutorials/auto-rebalance-bot) — Compound + rebalance go well together
+- [Zap-In & Zap-Out Tutorial](/tutorials/add-liquidity-api) — Understand the underlying zap flow
+- Explore the full [API Reference](/api-reference/introduction)
