@@ -48,7 +48,6 @@ Every check interval, the bot follows this flow:
  ┌──────────────────────────────┐
  │  For each position:          │
  │  uncollectedFee >= threshold │
- │  AND in range?               │
  └──────┬────────────┬──────────┘
         │ NO         │ YES
         ▼            ▼
@@ -71,7 +70,6 @@ Every check interval, the bot follows this flow:
 | Decision | How It's Handled |
 |----------|------------------|
 | **When to compound?** | When `uncollectedFee` (USD) crosses `MIN_FEE_USD` |
-| **Which positions to skip?** | Skip out-of-range positions (no point compounding into idle liquidity) |
 | **Should I swap to SOL first?** | Yes — `claim-fee-tx` does it in one round-trip with `swapToSol: true` |
 | **How much to re-deposit?** | The post-claim SOL balance gain, minus a small reserve for fees |
 
@@ -154,13 +152,13 @@ const positionsRes = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}`
 
 const compoundable = positionsRes.data.filter((pos: any) => {
   const uncollected = parseFloat(pos.uncollectedFee || "0");
-  return uncollected >= 1 && pos.inRange; // $1 threshold + in range
+  return uncollected >= 1; // $1 threshold
 });
 
 console.log(`${compoundable.length} of ${positionsRes.count} positions ready to compound`);
 ```
 
-**Why filter on `inRange`?** Out-of-range positions aren't earning new fees, so it's usually better to rebalance them ([see the rebalance tutorial](/tutorials/auto-rebalance-bot)) instead of compounding into a dead range.
+Fees are claimable regardless of whether the position is in range — accrued fees stay in the position until you collect them. If a position has drifted out of range, you can still claim and either re-deposit elsewhere or pair this with [rebalancing](/tutorials/auto-rebalance-bot).
 
 ### Step 3: Generate Claim + Swap-to-SOL Transactions
 
@@ -289,7 +287,7 @@ Each compound cycle costs roughly **0.01–0.03 SOL** in transaction fees (claim
 ### Tips
 
 - **Run on a slow cadence**: Fees accrue over hours, not seconds. Checking every 5–15 minutes is plenty and keeps API usage low.
-- **Don't compound out-of-range positions**: If a position is out of range, rebalancing yields more than compounding.
+- **Out-of-range positions**: Fees are still claimable, but if you re-deposit into the same range you'll be adding to dead liquidity. Consider [rebalancing](/tutorials/auto-rebalance-bot) instead, or set the new bin range around the current active bin (which is what the example bot does).
 - **Consider tax implications**: Each claim is a taxable event in many jurisdictions — check with your local rules.
 - **DAMM V2 support**: The same code works for DLMM and DAMM V2 — the only difference is the `type` field in the request body.
 
@@ -443,10 +441,6 @@ async function checkAndCompound() {
 
     log(`Position: ${pair} | Uncollected: $${uncollectedUsd.toFixed(2)} | In Range: ${pos.inRange}`);
 
-    if (!pos.inRange) {
-      log("  Out of range, consider rebalancing instead — skipping");
-      continue;
-    }
     if (uncollectedUsd < CONFIG.MIN_FEE_USD) {
       log(`  Below threshold ($${CONFIG.MIN_FEE_USD}), skipping`);
       continue;
