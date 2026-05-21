@@ -30,7 +30,7 @@ export const FreePlan = () => {
           style={{ fontSize: "48px", fontWeight: "700" }}
           className="text-[#1a1a1a] dark:text-white"
         >
-          $10
+          $7
         </span>
         <span style={{ fontSize: "18px", color: "#999" }}> lifetime</span>
       </div>
