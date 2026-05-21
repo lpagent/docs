@@ -32,7 +32,7 @@ export const EnterprisePlan = () => {
         >
           $40
         </span>
-        <span style={{ fontSize: "18px", color: "#999" }}>/month</span>
+        <span style={{ fontSize: "18px", color: "#999" }}> /month</span>
       </div>
 
       <div
