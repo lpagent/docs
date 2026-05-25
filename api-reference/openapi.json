@@ -19,6 +19,87 @@
         "name": "x-api-key",
         "description": "API key for authentication"
       }
+    },
+    "schemas": {
+      "JsonRpcId": {
+        "description": "JSON-RPC request id, echoed back unchanged in the response.",
+        "oneOf": [
+          {
+            "type": "number",
+            "example": 1
+          },
+          {
+            "type": "string",
+            "example": "req-1"
+          }
+        ]
+      },
+      "SendTransactionConfig": {
+        "type": "object",
+        "description": "Optional configuration object for sendTransaction. Mirrors https://solana.com/docs/rpc/http/sendtransaction.",
+        "properties": {
+          "encoding": {
+            "type": "string",
+            "enum": ["base58", "base64"],
+            "default": "base58",
+            "description": "Encoding used for the transaction data. `base58` is slow and DEPRECATED upstream — prefer `base64`."
+          },
+          "skipPreflight": {
+            "type": "boolean",
+            "default": false,
+            "description": "When true, skip the preflight transaction checks."
+          },
+          "preflightCommitment": {
+            "type": "string",
+            "enum": ["processed", "confirmed", "finalized"],
+            "default": "finalized",
+            "description": "Commitment level to use for preflight."
+          },
+          "maxRetries": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Maximum number of times for the RPC node to retry sending the transaction to the leader. If omitted, the node retries until the blockhash expires."
+          },
+          "minContextSlot": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Set the minimum slot at which to perform preflight transaction checks."
+          }
+        }
+      },
+      "JsonRpcSignatureResponse": {
+        "type": "object",
+        "required": ["jsonrpc", "id"],
+        "properties": {
+          "jsonrpc": {
+            "type": "string",
+            "enum": ["2.0"]
+          },
+          "id": {
+            "$ref": "#/components/schemas/JsonRpcId"
+          },
+          "result": {
+            "type": "string",
+            "description": "First transaction signature embedded in the submitted transaction, base58-encoded.",
+            "example": "2id3YC2jK9G5Wo2phDx4gJVAew8DcY5NAojnVuao8rkxwPYPe8cSwE5GzhEgJA2y8fVjDEo6iR6ykBvDxrTQrtpb"
+          },
+          "error": {
+            "type": "object",
+            "description": "Present instead of `result` when the call fails. HTTP is still 200.",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "example": -32602
+              },
+              "message": {
+                "type": "string",
+                "example": "Invalid params"
+              },
+              "data": {}
+            }
+          }
+        }
+      }
     }
   },
   "security": [
@@ -31,9 +112,7 @@
       "get": {
         "summary": "Get opening LP positions for an owner",
         "description": "Retrieves current liquidity pool positions that are open for a specific wallet owner",
-        "tags": [
-          "Positions"
-        ],
+        "tags": ["Positions"],
         "parameters": [
           {
             "in": "query",
@@ -325,8 +404,7 @@
                               "type": "number"
                             },
                             "example": [
-                              3.1257738735100027,
-                              6.210582680442794,
+                              3.1257738735100027, 6.210582680442794,
                               3.8521785290623467
                             ]
                           },
@@ -335,11 +413,7 @@
                             "items": {
                               "type": "integer"
                             },
-                            "example": [
-                              -402,
-                              -333,
-                              -381
-                            ]
+                            "example": [-402, -333, -381]
                           },
                           "value": {
                             "type": "number",
@@ -443,9 +517,7 @@
       "get": {
         "summary": "Get historical LP positions for an owner",
         "description": "Retrieves historical liquidity pool positions for a specific wallet owner",
-        "tags": [
-          "Positions"
-        ],
+        "tags": ["Positions"],
         "parameters": [
           {
             "in": "query",
@@ -773,8 +845,7 @@
                                   "type": "number"
                                 },
                                 "example": [
-                                  0.02119779171413261,
-                                  0.024379855528418568,
+                                  0.02119779171413261, 0.024379855528418568,
                                   0.01839426300470885
                                 ]
                               },
@@ -906,9 +977,7 @@
       "get": {
         "summary": "Get overview metrics for LP positions",
         "description": "Retrieves comprehensive overview and metrics for liquidity pool positions of a specific owner",
-        "tags": [
-          "Positions"
-        ],
+        "tags": ["Positions"],
         "parameters": [
           {
             "in": "query",
@@ -1492,9 +1561,7 @@
       "get": {
         "summary": "Get logs for LP positions",
         "description": "Retrieves transaction logs for liquidity pool positions. Can fetch logs for a specific position or for all positions of an owner.",
-        "tags": [
-          "Positions"
-        ],
+        "tags": ["Positions"],
         "parameters": [
           {
             "in": "query",
@@ -1673,9 +1740,7 @@
       "get": {
         "summary": "Get token balances for a wallet address",
         "description": "Returns all token balances (SOL and SPL tokens) for the specified wallet address",
-        "tags": [
-          "Token"
-        ],
+        "tags": ["Token"],
         "parameters": [
           {
             "in": "query",
@@ -1774,9 +1839,7 @@
       "get": {
         "summary": "Discover pools",
         "description": "Retrieve a list of pools with filtering, sorting, and pagination",
-        "tags": [
-          "Pools"
-        ],
+        "tags": ["Pools"],
         "parameters": [
           {
             "in": "query",
@@ -1809,11 +1872,7 @@
             "name": "sortOrder",
             "schema": {
               "type": "string",
-              "enum": [
-                "asc",
-                "desc",
-                "default"
-              ],
+              "enum": ["asc", "desc", "default"],
               "default": "desc"
             },
             "description": "Sort order direction"
@@ -1844,12 +1903,7 @@
             "name": "feeTVLInterval",
             "schema": {
               "type": "string",
-              "enum": [
-                "5m",
-                "1h",
-                "6h",
-                "24h"
-              ],
+              "enum": ["5m", "1h", "6h", "24h"],
               "default": "24h"
             },
             "description": "Time interval for fee/TVL ratio calculation"
@@ -2291,9 +2345,7 @@
       "get": {
         "summary": "Get detailed information for a specific pool",
         "description": "Retrieve token info, liquidity visualization, and pool data for a specific pool",
-        "tags": [
-          "Pools"
-        ],
+        "tags": ["Pools"],
         "parameters": [
           {
             "in": "path",
@@ -2324,10 +2376,7 @@
                         "type": {
                           "type": "string",
                           "description": "Pool protocol type",
-                          "enum": [
-                            "meteora",
-                            "meteora_damm_v2"
-                          ],
+                          "enum": ["meteora", "meteora_damm_v2"],
                           "example": "meteora"
                         },
                         "tokenInfo": {
@@ -2490,9 +2539,7 @@
       "get": {
         "summary": "Get positions for a specific pool",
         "description": "Retrieve all positions associated with a specific pool along with position state and pricing info",
-        "tags": [
-          "Pools"
-        ],
+        "tags": ["Pools"],
         "parameters": [
           {
             "in": "path",
@@ -2517,10 +2564,7 @@
             "name": "status",
             "schema": {
               "type": "string",
-              "enum": [
-                "Open",
-                "Close"
-              ]
+              "enum": ["Open", "Close"]
             },
             "description": "Filter by position status"
           },
@@ -2716,9 +2760,7 @@
       "get": {
         "summary": "Get onchain statistics for a specific pool",
         "description": "Retrieve aggregated statistics including total open positions, input values, and unique users for a pool",
-        "tags": [
-          "Pools"
-        ],
+        "tags": ["Pools"],
         "parameters": [
           {
             "in": "path",
@@ -2799,9 +2841,7 @@
       "get": {
         "summary": "Get top LPers for a pool",
         "description": "Retrieve ranked LP providers for a pool with pagination and sorting",
-        "tags": [
-          "Pools"
-        ],
+        "tags": ["Pools"],
         "parameters": [
           {
             "in": "path",
@@ -2826,10 +2866,7 @@
             "name": "sort_order",
             "schema": {
               "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ],
+              "enum": ["asc", "desc"],
               "default": "desc"
             },
             "description": "Sort direction"
@@ -3023,9 +3060,7 @@
       "get": {
         "summary": "Get LP positions revenue for an owner",
         "description": "Retrieve revenue and PnL data over time for a specific wallet owner. Only 7D and 1M ranges are available.",
-        "tags": [
-          "Positions"
-        ],
+        "tags": ["Positions"],
         "parameters": [
           {
             "in": "path",
@@ -3042,11 +3077,7 @@
             "name": "period",
             "schema": {
               "type": "string",
-              "enum": [
-                "day",
-                "week",
-                "month"
-              ],
+              "enum": ["day", "week", "month"],
               "default": "day"
             },
             "description": "Aggregation period for revenue data"
@@ -3056,10 +3087,7 @@
             "name": "range",
             "schema": {
               "type": "string",
-              "enum": [
-                "7D",
-                "1M"
-              ]
+              "enum": ["7D", "1M"]
             },
             "description": "Time range filter (only 7D and 1M are available)"
           },
@@ -3167,9 +3195,7 @@
       "post": {
         "summary": "Zap-In — Generate transaction to add liquidity to a pool",
         "description": "Generate serialized zap-in transactions to add liquidity to a pool. Supports both DLMM and DAMM V2 pools (auto-detected by pool address). In zap-in mode, provide SOL and the API auto-swaps to the correct token ratio. Returns serialized transactions ready to be signed and landed.",
-        "tags": [
-          "Pools"
-        ],
+        "tags": ["Pools"],
         "parameters": [
           {
             "in": "path",
@@ -3187,18 +3213,11 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "stratergy",
-                  "owner"
-                ],
+                "required": ["stratergy", "owner"],
                 "properties": {
                   "stratergy": {
                     "type": "string",
-                    "enum": [
-                      "Spot",
-                      "Curve",
-                      "BidAsk"
-                    ],
+                    "enum": ["Spot", "Curve", "BidAsk"],
                     "description": "The distribution strategy to use"
                   },
                   "inputSOL": {
@@ -3240,19 +3259,13 @@
                   },
                   "provider": {
                     "type": "string",
-                    "enum": [
-                      "OKX",
-                      "JUPITER_ULTRA"
-                    ],
+                    "enum": ["OKX", "JUPITER_ULTRA"],
                     "default": "JUPITER_ULTRA",
                     "description": "Swap provider to use for token swaps"
                   },
                   "mode": {
                     "type": "string",
-                    "enum": [
-                      "normal",
-                      "zap-in"
-                    ],
+                    "enum": ["normal", "zap-in"],
                     "default": "zap-in",
                     "description": "Add liquidity mode"
                   }
@@ -3314,19 +3327,14 @@
       "post": {
         "summary": "Zap-In — Submit and land zap-in transactions",
         "description": "Submit signed zap-in transactions via Jito bundles for on-chain execution",
-        "tags": [
-          "Pools"
-        ],
+        "tags": ["Pools"],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "lastValidBlockHeight",
-                  "addLiquidityTxsWithJito"
-                ],
+                "required": ["lastValidBlockHeight", "addLiquidityTxsWithJito"],
                 "properties": {
                   "lastValidBlockHeight": {
                     "type": "integer",
@@ -3373,9 +3381,7 @@
                       "properties": {
                         "method": {
                           "type": "string",
-                          "enum": [
-                            "JITO"
-                          ]
+                          "enum": ["JITO"]
                         },
                         "signature": {
                           "type": "string"
@@ -3400,19 +3406,14 @@
       "post": {
         "summary": "Zap-Out — Get quotes for withdrawing liquidity",
         "description": "Returns quotes for converting position tokens to different output combinations (token0 to token1, token1 to token0, to base token, etc.) before executing a zap-out",
-        "tags": [
-          "Position"
-        ],
+        "tags": ["Position"],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "id",
-                  "bps"
-                ],
+                "required": ["id", "bps"],
                 "properties": {
                   "id": {
                     "type": "string",
@@ -3439,10 +3440,7 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "success",
-                        "error"
-                      ]
+                      "enum": ["success", "error"]
                     },
                     "data": {
                       "type": "object"
@@ -3465,21 +3463,14 @@
       "post": {
         "summary": "Zap-Out — Generate transaction to withdraw liquidity",
         "description": "Generates serialized zap-out transactions to withdraw liquidity from a position. Supports both Meteora DLMM and DAMM V2 positions.",
-        "tags": [
-          "Position"
-        ],
+        "tags": ["Position"],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "position_id",
-                  "bps",
-                  "owner",
-                  "slippage_bps"
-                ],
+                "required": ["position_id", "bps", "owner", "slippage_bps"],
                 "properties": {
                   "position_id": {
                     "type": "string",
@@ -3503,28 +3494,17 @@
                   },
                   "output": {
                     "type": "string",
-                    "enum": [
-                      "allToken0",
-                      "allToken1",
-                      "both",
-                      "allBaseToken"
-                    ],
+                    "enum": ["allToken0", "allToken1", "both", "allBaseToken"],
                     "description": "The output token for the swap"
                   },
                   "provider": {
                     "type": "string",
-                    "enum": [
-                      "OKX",
-                      "JUPITER_ULTRA"
-                    ],
+                    "enum": ["OKX", "JUPITER_ULTRA"],
                     "description": "The swap provider to use"
                   },
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "meteora",
-                      "meteora_damm_v2"
-                    ],
+                    "enum": ["meteora", "meteora_damm_v2"],
                     "default": "meteora",
                     "description": "The pool type"
                   },
@@ -3599,19 +3579,14 @@
       "post": {
         "summary": "Zap-Out — Submit and land zap-out transactions",
         "description": "Submit signed zap-out (decrease position) transactions via Jito bundles for on-chain execution. Provides better landing rate than direct RPC submission.",
-        "tags": [
-          "Position"
-        ],
+        "tags": ["Position"],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "lastValidBlockHeight",
-                  "closeTxsWithJito"
-                ],
+                "required": ["lastValidBlockHeight", "closeTxsWithJito"],
                 "properties": {
                   "lastValidBlockHeight": {
                     "type": "integer",
@@ -3670,9 +3645,7 @@
                       "properties": {
                         "method": {
                           "type": "string",
-                          "enum": [
-                            "JITO"
-                          ]
+                          "enum": ["JITO"]
                         },
                         "signature": {
                           "type": "string"
@@ -3693,12 +3666,17 @@
         }
       }
     },
-    "/position/claim-fee-tx": {
+    "/rpc": {
       "post": {
-        "summary": "Claim Fees — Generate transaction(s) to claim accrued LP fees",
-        "description": "Generates serialized claim-fee transactions for a Meteora DLMM or DAMM V2 position. When `swapToNative` is true, the response also includes swap transactions that convert the claimed fees into SOL using the supplied slippage tolerance. A swap commission is taken via the swap aggregator only when `swapToNative` is true.",
-        "tags": [
-          "Position"
+        "summary": "Solana JSON-RPC proxy (sendTransaction)",
+        "description": "JSON-RPC 2.0 proxy mirroring Solana's HTTP RPC `sendTransaction` method. The signed transaction is forwarded to the LP-Agent priority RPC and the signature is returned as soon as the priority RPC accepts it (the rotating RPC pool is fanned out to in the background). The client is responsible for polling confirmation.\n\nUpstream spec: https://solana.com/docs/rpc/http/sendtransaction\n\n### Parameters\n\n`params` is a positional tuple — order matters.\n\n| Index | Type | Required | Description |\n|-------|------|----------|-------------|\n| `params[0]` | string | yes | Fully-signed Transaction, encoded as a string (see `encoding` below). |\n| `params[1]` | object | no | Configuration object (see `SendTransactionConfig` schema). |\n\n### Configuration object (`params[1]`)\n\n| Field | Type | Default | Description |\n|-------|------|---------|-------------|\n| `encoding` | string | `base58` | `base58` (DEPRECATED upstream) or `base64`. |\n| `skipPreflight` | boolean | `false` | When true, skip preflight transaction checks. |\n| `preflightCommitment` | string | `finalized` | Commitment level for preflight (`processed` \\| `confirmed` \\| `finalized`). |\n| `maxRetries` | integer | — | Max retries by the RPC node. If omitted, retries until blockhash expires. |\n| `minContextSlot` | integer | — | Minimum slot at which to perform preflight checks. |\n\n### Result\n\nA JSON-RPC 2.0 envelope whose `result` is the first transaction signature (base58) embedded in the submitted transaction — i.e. the transaction id. HTTP status is **always 200** per JSON-RPC 2.0; on failure, the envelope contains an `error` field instead of `result`.",
+        "tags": ["RPC"],
+        "x-codeSamples": [
+          {
+            "lang": "javascript",
+            "label": "@solana/web3.js",
+            "source": "import { Connection, VersionedTransaction } from \"@solana/web3.js\";\n\nconst conn = new Connection(\"https://api.lpagent.io/open-api/v1/rpc\", {\n  httpHeaders: { \"x-api-key\": \"<YOUR_API_KEY>\" },\n  commitment: \"confirmed\",\n});\n\n// `signedTx` is a fully-signed VersionedTransaction\nconst sig = await conn.sendRawTransaction(signedTx.serialize(), {\n  skipPreflight: true,\n  maxRetries: 0,\n});\nconsole.log(\"signature:\", sig);"
+          }
         ],
         "requestBody": {
           "required": true,
@@ -3706,207 +3684,238 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "position_id",
-                  "owner",
-                  "slippage_bps"
-                ],
+                "required": ["jsonrpc", "method", "params"],
                 "properties": {
-                  "position_id": {
+                  "jsonrpc": {
                     "type": "string",
-                    "description": "The position ID"
+                    "enum": ["2.0"],
+                    "default": "2.0"
                   },
-                  "owner": {
+                  "id": {
+                    "$ref": "#/components/schemas/JsonRpcId"
+                  },
+                  "method": {
                     "type": "string",
-                    "description": "The owner's wallet address"
+                    "enum": ["sendTransaction"]
                   },
-                  "slippage_bps": {
-                    "type": "integer",
-                    "description": "Slippage tolerance in basis points used by the swap-to-SOL transactions (0-10000). Ignored when swapToNative is false.",
-                    "minimum": 0,
-                    "maximum": 10000
-                  },
-                  "swapToNative": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "When true, the response includes swap transactions that convert the claimed fees into SOL."
-                  },
-                  "provider": {
-                    "type": "string",
-                    "enum": [
-                      "OKX",
-                      "JUPITER_ULTRA"
-                    ],
-                    "description": "The swap provider to use (only relevant when swapToNative is true)"
-                  },
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "meteora",
-                      "meteora_damm_v2"
-                    ],
-                    "default": "meteora",
-                    "description": "The pool type"
+                  "params": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 2,
+                    "description": "Positional tuple: [signed transaction string, optional config object]. See the description above for the field list.",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "string",
+                          "description": "params[0]: fully-signed transaction, encoded per the `encoding` field of the config (default base58). Use base64 for new code."
+                        },
+                        {
+                          "$ref": "#/components/schemas/SendTransactionConfig"
+                        }
+                      ]
+                    }
                   }
                 }
+              },
+              "example": {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "sendTransaction",
+                "params": [
+                  "AYx1aP3uA5h0v0...REPLACE_WITH_BASE64_SIGNED_TX...==",
+                  {
+                    "encoding": "base64",
+                    "skipPreflight": true,
+                    "preflightCommitment": "confirmed",
+                    "maxRetries": 0
+                  }
+                ]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Transaction data prepared successfully",
+            "description": "JSON-RPC response (success or error envelope). HTTP is always 200; inspect `result` vs `error`.",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "lastValidBlockHeight": {
-                          "type": "number"
-                        },
-                        "claimTxsWithJito": {
+                  "$ref": "#/components/schemas/JsonRpcSignatureResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Transaction accepted by priority RPC",
+                    "value": {
+                      "jsonrpc": "2.0",
+                      "result": "2id3YC2jK9G5Wo2phDx4gJVAew8DcY5NAojnVuao8rkxwPYPe8cSwE5GzhEgJA2y8fVjDEo6iR6ykBvDxrTQrtpb",
+                      "id": 1
+                    }
+                  },
+                  "invalid_params": {
+                    "summary": "Bad request — failed to decode the transaction",
+                    "value": {
+                      "jsonrpc": "2.0",
+                      "error": {
+                        "code": -32602,
+                        "message": "Failed to decode transaction as base64: Invalid character"
+                      },
+                      "id": 1
+                    }
+                  },
+                  "internal_error": {
+                    "summary": "Upstream RPC rejected the transaction",
+                    "value": {
+                      "jsonrpc": "2.0",
+                      "error": {
+                        "code": -32603,
+                        "message": "Transaction simulation failed: Blockhash not found"
+                      },
+                      "id": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jito": {
+      "post": {
+        "summary": "Jito Block Engine sendBundle (with landing confirmation)",
+        "description": "JSON-RPC 2.0 endpoint that submits a bundle to the Jito Block Engine and waits for it to land. Internally calls `sendJitoBundle`, which simulates the bundle, sends it to `https://<region>.mainnet.block-engine.jito.wtf/api/v1/bundles`, polls signature status until the first transaction is confirmed (up to ~30s), and retries on failure.\n\nSpec reference: https://docs.jito.wtf/lowlatencytxnsend/#sendbundle\n\nNotes:\n- HTTP status is always 200 per JSON-RPC 2.0; check the `error` field for failures.\n- Bundle size is capped at 5 transactions (Jito limit).\n- Transactions must already include a tip instruction; this endpoint does NOT inject tips.\n- Transactions must be fully signed (all required signatures present) before submission. Unsigned bundles return JSON-RPC INVALID_PARAMS with `data.unsignedIndices` listing the offending positions.\n- This endpoint blocks until the bundle lands or polling/retries are exhausted.",
+        "tags": ["RPC"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "region",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["mainnet", "amsterdam", "frankfurt", "ny", "tokyo"],
+              "default": "mainnet"
+            },
+            "description": "Jito block engine region"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["jsonrpc", "method", "params"],
+                "properties": {
+                  "jsonrpc": {
+                    "type": "string",
+                    "enum": ["2.0"]
+                  },
+                  "id": {
+                    "description": "Request id, echoed back in the response",
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "method": {
+                    "type": "string",
+                    "enum": ["sendBundle"]
+                  },
+                  "params": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 2,
+                    "description": "Positional tuple: [transactions[] (1-5 signed txs), options? ({ encoding })]",
+                    "items": {
+                      "oneOf": [
+                        {
                           "type": "array",
+                          "description": "params[0]: array of 1-5 fully-signed transactions, each encoded per `options.encoding` (default base58).",
+                          "minItems": 1,
+                          "maxItems": 5,
                           "items": {
                             "type": "string"
-                          },
-                          "description": "Unsigned claim-fee transactions (base64) with Jito tips already attached"
+                          }
                         },
-                        "swapTxsWithJito": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          },
-                          "description": "Unsigned swap-to-SOL transactions (base64). Empty when swapToNative is false. Otherwise contains one swap tx per non-SOL fee token plus a trailing Jito-tip-only transaction."
-                        },
-                        "meta": {
+                        {
                           "type": "object",
+                          "description": "params[1]: optional options object.",
                           "properties": {
-                            "position_id": {
-                              "type": "string"
-                            },
-                            "type": {
+                            "encoding": {
                               "type": "string",
-                              "enum": [
-                                "meteora",
-                                "meteora_damm_v2"
-                              ]
-                            },
-                            "swapToNative": {
-                              "type": "boolean"
-                            },
-                            "token0": {
-                              "type": "string"
-                            },
-                            "token1": {
-                              "type": "string"
-                            },
-                            "rawFee0": {
-                              "type": "string",
-                              "description": "Uncollected fee for token0 at build time (raw, in token decimals)"
-                            },
-                            "rawFee1": {
-                              "type": "string",
-                              "description": "Uncollected fee for token1 at build time (raw, in token decimals)"
-                            },
-                            "updatedAt": {
-                              "type": "string",
-                              "format": "date-time"
+                              "enum": ["base58", "base64"],
+                              "default": "base58",
+                              "description": "Encoding used for each transaction string."
                             }
                           }
                         }
-                      }
+                      ]
                     }
                   }
                 }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid parameters or position-related errors"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/position/landing-claim-fee-tx": {
-      "post": {
-        "summary": "Claim Fees — Submit and land signed claim-fee transactions",
-        "description": "Submits the signed claim-fee transactions (and optional swap-to-SOL transactions) via Jito bundles for on-chain execution. Provides better landing rate than direct RPC submission.",
-        "tags": [
-          "Position"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "lastValidBlockHeight",
-                  "claimTxsWithJito"
-                ],
-                "properties": {
-                  "lastValidBlockHeight": {
-                    "type": "integer",
-                    "description": "Last valid block height for the transactions"
-                  },
-                  "claimTxsWithJito": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "description": "Signed claim-fee transactions (base64) — already include Jito tip"
-                  },
-                  "swapTxsWithJito": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "description": "Signed swap-to-SOL transactions with trailing Jito-tip transaction (base64). Empty when swapToNative was false at build time.",
-                    "default": []
-                  }
-                }
+              },
+              "example": {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "sendBundle",
+                "params": [
+                  [
+                    "REPLACE_WITH_BASE58_SIGNED_TX_1",
+                    "REPLACE_WITH_BASE58_SIGNED_TX_2_INCLUDING_JITO_TIP"
+                  ]
+                ]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Successfully submitted and landed transactions",
+            "description": "JSON-RPC response (success or error envelope)",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "status": {
+                    "jsonrpc": {
                       "type": "string",
-                      "example": "success"
+                      "example": "2.0"
                     },
-                    "data": {
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "result": {
                       "type": "object",
+                      "description": "Bundle landing details",
                       "properties": {
-                        "method": {
+                        "bundleId": {
                           "type": "string",
-                          "enum": [
-                            "JITO"
-                          ]
+                          "description": "Jito bundle id (UUID)"
                         },
                         "signature": {
-                          "type": "string"
-                        },
-                        "bundleIds": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        "swapResultsCount": {
+                          "type": "string",
+                          "description": "Base58 signature of the first transaction in the bundle"
+                        }
+                      }
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
                           "type": "integer"
+                        },
+                        "message": {
+                          "type": "string"
                         }
                       }
                     }
@@ -3914,12 +3923,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid parameters or transaction execution failed"
-          },
-          "500": {
-            "description": "Internal server error"
           }
         }
       }
