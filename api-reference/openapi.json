@@ -19,87 +19,6 @@
         "name": "x-api-key",
         "description": "API key for authentication"
       }
-    },
-    "schemas": {
-      "JsonRpcId": {
-        "description": "JSON-RPC request id, echoed back unchanged in the response.",
-        "oneOf": [
-          {
-            "type": "number",
-            "example": 1
-          },
-          {
-            "type": "string",
-            "example": "req-1"
-          }
-        ]
-      },
-      "SendTransactionConfig": {
-        "type": "object",
-        "description": "Optional configuration object for sendTransaction. Mirrors https://solana.com/docs/rpc/http/sendtransaction.",
-        "properties": {
-          "encoding": {
-            "type": "string",
-            "enum": ["base58", "base64"],
-            "default": "base58",
-            "description": "Encoding used for the transaction data. `base58` is slow and DEPRECATED upstream — prefer `base64`."
-          },
-          "skipPreflight": {
-            "type": "boolean",
-            "default": false,
-            "description": "When true, skip the preflight transaction checks."
-          },
-          "preflightCommitment": {
-            "type": "string",
-            "enum": ["processed", "confirmed", "finalized"],
-            "default": "finalized",
-            "description": "Commitment level to use for preflight."
-          },
-          "maxRetries": {
-            "type": "integer",
-            "minimum": 0,
-            "description": "Maximum number of times for the RPC node to retry sending the transaction to the leader. If omitted, the node retries until the blockhash expires."
-          },
-          "minContextSlot": {
-            "type": "integer",
-            "minimum": 0,
-            "description": "Set the minimum slot at which to perform preflight transaction checks."
-          }
-        }
-      },
-      "JsonRpcSignatureResponse": {
-        "type": "object",
-        "required": ["jsonrpc", "id"],
-        "properties": {
-          "jsonrpc": {
-            "type": "string",
-            "enum": ["2.0"]
-          },
-          "id": {
-            "$ref": "#/components/schemas/JsonRpcId"
-          },
-          "result": {
-            "type": "string",
-            "description": "First transaction signature embedded in the submitted transaction, base58-encoded.",
-            "example": "2id3YC2jK9G5Wo2phDx4gJVAew8DcY5NAojnVuao8rkxwPYPe8cSwE5GzhEgJA2y8fVjDEo6iR6ykBvDxrTQrtpb"
-          },
-          "error": {
-            "type": "object",
-            "description": "Present instead of `result` when the call fails. HTTP is still 200.",
-            "properties": {
-              "code": {
-                "type": "integer",
-                "example": -32602
-              },
-              "message": {
-                "type": "string",
-                "example": "Invalid params"
-              },
-              "data": {}
-            }
-          }
-        }
-      }
     }
   },
   "security": [
@@ -2840,7 +2759,7 @@
     "/pools/{poolId}/top-lpers": {
       "get": {
         "summary": "Get top LPers for a pool",
-        "description": "Retrieve ranked LP providers for a pool with pagination and sorting",
+        "description": "Retrieve ranked LP providers for a pool with pagination and sorting.\n\n**Plan:** Requires an active **Premium** or **Enterprise** API key. Free-plan keys receive `401`.\n",
         "tags": ["Pools"],
         "parameters": [
           {
@@ -3049,6 +2968,22 @@
           },
           "400": {
             "description": "Invalid parameters"
+          },
+          "401": {
+            "description": "Free plan not allowed — upgrade to Premium or Enterprise",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "A Premium or Enterprise plan is required to access this endpoint."
+                    }
+                  }
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal server error"
@@ -3666,18 +3601,179 @@
         }
       }
     },
+    "/position/claim-fee-tx": {
+      "post": {
+        "summary": "Claim Fees — Generate transaction(s) to claim accrued LP fees",
+        "description": "Generates serialized claim-fee transactions for a Meteora DLMM or DAMM V2 position. When `swapToNative` is true, also returns swap transactions that convert the claimed fees into SOL using the supplied slippage tolerance.",
+        "tags": ["Position"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["position_id", "owner", "slippage_bps"],
+                "properties": {
+                  "position_id": {
+                    "type": "string",
+                    "description": "The position ID"
+                  },
+                  "owner": {
+                    "type": "string",
+                    "description": "The owner's wallet address"
+                  },
+                  "slippage_bps": {
+                    "type": "integer",
+                    "description": "Slippage tolerance in basis points for swap-to-SOL (0-10000). Ignored when swapToNative is false.",
+                    "minimum": 0,
+                    "maximum": 10000
+                  },
+                  "swapToNative": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "When true, the response includes swap transactions that convert the claimed fees into SOL."
+                  },
+                  "provider": {
+                    "type": "string",
+                    "enum": ["OKX", "JUPITER_ULTRA"],
+                    "description": "The swap provider to use (only relevant when swapToNative is true)"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["meteora", "meteora_damm_v2"],
+                    "default": "meteora",
+                    "description": "The pool type"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transaction data prepared successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "lastValidBlockHeight": {
+                          "type": "number"
+                        },
+                        "claimTxsWithJito": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "swapTxsWithJito": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "meta": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters or position-related errors"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/position/landing-claim-fee-tx": {
+      "post": {
+        "summary": "Claim Fees — Submit and land signed claim-fee transactions",
+        "description": "Submits the signed claim-fee transactions (and optional swap-to-SOL transactions) via Jito bundles for on-chain execution. Provides better landing rate than direct RPC submission.",
+        "tags": ["Position"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["lastValidBlockHeight", "claimTxsWithJito"],
+                "properties": {
+                  "lastValidBlockHeight": {
+                    "type": "integer",
+                    "description": "Last valid block height for the transactions"
+                  },
+                  "claimTxsWithJito": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Signed claim-fee transactions (base64) — already include Jito tip"
+                  },
+                  "swapTxsWithJito": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Signed swap-to-SOL transactions with trailing Jito tip tx (base64). Empty if swapToNative was false at build time.",
+                    "default": []
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully submitted and landed transactions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "method": {
+                          "type": "string",
+                          "enum": ["JITO"]
+                        },
+                        "signature": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters or transaction execution failed"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/rpc": {
       "post": {
         "summary": "Solana JSON-RPC proxy (sendTransaction)",
-        "description": "JSON-RPC 2.0 proxy mirroring Solana's HTTP RPC `sendTransaction` method. The signed transaction is forwarded to the LP-Agent priority RPC and the signature is returned as soon as the priority RPC accepts it (the rotating RPC pool is fanned out to in the background). The client is responsible for polling confirmation.\n\nUpstream spec: https://solana.com/docs/rpc/http/sendtransaction\n\n### Parameters\n\n`params` is a positional tuple — order matters.\n\n| Index | Type | Required | Description |\n|-------|------|----------|-------------|\n| `params[0]` | string | yes | Fully-signed Transaction, encoded as a string (see `encoding` below). |\n| `params[1]` | object | no | Configuration object (see `SendTransactionConfig` schema). |\n\n### Configuration object (`params[1]`)\n\n| Field | Type | Default | Description |\n|-------|------|---------|-------------|\n| `encoding` | string | `base58` | `base58` (DEPRECATED upstream) or `base64`. |\n| `skipPreflight` | boolean | `false` | When true, skip preflight transaction checks. |\n| `preflightCommitment` | string | `finalized` | Commitment level for preflight (`processed` \\| `confirmed` \\| `finalized`). |\n| `maxRetries` | integer | — | Max retries by the RPC node. If omitted, retries until blockhash expires. |\n| `minContextSlot` | integer | — | Minimum slot at which to perform preflight checks. |\n\n### Result\n\nA JSON-RPC 2.0 envelope whose `result` is the first transaction signature (base58) embedded in the submitted transaction — i.e. the transaction id. HTTP status is **always 200** per JSON-RPC 2.0; on failure, the envelope contains an `error` field instead of `result`.",
+        "description": "JSON-RPC 2.0 endpoint mirroring Solana's HTTP RPC. Currently supports only `sendTransaction`.\nThe encoded transaction is forwarded to the LP-Agent priority RPC; the signature is returned\nas soon as the priority RPC accepts it (the rotating RPC pool is fanned out to in the\nbackground). Behavior matches https://solana.com/docs/rpc/http/sendtransaction — the client\nis responsible for polling confirmation.\n\nOn success the response is HTTP 200 with a `result` field. On failure the response is HTTP 400\nwith a JSON-RPC `error` envelope (invalid request, unsupported method, bad params, decode failure, or upstream error).\n",
         "tags": ["RPC"],
-        "x-codeSamples": [
-          {
-            "lang": "javascript",
-            "label": "@solana/web3.js",
-            "source": "import { Connection, VersionedTransaction } from \"@solana/web3.js\";\n\nconst conn = new Connection(\"https://api.lpagent.io/open-api/v1/rpc\", {\n  httpHeaders: { \"x-api-key\": \"<YOUR_API_KEY>\" },\n  commitment: \"confirmed\",\n});\n\n// `signedTx` is a fully-signed VersionedTransaction\nconst sig = await conn.sendRawTransaction(signedTx.serialize(), {\n  skipPreflight: true,\n  maxRetries: 0,\n});\nconsole.log(\"signature:\", sig);"
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -3688,11 +3784,18 @@
                 "properties": {
                   "jsonrpc": {
                     "type": "string",
-                    "enum": ["2.0"],
-                    "default": "2.0"
+                    "enum": ["2.0"]
                   },
                   "id": {
-                    "$ref": "#/components/schemas/JsonRpcId"
+                    "description": "Request id, echoed back in the response",
+                    "oneOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
                   },
                   "method": {
                     "type": "string",
@@ -3702,75 +3805,80 @@
                     "type": "array",
                     "minItems": 1,
                     "maxItems": 2,
-                    "description": "Positional tuple: [signed transaction string, optional config object]. See the description above for the field list.",
-                    "items": {
-                      "oneOf": [
-                        {
-                          "type": "string",
-                          "description": "params[0]: fully-signed transaction, encoded per the `encoding` field of the config (default base58). Use base64 for new code."
-                        },
-                        {
-                          "$ref": "#/components/schemas/SendTransactionConfig"
-                        }
-                      ]
-                    }
+                    "description": "[transaction (encoded string), config? (object)]",
+                    "items": {}
                   }
                 }
-              },
-              "example": {
-                "jsonrpc": "2.0",
-                "id": 1,
-                "method": "sendTransaction",
-                "params": [
-                  "AYx1aP3uA5h0v0...REPLACE_WITH_BASE64_SIGNED_TX...==",
-                  {
-                    "encoding": "base64",
-                    "skipPreflight": true,
-                    "preflightCommitment": "confirmed",
-                    "maxRetries": 0
-                  }
-                ]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "JSON-RPC response (success or error envelope). HTTP is always 200; inspect `result` vs `error`.",
+            "description": "Success — JSON-RPC envelope with `result` set to the transaction signature (base58).",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JsonRpcSignatureResponse"
-                },
-                "examples": {
-                  "success": {
-                    "summary": "Transaction accepted by priority RPC",
-                    "value": {
-                      "jsonrpc": "2.0",
-                      "result": "2id3YC2jK9G5Wo2phDx4gJVAew8DcY5NAojnVuao8rkxwPYPe8cSwE5GzhEgJA2y8fVjDEo6iR6ykBvDxrTQrtpb",
-                      "id": 1
+                  "type": "object",
+                  "properties": {
+                    "jsonrpc": {
+                      "type": "string",
+                      "example": "2.0"
+                    },
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "result": {
+                      "type": "string",
+                      "description": "Transaction signature (base58)"
                     }
-                  },
-                  "invalid_params": {
-                    "summary": "Bad request — failed to decode the transaction",
-                    "value": {
-                      "jsonrpc": "2.0",
-                      "error": {
-                        "code": -32602,
-                        "message": "Failed to decode transaction as base64: Invalid character"
-                      },
-                      "id": 1
-                    }
-                  },
-                  "internal_error": {
-                    "summary": "Upstream RPC rejected the transaction",
-                    "value": {
-                      "jsonrpc": "2.0",
-                      "error": {
-                        "code": -32603,
-                        "message": "Transaction simulation failed: Blockhash not found"
-                      },
-                      "id": 1
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or upstream failure — JSON-RPC envelope with the `error` field populated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "jsonrpc": {
+                      "type": "string",
+                      "example": "2.0"
+                    },
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "integer"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data": {
+                          "description": "Optional structured details",
+                          "nullable": true
+                        }
+                      }
                     }
                   }
                 }
@@ -3783,7 +3891,7 @@
     "/jito": {
       "post": {
         "summary": "Jito Block Engine sendBundle (with landing confirmation)",
-        "description": "JSON-RPC 2.0 endpoint that submits a bundle to the Jito Block Engine and waits for it to land. Internally calls `sendJitoBundle`, which simulates the bundle, sends it to `https://<region>.mainnet.block-engine.jito.wtf/api/v1/bundles`, polls signature status until the first transaction is confirmed (up to ~30s), and retries on failure.\n\nSpec reference: https://docs.jito.wtf/lowlatencytxnsend/#sendbundle\n\nNotes:\n- HTTP status is always 200 per JSON-RPC 2.0; check the `error` field for failures.\n- Bundle size is capped at 5 transactions (Jito limit).\n- Transactions must already include a tip instruction; this endpoint does NOT inject tips.\n- Transactions must be fully signed (all required signatures present) before submission. Unsigned bundles return JSON-RPC INVALID_PARAMS with `data.unsignedIndices` listing the offending positions.\n- This endpoint blocks until the bundle lands or polling/retries are exhausted.",
+        "description": "JSON-RPC 2.0 endpoint that submits a bundle to the Jito Block Engine and waits for it to land.\nInternally calls `sendJitoBundle`, which simulates the bundle, sends it to\n`https://<region>.mainnet.block-engine.jito.wtf/api/v1/bundles`, polls signature status until the\nfirst transaction is confirmed (up to ~30s), and retries on failure.\n\nSpec reference: https://docs.jito.wtf/lowlatencytxnsend/#sendbundle\n\nNotes:\n- On success the response is HTTP 200 with a `result` object. On failure the response is HTTP 400 with a JSON-RPC `error` envelope.\n- Bundle size is capped at 5 transactions (Jito limit).\n- Transactions must already include a tip instruction; this endpoint does NOT inject tips.\n- Transactions must be fully signed (all required signatures present) before submission. Unsigned bundles return HTTP 400 with JSON-RPC INVALID_PARAMS and `data.unsignedIndices` listing the offending positions.\n- This endpoint blocks until the bundle lands or polling/retries are exhausted.\n",
         "tags": ["RPC"],
         "parameters": [
           {
@@ -3829,52 +3937,17 @@
                     "type": "array",
                     "minItems": 1,
                     "maxItems": 2,
-                    "description": "Positional tuple: [transactions[] (1-5 signed txs), options? ({ encoding })]",
-                    "items": {
-                      "oneOf": [
-                        {
-                          "type": "array",
-                          "description": "params[0]: array of 1-5 fully-signed transactions, each encoded per `options.encoding` (default base58).",
-                          "minItems": 1,
-                          "maxItems": 5,
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        {
-                          "type": "object",
-                          "description": "params[1]: optional options object.",
-                          "properties": {
-                            "encoding": {
-                              "type": "string",
-                              "enum": ["base58", "base64"],
-                              "default": "base58",
-                              "description": "Encoding used for each transaction string."
-                            }
-                          }
-                        }
-                      ]
-                    }
+                    "description": "[transactions[] (1-5 base58/base64 encoded txs), options? ({ encoding: 'base58' | 'base64' })]",
+                    "items": {}
                   }
                 }
-              },
-              "example": {
-                "jsonrpc": "2.0",
-                "id": 1,
-                "method": "sendBundle",
-                "params": [
-                  [
-                    "REPLACE_WITH_BASE58_SIGNED_TX_1",
-                    "REPLACE_WITH_BASE58_SIGNED_TX_2_INCLUDING_JITO_TIP"
-                  ]
-                ]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "JSON-RPC response (success or error envelope)",
+            "description": "Success — JSON-RPC envelope with `result` set to the bundle landing details.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3907,6 +3980,32 @@
                           "description": "Base58 signature of the first transaction in the bundle"
                         }
                       }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation, simulation, or upstream failure — JSON-RPC envelope with the `error` field populated. Unsigned-bundle errors include `error.data.unsignedIndices`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "jsonrpc": {
+                      "type": "string",
+                      "example": "2.0"
+                    },
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ]
                     },
                     "error": {
                       "type": "object",
@@ -3916,6 +4015,10 @@
                         },
                         "message": {
                           "type": "string"
+                        },
+                        "data": {
+                          "description": "Optional structured details (e.g. unsignedIndices: number[])",
+                          "nullable": true
                         }
                       }
                     }
