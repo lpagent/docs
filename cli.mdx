@@ -7,7 +7,7 @@ description: "Use LP Agent from terminal or inside AI agent workflows"
 
 `lpagent` is the command-line interface for LP Agent.
 
-It lets users and AI agents discover pools, inspect positions, and execute zap-in/zap-out transaction workflows from terminal scripts.
+It lets users and AI agents discover pools, inspect positions, and execute zap-in/zap-out transaction workflows from terminal scripts, on Solana and on the Robinhood chain.
 
 - Works as a standalone CLI
 - Works well in coding-agent environments
@@ -50,6 +50,22 @@ Then verify access:
 lpagent positions open -o table --native
 ```
 
+## Chains
+
+Commands that accept `--chain` default to `SOL`. Pass `--chain ROBINHOOD` for Uniswap v3/v4 on the Robinhood chain.
+
+```bash
+lpagent pools discover --chain ROBINHOOD --sort-by tvl -o table
+lpagent positions logs --chain ROBINHOOD --owner 0xYourWallet
+lpagent api get /pools/discover --query "chain=ROBINHOOD&sortBy=tvl"
+```
+
+Today `pools discover` and `positions logs` are the chain-aware commands. The remaining commands
+(`positions open/historical/overview/get/revenue`, `pools info/positions/onchain-stats/top-lpers`,
+`token balance`, and all zap-in / zap-out / claim-fee transaction commands) are Solana only.
+Native values (`--native`) are shown in SOL on Solana and in ETH on Robinhood.
+See the [chain support matrix](/ai-api-guide#chain-support-matrix).
+
 ## Core command groups
 
 ### Positions
@@ -73,7 +89,7 @@ lpagent pools onchain-stats <poolId>
 lpagent pools top-lpers <poolId>
 ```
 
-### Zap-In / Zap-Out transaction flow
+### Zap-In / Zap-Out transaction flow (Solana only)
 
 ```bash
 # Zap-In

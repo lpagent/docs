@@ -1496,9 +1496,10 @@
             "name": "chain",
             "schema": {
               "type": "string",
+              "enum": ["SOL", "ROBINHOOD"],
               "default": "SOL"
             },
-            "description": "Blockchain chain identifier",
+            "description": "Blockchain chain identifier. `SOL` for Solana, `ROBINHOOD` for the Robinhood chain (Uniswap v3/v4). Native amounts in the response are in SOL or ETH accordingly.",
             "example": "SOL"
           },
           {
@@ -1765,9 +1766,10 @@
             "name": "chain",
             "schema": {
               "type": "string",
+              "enum": ["SOL", "ROBINHOOD"],
               "default": "SOL"
             },
-            "description": "The blockchain network"
+            "description": "The blockchain network. `SOL` returns Meteora/Orca pools, `ROBINHOOD` returns Uniswap v3/v4 pools on the Robinhood chain."
           },
           {
             "in": "query",

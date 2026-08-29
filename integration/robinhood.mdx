@@ -1,0 +1,105 @@
+---
+title: "Robinhood Chain"
+description: "Uniswap v3 and v4 liquidity on the Robinhood chain"
+---
+
+## Overview
+
+LP Agent supports the **Robinhood chain**, an EVM network (chain id `4663`), for
+Uniswap liquidity positions. Everything that makes LP Agent useful on Solana —
+position tracking, PnL and fee analytics, copy LP, take-profit / stop-loss,
+auto-compound — also runs on Robinhood.
+
+| | Solana | Robinhood |
+| --- | --- | --- |
+| Chain key (`chain` param) | `SOL` | `ROBINHOOD` |
+| Chain type | Solana | EVM (chain id `4663`) |
+| Protocols | Meteora DLMM, Meteora DAMM v2, Orca | Uniswap v3, Uniswap v4 |
+| Native token | SOL | ETH |
+| Wallet / token / pool address | base58 pubkey | `0x…` hex address |
+| Position id | position pubkey | NFT `tokenId` (a number) |
+| Public RPC | — | `https://rpc.mainnet.chain.robinhood.com` |
+
+<Note>
+All `*Native` fields in API responses (`valueNative`, `inputNative`, `collectedFeeNative`,
+`unCollectedFeeNative`, `pnlNative`, …) are denominated in the chain's native token.
+On Robinhood that means **ETH**, not SOL.
+</Note>
+
+## Supported protocols
+
+<CardGroup cols={2}>
+  <Card title="Uniswap v3">
+    Concentrated liquidity positions represented as NFTs. LP Agent tracks principal
+    and fees separately, so PnL is not polluted by fee claims.
+  </Card>
+  <Card title="Uniswap v4">
+    Singleton pool manager with optional hooks. LP Agent indexes v4 pools, including
+    hooked pools, and tracks positions by `tokenId` and `poolId`.
+  </Card>
+</CardGroup>
+
+Uniswap v3 and v4 are indexed separately and appear as two `platform` values,
+`uniswap_v3` and `uniswap_v4`. When you filter by platform, include both if you
+want the full Robinhood picture.
+
+## Address and id formats
+
+- **Wallet, token, and pool addresses** are EVM hex addresses (`0x` + 40 hex chars).
+  Lookups are case-insensitive; checksummed and lowercase addresses both work.
+- **Position ids** are the Uniswap NFT `tokenId` (for example `18423`), not an address.
+  On v4 the position also carries its `poolId` (a `bytes32` hash), which is what
+  pool-scoped endpoints expect for v4 pools.
+
+## Swaps and transaction landing
+
+- Zap-in / zap-out swaps on Robinhood route through the **OKX DEX aggregator**.
+  Jupiter and Jito are Solana-only and do not apply here.
+- There is no bundle "landing" step on EVM. Transactions are regular EVM
+  transactions submitted to the Robinhood RPC.
+
+## Risk notes specific to Robinhood
+
+<Warning>
+**Uniswap v4 hooks can change the fee you actually pay.** A v4 pool's hook may
+override the swap fee at execution time, so the fee shown in the pool's on-chain
+state (or returned by a quoter) is not always the fee charged. LP Agent applies a
+pool fee guard before executing on suspicious pools, but agents building their own
+execution should measure the effective fee from real swaps rather than trusting
+the quoted fee.
+</Warning>
+
+- New pools on Robinhood are often thin. Use liquidity and volume filters on
+  `GET /pools/discover` and prefer pools with an established trading history.
+- LP positions on USD-quoted pairs funded from ETH are effectively short ETH while
+  in range. Factor that into any risk rules your agent enforces.
+
+## Using Robinhood via the API and CLI
+
+Pass `chain=ROBINHOOD` on endpoints that accept a `chain` parameter:
+
+```bash
+# Discover Uniswap pools on Robinhood
+curl "https://api.lpagent.io/open-api/v1/pools/discover?chain=ROBINHOOD&sortBy=tvl&pageSize=10" \
+  -H "x-api-key: YOUR_API_KEY"
+
+# Activity logs for a wallet on Robinhood
+curl "https://api.lpagent.io/open-api/v1/lp-positions/logs?chain=ROBINHOOD&owner=0xYourWallet" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+```bash
+lpagent pools discover --chain ROBINHOOD --sort-by tvl -o table
+lpagent positions logs --chain ROBINHOOD --owner 0xYourWallet
+```
+
+Not every Open API endpoint is chain-aware yet. See the
+[chain support matrix](/ai-api-guide#chain-support-matrix) in the AI API Guide
+for the current per-endpoint status before building a Robinhood integration.
+
+## Related
+
+- [AI API Guide](/ai-api-guide)
+- [CLI](/cli)
+- [Copy LP](/features/copy-lp)
+- [Take Profit / Stop Loss](/features/take-profit-stop-loss)
