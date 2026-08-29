@@ -5,7 +5,12 @@ description: "LP Agent with leading DeFi protocols"
 
 ## Supported Protocols
 
-LP Agent currently supports integration with two leading Solana DeFi protocols:
+LP Agent runs on two chains. Pick the chain with the `chain` parameter (`SOL` or `ROBINHOOD`) wherever the API or CLI accepts one.
+
+| Chain | Chain key | Protocols | Native token |
+| --- | --- | --- | --- |
+| Solana | `SOL` | Meteora DLMM, Meteora DAMM v2, Orca | SOL |
+| Robinhood | `ROBINHOOD` | Uniswap v3, Uniswap v4 | ETH |
 
 <CardGroup cols={2}>
   <Card href="/integration/meteora">
@@ -21,6 +26,15 @@ LP Agent currently supports integration with two leading Solana DeFi protocols:
       Advanced dynamic liquidity pools with innovative features for both stable
       and volatile pairs. Optimized for consistent yields and reduced
       impermanent loss.
+    </div>
+  </Card>
+  <Card href="/integration/robinhood">
+    <div className="flex items-center gap-2">
+      <h3 className="text-xl font-semibold">Uniswap on Robinhood</h3>
+    </div>
+    <div className="mt-3">
+      Uniswap v3 and v4 concentrated liquidity on the Robinhood EVM chain.
+      Position tracking, PnL, copy LP, and TP/SL with ETH as the native token.
     </div>
   </Card>
 </CardGroup>

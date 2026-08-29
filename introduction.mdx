@@ -7,19 +7,29 @@ description: "Welcome to LP Agent - Your AI-powered DeFi automation companion"
 
 ## What is LP Agent?
 
-LP Agent is an AI-powered DeFi automation tool that revolutionizes liquidity management through one-click optimal position deployment. By analyzing on-chain data and market conditions, our AI provides personalized position suggestions tailored to your risk profile - no complex calculations needed. Built specifically for Meteora on Solana, it ensures smarter liquidity management with hands-free automation.
+LP Agent is an AI-powered DeFi automation tool that revolutionizes liquidity management through one-click optimal position deployment. By analyzing on-chain data and market conditions, our AI provides personalized position suggestions tailored to your risk profile - no complex calculations needed. It runs on Solana (Meteora, Orca) and on the Robinhood chain (Uniswap v3 and v4), ensuring smarter liquidity management with hands-free automation.
 
-## Supported Protocols
+## Supported Chains and Protocols
+
+| Chain | Chain key | Protocols | Native token |
+| --- | --- | --- | --- |
+| Solana | `SOL` | Meteora DLMM, Meteora DAMM v2, Orca | SOL |
+| Robinhood | `ROBINHOOD` | Uniswap v3, Uniswap v4 | ETH |
 
 <CardGroup cols={2}>
-  <Card>
+  <Card href="/integration/meteora">
     <img
       src="/images/meteora.svg"
       alt="Meteora Protocol"
       className="h-8 dark:invert"
     />
     <div className="mt-4">
-      Innovative dynamic liquidity pools optimized for stable and volatile pairs
+      Innovative dynamic liquidity pools optimized for stable and volatile pairs on Solana
+    </div>
+  </Card>
+  <Card title="Uniswap on Robinhood" href="/integration/robinhood">
+    <div className="mt-4">
+      Concentrated liquidity on Uniswap v3 and v4, running on the Robinhood EVM chain
     </div>
   </Card>
 </CardGroup>

@@ -28,11 +28,53 @@ curl -X GET "https://api.lpagent.io/open-api/v1/pools/discover?chain=SOL&pageSiz
 Never expose API keys or private keys in frontend code, shared prompts, screenshots, or logs. Use a secure backend for production agents.
 </Warning>
 
+## Chains
+
+LP Agent runs on two chains. Select one with the `chain` query parameter on endpoints that accept it.
+
+| Chain | `chain` value | Protocols | Native token | Address format | Position id |
+| --- | --- | --- | --- | --- | --- |
+| Solana | `SOL` (default) | Meteora DLMM, Meteora DAMM v2, Orca | SOL | base58 pubkey | position pubkey |
+| Robinhood | `ROBINHOOD` | Uniswap v3, Uniswap v4 | ETH | `0x…` hex | NFT `tokenId` |
+
+See [Robinhood Chain](/integration/robinhood) for id formats, swap routing, and v4 hook risks.
+
+## Chain support matrix
+
+Not every endpoint is chain-aware yet. Omitting `chain` always means Solana. Endpoints
+marked **Solana only** ignore `chain` (or have no such parameter) and will return
+Solana data or an error for a Robinhood address.
+
+| Endpoint | `chain` param | Solana | Robinhood |
+| --- | --- | --- | --- |
+| `GET /pools/discover` | yes | ✅ | ✅ |
+| `GET /lp-positions/logs` | yes | ✅ | ✅ |
+| `GET /pools/{poolId}/info` | no | ✅ | Solana only |
+| `GET /pools/{poolId}/positions` | no | ✅ | Solana only |
+| `GET /pools/{poolId}/onchain-stats` | no | ✅ | Solana only |
+| `GET /pools/{poolId}/top-lpers` | no | ✅ | Solana only |
+| `GET /lp-positions/opening` | no | ✅ (Meteora) | Solana only |
+| `GET /lp-positions/historical` | no | ✅ | Solana only |
+| `GET /lp-positions/overview` | no | ✅ | Solana only |
+| `GET /lp-positions/position` | no | ✅ | Solana only |
+| `GET /lp-positions/revenue/{owner}` | no | ✅ | Solana only |
+| `GET /token/balance` | no | ✅ | Solana only |
+| `POST /pools/{poolId}/add-tx`, `landing-add-tx` | no | ✅ | Solana only |
+| `POST /position/decrease-quotes`, `decrease-tx`, `landing-decrease-tx` | no | ✅ | Solana only |
+| `POST /position/claim-fee-tx`, `landing-claim-fee-tx` | no | ✅ | Solana only |
+| `POST /rpc`, `/rpc/historical`, `/jito` | no | ✅ | Solana only |
+
+<Note>
+Robinhood coverage on the Open API is being expanded endpoint by endpoint. This table
+is the source of truth for what works today; treat anything not marked ✅ under Robinhood
+as unavailable rather than assuming it accepts `chain=ROBINHOOD`.
+</Note>
+
 ## Capability Map
 
 ### 1) Discover pools and market state
 
-- `GET /pools/discover` → find pools with filters/sorting
+- `GET /pools/discover` → find pools with filters/sorting (`chain=SOL` or `chain=ROBINHOOD`)
 - `GET /pools/{poolId}/info` → inspect pool state and active bin context
 - `GET /pools/{poolId}/onchain-stats` → on-chain pool metrics
 - `GET /pools/{poolId}/top-lpers` → top liquidity providers
@@ -42,10 +84,10 @@ Never expose API keys or private keys in frontend code, shared prompts, screensh
 - `GET /lp-positions/opening` → open positions for owner
 - `GET /lp-positions/historical` → historical/closed positions
 - `GET /lp-positions/overview` → aggregated portfolio metrics
-- `GET /lp-positions/logs` → position activity logs
+- `GET /lp-positions/logs` → position activity logs (`chain=SOL` or `chain=ROBINHOOD`)
 - `GET /lp-positions/revenue/{owner}` → revenue/pnl time data
 
-### 3) Execute liquidity operations (zap-in / zap-out)
+### 3) Execute liquidity operations (zap-in / zap-out) — Solana only
 
 - `POST /pools/{poolId}/add-tx` → generate unsigned zap-in txs
 - `POST /pools/landing-add-tx` → submit signed zap-in txs
@@ -61,7 +103,7 @@ Never expose API keys or private keys in frontend code, shared prompts, screensh
 
 ## Flow A: Discover -> Zap-In
 
-Use this when your AI wants to open a new LP position from SOL input.
+Use this when your AI wants to open a new LP position from SOL input. Solana only today.
 
 <Steps>
   <Step title="1) Discover candidate pools">
@@ -83,7 +125,7 @@ Use this when your AI wants to open a new LP position from SOL input.
 
 ### Flow B: List positions -> Quote -> Zap-Out
 
-Use this when your AI wants to close all or part of an LP position.
+Use this when your AI wants to close all or part of an LP position. Solana only today.
 
 <Steps>
   <Step title="1) Get open positions">
@@ -105,7 +147,7 @@ Use this when your AI wants to close all or part of an LP position.
 
 ### Flow C: Auto-rebalancing loop
 
-Use this when your AI should continuously keep positions in-range.
+Use this when your AI should continuously keep positions in-range. Solana only today.
 
 1. Poll `GET /lp-positions/opening?owner=...`
 2. For each position with `inRange=false`:
@@ -115,8 +157,25 @@ Use this when your AI should continuously keep positions in-range.
    - zap-in new position (`add-tx` + `landing-add-tx`)
 3. Repeat every interval (for example, every 60s)
 
+### Flow D: Robinhood pool discovery and activity (read-only)
+
+Use this when your AI wants market and activity data for Uniswap v3/v4 on Robinhood.
+
+```bash
+# Top Uniswap pools on Robinhood by TVL
+curl "https://api.lpagent.io/open-api/v1/pools/discover?chain=ROBINHOOD&sortBy=tvl&pageSize=10" \
+  -H "x-api-key: YOUR_API_KEY"
+
+# Activity logs for a Robinhood wallet
+curl "https://api.lpagent.io/open-api/v1/lp-positions/logs?chain=ROBINHOOD&owner=0xYourWallet" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+Response `*Native` fields are in ETH on Robinhood. Position ids are Uniswap NFT `tokenId`s.
+
 ## Critical Parameters and Constraints
 
+- `chain`: `SOL` (default) or `ROBINHOOD` — only on endpoints listed in the [chain support matrix](#chain-support-matrix)
 - `bps`: `0..10000` (10000 = 100%)
 - `slippage_bps`: `0..10000`
 - `percentX`: `0..1`
