@@ -1,0 +1,137 @@
+---
+title: "Robinhood Chain Integration"
+description: "Read Uniswap V3 liquidity data on Robinhood Chain through the LP Agent API"
+---
+
+## Overview
+
+LP Agent indexes Uniswap V3 liquidity on **Robinhood Chain**, an EVM network. The
+public API serves that data through the same endpoints you already use for Solana —
+you select the network with a `chain` query parameter.
+
+| | |
+| --- | --- |
+| Network | Robinhood Chain |
+| Chain ID | `4663` |
+| Protocol | Uniswap V3 (`uniswap_v3`) |
+| Native currency | ETH (18 decimals) |
+| API value | `chain=ROBINHOOD` |
+
+<Note>
+  `chain` defaults to `SOL`. Every existing integration keeps working untouched — you
+  only pass `chain=ROBINHOOD` on the requests where you want Robinhood data.
+</Note>
+
+## Selecting a chain
+
+```bash
+curl -H "x-api-key: $LPAGENT_API_KEY" \
+  "https://api.lpagent.io/open-api/v1/lp-positions/opening?owner=0xYourWallet&chain=ROBINHOOD"
+```
+
+An unrecognised `chain` value falls back to `SOL` rather than returning an error, so a
+typo produces Solana data — not a `400`. Check the value you send.
+
+## Endpoint support
+
+<AccordionGroup>
+  <Accordion title="Available on both SOL and ROBINHOOD">
+    | Method | Endpoint |
+    | --- | --- |
+    | `GET` | `/lp-positions/opening` |
+    | `GET` | `/lp-positions/historical` |
+    | `GET` | `/lp-positions/overview` |
+    | `GET` | `/lp-positions/logs` |
+    | `GET` | `/lp-positions/position` |
+    | `GET` | `/lp-positions/revenue/{owner}` |
+    | `GET` | `/pools/discover` |
+    | `GET` | `/token/balance` |
+  </Accordion>
+
+  <Accordion title="Solana only">
+    These endpoints have no Robinhood Chain equivalent today. They either read
+    Solana-specific pool state or build and land Solana transactions through Jito
+    bundles, which has no EVM counterpart.
+
+    | Method | Endpoint | Why |
+    | --- | --- | --- |
+    | `GET` | `/pools/{poolId}/info` | Meteora DLMM / DAMM v2 pool state |
+    | `GET` | `/pools/{poolId}/positions` | Meteora pool state |
+    | `GET` | `/pools/{poolId}/onchain-stats` | Meteora pool state |
+    | `GET` | `/pools/{poolId}/top-lpers` | Meteora pool state |
+    | `POST` | `/pools/{poolId}/add-tx` | Builds Solana transactions |
+    | `POST` | `/pools/landing-add-tx` | Jito bundle landing |
+    | `POST` | `/position/decrease-quotes` | Solana zap-out quoting |
+    | `POST` | `/position/decrease-tx` | Builds Solana transactions |
+    | `POST` | `/position/landing-decrease-tx` | Jito bundle landing |
+    | `POST` | `/position/claim-fee-tx` | Builds Solana transactions |
+    | `POST` | `/position/landing-claim-fee-tx` | Jito bundle landing |
+    | `POST` | `/rpc`, `/rpc/historical`, `/jito` | Solana RPC passthrough |
+  </Accordion>
+</AccordionGroup>
+
+## Response differences to expect
+
+Robinhood responses use the same envelope as Solana, but a few fields carry different
+conventions. Handle these explicitly rather than assuming Solana shapes.
+
+<AccordionGroup>
+  <Accordion title="Position IDs are manager + token ID">
+    A Robinhood position ID is the Uniswap V3 position-manager address and the NFT token
+    ID, joined by a hyphen: `0x1234…abcd-5678`. The API also accepts the fully qualified
+    `robinhood:0x1234…abcd-5678` form.
+
+    Because that shape is self-identifying, `GET /lp-positions/position` resolves the
+    chain from the ID when you omit `chain`. Solana position IDs stay base58 mint
+    addresses.
+  </Accordion>
+
+  <Accordion title="Native ETH is reported under the wrapped address">
+    `GET /token/balance` returns the native ETH balance under the **wrapped** native
+    token address, not the zero address. On Solana, native SOL appears under the wrapped
+    SOL mint and the response is additionally filtered to holdings worth more than
+    $0.02; the Robinhood response applies no such dust filter.
+  </Accordion>
+
+  <Accordion title="Quote tokens for pool discovery">
+    `GET /pools/discover?chain=ROBINHOOD` filters by these quote tokens:
+
+    | Symbol | Address |
+    | --- | --- |
+    | `WETH` / `ETH` | `0x0bd7d308f8e1639fab988df18a8011f41eacad73` |
+    | `USDG` | `0x5fc5360d0400a0fd4f2af552add042d716f1d168` |
+  </Accordion>
+
+  <Accordion title="Transaction history is filtered differently">
+    `GET /lp-positions/logs` returns economic events only. On Solana, `open` and `close`
+    rows are metadata and are dropped. On Robinhood, `close` and `collectGross` are
+    dropped — `collectGross` is the raw Uniswap Collect payout, which the API splits into
+    separate decrease and fee rows — while `open` is kept because Uniswap V3 records the
+    initial deposit there. Logs are capped at 200 rows per position.
+  </Accordion>
+
+  <Accordion title="Protocol defaults per chain">
+    Endpoints that take a `platform` or `protocol` parameter default to the one protocol
+    served on the requested chain: `meteora` on `SOL`, `uniswap_v3` on `ROBINHOOD`. Pass
+    the parameter explicitly to override it.
+  </Accordion>
+</AccordionGroup>
+
+## Known limitations
+
+<Warning>
+  **PnL for Robinhood positions is incomplete.** Treat the fields below as indicative,
+  not settled accounting, and reconcile against on-chain data for anything financial.
+</Warning>
+
+- **Swap legs are outside the ledger.** Position PnL measures the liquidity leg only. The
+  swaps that enter and exit a position — up to four per cycle — are not booked into it,
+  and their cost is material relative to typical LP gains.
+- **Open positions do not carry a live value.** The stored current value of an open
+  position is not continuously refreshed, so any PnL derived from it is unreliable while
+  the position is open. Use `GET /lp-positions/position` for a live read.
+- **Reconciled PnL is not yet applied on Robinhood.** The audit pass that corrects
+  Solana position PnL does not currently reach Robinhood rows, so Robinhood values are
+  the raw ledger figures.
+
+Closed-position and realised-fee figures are the most reliable Robinhood numbers today.

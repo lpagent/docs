@@ -31,6 +31,7 @@
             "pages": [
               "integration/overview",
               "integration/meteora",
+              "integration/robinhood",
               "integration/meteora-airdrop"
             ]
           },
