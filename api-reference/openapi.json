@@ -30,7 +30,7 @@
     "/lp-positions/opening": {
       "get": {
         "summary": "Get opening LP positions for an owner",
-        "description": "Retrieves current liquidity pool positions that are open for a specific wallet owner. Defaults to the one protocol served on the requested chain (`meteora` on `SOL`, `uniswap_v3` on `ROBINHOOD`); pass `platform` to override.",
+        "description": "Retrieves current liquidity pool positions that are open for a specific wallet owner. Covers every protocol served on the requested chain (`meteora,meteora_damm_v2` on `SOL`, `uniswap_v3,uniswap_v4` on `ROBINHOOD`); pass `platform` to narrow it.",
         "tags": [
           "Positions"
         ],
@@ -46,7 +46,7 @@
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
           },
           {
             "in": "query",
@@ -57,6 +57,15 @@
             },
             "description": "Wallet address of the position owner",
             "example": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
+          },
+          {
+            "in": "query",
+            "name": "platform",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated protocols to filter by. Omit it to get every protocol served on the chain. Valid values are `meteora` and `meteora_damm_v2` on `SOL`, `uniswap_v3` and `uniswap_v4` on `ROBINHOOD`. A protocol that is not served on the requested chain simply matches nothing.",
+            "example": "uniswap_v4"
           }
         ],
         "responses": {
@@ -471,7 +480,7 @@
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
           },
           {
             "in": "query",
@@ -482,6 +491,15 @@
             },
             "description": "Wallet address of the position owner",
             "example": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
+          },
+          {
+            "in": "query",
+            "name": "platform",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated protocols to filter by. Omit it to get every protocol served on the chain. Valid values are `meteora` and `meteora_damm_v2` on `SOL`, `uniswap_v3` and `uniswap_v4` on `ROBINHOOD`.",
+            "example": "uniswap_v4"
           },
           {
             "in": "query",
@@ -947,7 +965,7 @@
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
           },
           {
             "in": "query",
@@ -963,10 +981,10 @@
             "in": "query",
             "name": "protocol",
             "schema": {
-              "type": "string",
-              "default": "meteora"
+              "type": "string"
             },
-            "description": "Protocol to filter by (e.g., meteora, orca)"
+            "description": "Comma-separated protocols to filter by. Omit it to get every protocol served on the chain (`meteora,meteora_damm_v2` on `SOL`, `uniswap_v3,uniswap_v4` on `ROBINHOOD`).",
+            "example": "uniswap_v4"
           }
         ],
         "responses": {
@@ -1555,7 +1573,7 @@
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
           },
           {
             "in": "query",
@@ -1730,7 +1748,7 @@
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
           },
           {
             "in": "query",
@@ -2335,7 +2353,7 @@
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
           },
           {
             "in": "query",
@@ -2449,7 +2467,7 @@
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
           },
           {
             "in": "query",
@@ -2676,7 +2694,7 @@
               "type": "string",
               "default": "all"
             },
-            "description": "Pool type filter. `meteora` for dlmm and `meteora_damm_v2` for DAMM V2"
+            "description": "Pool protocol filter; `all` keeps every protocol on the chain. On `SOL`, `meteora` for DLMM and `meteora_damm_v2` for DAMM V2. On `ROBINHOOD`, `uniswap_v3` or `uniswap_v4`."
           },
           {
             "in": "query",
@@ -3232,7 +3250,8 @@
             "schema": {
               "type": "string"
             },
-            "description": "Filter by platform"
+            "description": "Comma-separated protocols to filter by. This endpoint is Solana only, so the valid values are `meteora` and `meteora_damm_v2`.",
+            "example": "meteora,meteora_damm_v2"
           },
           {
             "in": "query",
@@ -3717,7 +3736,7 @@
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
           },
           {
             "in": "path",
@@ -3761,7 +3780,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Comma-separated protocol filter",
+            "description": "Comma-separated protocols to filter by. Omit it to aggregate every protocol served on the chain. Valid values are `meteora` and `meteora_damm_v2` on `SOL`, `uniswap_v3` and `uniswap_v4` on `ROBINHOOD`.",
             "example": "meteora,meteora_damm_v2"
           }
         ],
