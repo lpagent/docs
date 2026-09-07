@@ -5,7 +5,7 @@ description: "How to size a copy on Robinhood Chain so fee income actually clear
 
 ## TL;DR
 
-- Set **Max Increase Amount to 0.08 ETH or more**, because smaller copies seldom earn back the round trip
+- Copy from a wallet holding **at least 0.08 ETH of net worth**, because a smaller book cannot earn back the round trip
 - Set **Copy Percentage to your net worth ÷ the leader's net worth**, not to a number that sounds right
 - Skip leaders whose **average position age is under 1 hour**, since you pay for every flip
 - Keep **spare ETH in the agent wallet for gas**, on top of the capital you intend to deploy
@@ -24,13 +24,13 @@ The important property is that **most of this cost is fixed per cycle, not propo
   LP Agent charges **0% to open or close** and **8% of the fees you claim**. That is not what makes small copies unprofitable. Network gas and swap spread are. See the [Fee Structure](/fee).
 </Note>
 
-## 1. Size Each Copy at 0.08 ETH or More
+## 1. Copy With at Least 0.08 ETH of Net Worth
 
-**Max Increase Amount** caps how much a single copied position can use. Set it to at least **0.08 ETH**.
+Before any field in the copy dialog matters, the wallet doing the copying needs enough behind it. Keep at least **0.08 ETH** of net worth, counting holdings and open positions, in the agent wallet your copies run from.
 
 That figure is a floor on execution cost, not a promise of profit. It is the point where a normally behaved position has room to earn back the round trip. It is not a target either: everything above it behaves better, not worse.
 
-If your follow is denominated in USD, the settings screen converts the floor at the current ETH price and shows the dollar figure. The rule is the same rule.
+A wallet below the floor cannot settle this with settings. Lowering **Copy Percentage** or **Max Increase Amount** only redistributes capital that is not there, while the per-cycle bill stays where it was. The copy settings screen shows the recommendation at the top of the dialog, and it stays advice: nothing is blocked or refused.
 
 <Warning>
   **A Max Increase Amount of 0 is not "unlimited".** A zero cap scales every copy to nothing: the follow stays enabled, the leader keeps trading, and no position is ever opened for you. If you want no cap, leave the field empty rather than typing `0`.
@@ -53,7 +53,7 @@ Matching that ratio is what makes the leader's 3% allocation land as your 3% all
 
 The copy settings screen computes this for you. It reads both wallets' holdings and open positions, shows the suggested percentage next to the two net worths it came from, and offers a one-click **Apply**. Two edges are worth knowing about:
 
-- **You are much smaller than the leader**: the field's minimum is 1%, so the suggestion is raised to 1% and says so. Combined with the 0.08 ETH floor, that is the honest signal that this leader is too large to copy meaningfully, because their small positions fall below your floor and their large ones clip your cap
+- **You are much smaller than the leader**: the field's minimum is 1%, so the suggestion is raised to 1% and says so. Read that as the honest signal that this leader is too large for your wallet to copy meaningfully, since even their ordinary positions arrive scaled to more than your share
 - **You are much larger than the leader**: the suggestion is capped at 10000%, and most of your capital sits idle
 
 The suggestion is sized against the **agent wallet** that executes your copies, not whatever wallet is connected. That is the capital actually at work.
@@ -102,7 +102,7 @@ Reconcile against on-chain data before drawing conclusions about a leader, or ab
 
 ## Common Mistakes to Avoid
 
-1. **Copying with a cap below 0.08 ETH** because it feels safer, which mostly guarantees the round trip eats the position
+1. **Copying from a wallet holding less than 0.08 ETH**, where the round trip eats whatever the positions can earn
 2. **Leaving Max Increase Amount at `0`**, which disables copying without disabling the follow
 3. **Picking a copy percentage by feel** instead of from the ratio of net worths
 4. **Deploying the entire agent balance** and leaving nothing for gas
