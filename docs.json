@@ -68,7 +68,8 @@
           {
             "group": "Best Practices",
             "pages": [
-              "tutorials/copy-lp-best-practices"
+              "tutorials/copy-lp-best-practices",
+              "tutorials/copy-robinhood-best-practices"
             ]
           }
         ]
