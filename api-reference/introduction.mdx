@@ -17,7 +17,7 @@ integrations need no change.
 | Value | Network | Protocol |
 | ----- | ------- | -------- |
 | `SOL` | Solana | Meteora (DLMM, DAMM v2) |
-| `ROBINHOOD` | Robinhood Chain (EVM, chain ID `4663`) | Uniswap V3 |
+| `ROBINHOOD` | Robinhood Chain (EVM, chain ID `4663`) | Uniswap V3, Uniswap V4 |
 
 An unrecognised value falls back to `SOL` rather than returning an error.
 
@@ -34,8 +34,12 @@ These endpoints are chain-aware:
 | `GET` | `/pools/discover` |
 | `GET` | `/token/balance` |
 
-Every other endpoint is Solana only — the `/pools/{poolId}/*` routes read Meteora pool
-state, and the transaction-building, Jito, and RPC routes are Solana specific. See
+`GET /pools/{poolId}/top-lpers` also serves both chains, but takes no `chain` parameter:
+the pool ID selects the chain. Pass a Solana pool address for Meteora, or a Robinhood
+Uniswap V3 pool address / Uniswap V4 pool ID in lowercase for Robinhood Chain.
+
+Every other endpoint is Solana only. The remaining `/pools/{poolId}/*` routes read Meteora
+pool state, and the transaction-building, Jito, and RPC routes are Solana specific. See
 [Robinhood Chain Integration](/integration/robinhood) for the response differences and
 current data limitations.
 

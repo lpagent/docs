@@ -3480,7 +3480,7 @@
     "/pools/{poolId}/top-lpers": {
       "get": {
         "summary": "Get top LPers for a pool",
-        "description": "Retrieve ranked LP providers for a pool with pagination and sorting.\n\n**Plan:** Requires an active **Premium** or **Enterprise** API key. Free-plan keys receive `401`.\n",
+        "description": "Retrieve ranked LP providers for a pool with pagination and sorting.\n\n**Chains:** Solana (Meteora DLMM, DAMM V2) and Robinhood Chain (Uniswap V3, Uniswap V4). There is no `chain` parameter: the pool ID selects the chain, and each row reports it in `chain`.\n\n**Plan:** Requires an active **Premium** or **Enterprise** API key. Free-plan keys receive `401`.\n",
         "tags": [
           "Pools"
         ],
@@ -3492,16 +3492,32 @@
             "schema": {
               "type": "string"
             },
-            "description": "Pool address",
+            "description": "Pool ID. On Solana, the Meteora pool address. On Robinhood Chain, the Uniswap V3 pool address or the Uniswap V4 pool ID (32-byte `0x` hash), in lowercase: a checksummed address matches nothing and returns an empty list.",
             "example": "7d51qGEeAKiPakkxLoHda9egShXQLJcjFYpHEcX4d3EM"
           },
           {
             "in": "query",
             "name": "order_by",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "total_pnl_native",
+                "total_pnl",
+                "total_inflow_native",
+                "total_inflow",
+                "total_fee_native",
+                "total_fee",
+                "total_lp",
+                "win_rate",
+                "win_rate_native",
+                "apr",
+                "roi",
+                "last_activity",
+                "updated_at"
+              ],
+              "default": "total_pnl_native"
             },
-            "description": "Column to sort by"
+            "description": "Column to sort by. Any other value falls back to `total_pnl_native`."
           },
           {
             "in": "query",
@@ -3563,17 +3579,23 @@
                             "type": "string",
                             "description": "Wallet address"
                           },
+                          "chain": {
+                            "type": "string",
+                            "description": "Chain the pool lives on: `SOL` or `ROBINHOOD`",
+                            "example": "SOL"
+                          },
                           "protocol": {
                             "type": "string",
+                            "description": "`meteora` or `meteora_damm_v2` on `SOL`; `uniswap_v3` or `uniswap_v4` on `ROBINHOOD`",
                             "example": "meteora"
                           },
                           "token0": {
                             "type": "string",
-                            "description": "Token X mint address"
+                            "description": "Token X mint address (ERC-20 contract address on Robinhood Chain)"
                           },
                           "token1": {
                             "type": "string",
-                            "description": "Token Y mint address"
+                            "description": "Token Y mint address (ERC-20 contract address on Robinhood Chain)"
                           },
                           "total_inflow": {
                             "type": "number",

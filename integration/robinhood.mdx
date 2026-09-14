@@ -1,19 +1,19 @@
 ---
 title: "Robinhood Chain Integration"
-description: "Read Uniswap V3 liquidity data on Robinhood Chain through the LP Agent API"
+description: "Read Uniswap V3 and V4 liquidity data on Robinhood Chain through the LP Agent API"
 ---
 
 ## Overview
 
-LP Agent indexes Uniswap V3 liquidity on **Robinhood Chain**, an EVM network. The
-public API serves that data through the same endpoints you already use for Solana —
-you select the network with a `chain` query parameter.
+LP Agent indexes Uniswap V3 and Uniswap V4 liquidity on **Robinhood Chain**, an EVM
+network. The public API serves that data through the same endpoints you already use for
+Solana: you select the network with a `chain` query parameter.
 
 | | |
 | --- | --- |
 | Network | Robinhood Chain |
 | Chain ID | `4663` |
-| Protocol | Uniswap V3 (`uniswap_v3`) |
+| Protocols | Uniswap V3 (`uniswap_v3`), Uniswap V4 (`uniswap_v4`) |
 | Native currency | ETH (18 decimals) |
 | API value | `chain=ROBINHOOD` |
 
@@ -46,6 +46,12 @@ typo produces Solana data — not a `400`. Check the value you send.
     | `GET` | `/lp-positions/revenue/{owner}` |
     | `GET` | `/pools/discover` |
     | `GET` | `/token/balance` |
+    | `GET` | `/pools/{poolId}/top-lpers` |
+
+    `/pools/{poolId}/top-lpers` takes no `chain` parameter. The pool ID picks the chain:
+    a Uniswap V3 pool address or a Uniswap V4 pool ID (the 32-byte `0x` hash) returns
+    Robinhood LPers. Send the ID in lowercase; a checksummed address matches nothing and
+    returns an empty list.
   </Accordion>
 
   <Accordion title="Solana only">
@@ -58,7 +64,6 @@ typo produces Solana data — not a `400`. Check the value you send.
     | `GET` | `/pools/{poolId}/info` | Meteora DLMM / DAMM v2 pool state |
     | `GET` | `/pools/{poolId}/positions` | Meteora pool state |
     | `GET` | `/pools/{poolId}/onchain-stats` | Meteora pool state |
-    | `GET` | `/pools/{poolId}/top-lpers` | Meteora pool state |
     | `POST` | `/pools/{poolId}/add-tx` | Builds Solana transactions |
     | `POST` | `/pools/landing-add-tx` | Jito bundle landing |
     | `POST` | `/position/decrease-quotes` | Solana zap-out quoting |
@@ -111,9 +116,9 @@ conventions. Handle these explicitly rather than assuming Solana shapes.
   </Accordion>
 
   <Accordion title="Protocol defaults per chain">
-    Endpoints that take a `platform` or `protocol` parameter default to the one protocol
-    served on the requested chain: `meteora` on `SOL`, `uniswap_v3` on `ROBINHOOD`. Pass
-    the parameter explicitly to override it.
+    Endpoints that take a `platform` or `protocol` parameter default to every protocol
+    served on the requested chain: `meteora,meteora_damm_v2` on `SOL`,
+    `uniswap_v3,uniswap_v4` on `ROBINHOOD`. Pass the parameter to narrow it to one.
   </Accordion>
 </AccordionGroup>
 
