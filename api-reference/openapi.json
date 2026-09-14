@@ -3593,7 +3593,7 @@
     "/pools/{poolId}/top-lpers": {
       "get": {
         "summary": "Get top LPers for a pool",
-        "description": "Retrieve ranked LP providers for a pool with pagination and sorting.\n\n**Chains:** Solana (Meteora DLMM, DAMM V2) and Robinhood Chain (Uniswap V3, Uniswap V4). There is no `chain` parameter: the pool ID selects the chain, and each row reports it in `chain`.\n\n**Plan:** Requires an active **Premium** or **Enterprise** API key. Free-plan keys receive `401`.\n",
+        "description": "Retrieve ranked LP providers for a pool with pagination and sorting.\n\n**Chains:** Solana (Meteora DLMM, DAMM V2) and Robinhood Chain (Uniswap V3, Uniswap V4). Pick the network with `chain` and narrow the protocols with `platform`; each row reports both in `chain` and `protocol`.\n\n**Plan:** Requires an active **Premium** or **Enterprise** API key. Free-plan keys receive `401`.\n",
         "tags": [
           "Pools"
         ],
@@ -3605,8 +3605,29 @@
             "schema": {
               "type": "string"
             },
-            "description": "Pool ID. On Solana, the Meteora pool address. On Robinhood Chain, the Uniswap V3 pool address or the Uniswap V4 pool ID (32-byte `0x` hash), in lowercase: a checksummed address matches nothing and returns an empty list.",
+            "description": "Pool ID. On Solana, the Meteora pool address. On Robinhood Chain, the Uniswap V3 pool address or the Uniswap V4 pool ID (32-byte `0x` hash), in any letter case.",
             "example": "7d51qGEeAKiPakkxLoHda9egShXQLJcjFYpHEcX4d3EM"
+          },
+          {
+            "in": "query",
+            "name": "chain",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SOL",
+                "ROBINHOOD"
+              ]
+            },
+            "description": "Blockchain network the pool lives on. `SOL` returns Meteora (DLMM / DAMM v2) LPers; `ROBINHOOD` returns Uniswap V3 and V4 LPers on Robinhood Chain (EVM, chain id 4663). When omitted, it is inferred from `poolId`: a `0x` ID is `ROBINHOOD`, anything else is `SOL`. An unrecognised value falls back to `SOL`."
+          },
+          {
+            "in": "query",
+            "name": "platform",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated protocols to filter by. Omit it to get every protocol served on the chain. Valid values are `meteora` and `meteora_damm_v2` on `SOL`, `uniswap_v3` and `uniswap_v4` on `ROBINHOOD`. A protocol that is not served on the requested chain simply matches nothing.",
+            "example": "meteora,meteora_damm_v2"
           },
           {
             "in": "query",
