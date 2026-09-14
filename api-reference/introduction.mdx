@@ -33,6 +33,7 @@ These endpoints are chain-aware:
 | `GET` | `/lp-positions/revenue/{owner}` |
 | `GET` | `/pools/discover` |
 | `GET` | `/token/balance` |
+| `GET` | `/pools/{poolId}/positions` |
 
 `GET /pools/{poolId}/top-lpers` also serves both chains, but takes no `chain` parameter:
 the pool ID selects the chain. Pass a Solana pool address for Meteora, or a Robinhood

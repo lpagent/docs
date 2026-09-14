@@ -46,7 +46,12 @@ typo produces Solana data — not a `400`. Check the value you send.
     | `GET` | `/lp-positions/revenue/{owner}` |
     | `GET` | `/pools/discover` |
     | `GET` | `/token/balance` |
+    | `GET` | `/pools/{poolId}/positions` |
     | `GET` | `/pools/{poolId}/top-lpers` |
+
+    `/pools/{poolId}/positions` needs `chain=ROBINHOOD` for a Robinhood pool. On Robinhood
+    its `positionState` is always empty and `activeBin` is omitted, since both are Meteora
+    DLMM bin data, and `platform` is ignored in favour of the pool's own protocol.
 
     `/pools/{poolId}/top-lpers` takes no `chain` parameter. The pool ID picks the chain:
     a Uniswap V3 pool address or a Uniswap V4 pool ID (the 32-byte `0x` hash) returns
@@ -62,7 +67,6 @@ typo produces Solana data — not a `400`. Check the value you send.
     | Method | Endpoint | Why |
     | --- | --- | --- |
     | `GET` | `/pools/{poolId}/info` | Meteora DLMM / DAMM v2 pool state |
-    | `GET` | `/pools/{poolId}/positions` | Meteora pool state |
     | `GET` | `/pools/{poolId}/onchain-stats` | Meteora pool state |
     | `POST` | `/pools/{poolId}/add-tx` | Builds Solana transactions |
     | `POST` | `/pools/landing-add-tx` | Jito bundle landing |
