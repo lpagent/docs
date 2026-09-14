@@ -464,7 +464,7 @@
     "/lp-positions/historical": {
       "get": {
         "summary": "Get historical LP positions for an owner",
-        "description": "Retrieves historical liquidity pool positions for a specific wallet owner",
+        "description": "Retrieves closed liquidity pool positions for a specific wallet owner. Works on Solana (Meteora DLMM, DAMM V2) and Robinhood Chain (Uniswap V3, Uniswap V4); pick the network with `chain`.",
         "tags": [
           "Positions"
         ],
@@ -532,12 +532,14 @@
           },
           {
             "in": "query",
-            "name": "limit",
+            "name": "pageSize",
             "schema": {
               "type": "integer",
-              "default": 20
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10
             },
-            "description": "Number of items per page"
+            "description": "Number of items per page. Values above 100 are capped at 100."
           }
         ],
         "responses": {
@@ -1548,7 +1550,7 @@
     "/lp-positions/logs": {
       "get": {
         "summary": "Get logs for LP positions",
-        "description": "Retrieves transaction logs for liquidity pool positions. Can fetch logs for a specific position or for all positions of an owner.",
+        "description": "Retrieves transaction logs for one liquidity pool position, newest first, capped at 200 rows. Works on Solana and Robinhood Chain; pass the `chain` the position lives on.\n\n`position` is what selects the logs. A request with only `owner` returns `200` with an empty `data` array, not the owner's logs across positions.",
         "tags": [
           "Positions"
         ],
@@ -1559,7 +1561,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Position ID (token ID)",
+            "description": "Position ID. On `SOL`, the position's base58 address. On `ROBINHOOD`, the position-manager address and NFT token ID joined by a hyphen (`0x<manager>-<tokenId>`). Required in practice: without it the response is empty.",
             "example": "Ep22EwKegXis3bTC6P8JLgsHaT5J2beM2TncKe2Hmv24"
           },
           {
@@ -1581,7 +1583,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Wallet address of the position owner (required for public access)",
+            "description": "Wallet address of the position owner. Optional, and not a filter: when it matches the position's owner, the response also includes the swap transactions made around the position (zap-in / zap-out legs). On `ROBINHOOD` the match ignores address case.",
             "example": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
           }
         ],
@@ -1745,10 +1747,9 @@
               "enum": [
                 "SOL",
                 "ROBINHOOD"
-              ],
-              "default": "SOL"
+              ]
             },
-            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to query: `SOL` (Meteora DLMM / DAMM v2) or `ROBINHOOD` (Uniswap V3 and V4 on Robinhood Chain, chain id 4663). Usually safe to omit: a Robinhood position ID is self-identifying, so the chain is inferred from `position` (`ROBINHOOD` for `0x<manager>-<tokenId>` or `robinhood:`-prefixed IDs, `SOL` otherwise). If you do send it, an unrecognised value falls back to `SOL`."
           },
           {
             "in": "query",
@@ -1757,7 +1758,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "The position ID/token ID to retrieve",
+            "description": "The position ID to retrieve. On Solana, the position's base58 address. On Robinhood Chain, the position-manager address and NFT token ID joined by a hyphen (`0x<manager>-<tokenId>`); the `robinhood:0x<manager>-<tokenId>` form is also accepted.",
             "example": "5tTjw7V7b5QV7xL6jj5RUfV45QWMugYzENSTLZYvp1TP"
           }
         ],
@@ -2353,7 +2354,7 @@
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to read balances from: `SOL` for Solana, `ROBINHOOD` for Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
           },
           {
             "in": "query",
@@ -2362,7 +2363,7 @@
               "type": "string"
             },
             "required": true,
-            "description": "The wallet address to get balances for",
+            "description": "The wallet address to get balances for: a base58 address on `SOL`, a `0x` address on `ROBINHOOD`",
             "example": "Ff8v35AC52qYrKUDvmzAapyd8UBYZFHCxzE5Puo1cuVU"
           },
           {
@@ -2371,7 +2372,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Comma-separated list of token contract addresses to filter by"
+            "description": "Comma-separated list of token addresses to filter by: SPL mint addresses on `SOL`, ERC-20 contract addresses on `ROBINHOOD`"
           }
         ],
         "responses": {
@@ -2451,7 +2452,7 @@
     "/pools/discover": {
       "get": {
         "summary": "Discover pools",
-        "description": "Retrieve a list of pools with filtering, sorting, and pagination",
+        "description": "Retrieve a list of pools with filtering, sorting, and pagination. Works on Solana (Meteora DLMM, DAMM V2) and Robinhood Chain (Uniswap V3, Uniswap V4); pick the network with `chain`.\n\nSome filters behave differently per chain:\n- `min_bin_step`, `max_bin_step`, `min_organic_score` and `max_organic_score` apply on `SOL` only and are ignored on `ROBINHOOD`.\n- On `ROBINHOOD`, browsing hides pools under $5,000 liquidity unless you pass `min_liquidity`, `show_small_pools=true` or `search`.\n- On `ROBINHOOD`, browsing also hides pools that report at least $50,000 TVL with under $500 of 24h volume (TVL painted by a single-sided deposit). A `search` request skips this filter.",
         "tags": [
           "Pools"
         ],
@@ -2467,7 +2468,7 @@
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) pools; `ROBINHOOD` returns Uniswap V3 and V4 pools on Robinhood Chain (EVM, chain id 4663). Unrecognised values match no pools."
           },
           {
             "in": "query",
@@ -2479,11 +2480,12 @@
                 "created_at",
                 "vol_24h",
                 "tvl",
-                "fee_tvl_ratio"
+                "fee_tvl_ratio",
+                "fee_24h"
               ],
               "default": "mcap"
             },
-            "description": "Field to sort pools by"
+            "description": "Field to sort pools by. Any other value falls back to `mcap`. On `SOL`, `fee_24h` and `fee_tvl_ratio` are derived from the pool fee rate and 24h volume; on `ROBINHOOD` they use the stored 24h fee figures, which are empty for dynamic-fee pools and sort last."
           },
           {
             "in": "query",
@@ -2497,7 +2499,7 @@
               ],
               "default": "desc"
             },
-            "description": "Sort order direction"
+            "description": "Sort order direction. `default` ignores `sortBy` and sorts by market cap, highest first."
           },
           {
             "in": "query",
@@ -2541,7 +2543,8 @@
             "schema": {
               "type": "string"
             },
-            "description": "Filter by quote token address"
+            "description": "Filter by quote token **symbol** (case-insensitive), not address. On `SOL`: `SOL` or `USDC`. On `ROBINHOOD`: `WETH` (alias `ETH`) or `USDG`. An unknown symbol, `ALL`, or a combined value such as `SOL&USDC` applies no quote filter.",
+            "example": "USDC"
           },
           {
             "in": "query",
@@ -2565,7 +2568,7 @@
             "schema": {
               "type": "number"
             },
-            "description": "Minimum bin step filter"
+            "description": "Minimum bin step filter. `SOL` only; ignored on `ROBINHOOD`."
           },
           {
             "in": "query",
@@ -2573,7 +2576,7 @@
             "schema": {
               "type": "number"
             },
-            "description": "Maximum bin step filter"
+            "description": "Maximum bin step filter. `SOL` only; ignored on `ROBINHOOD`."
           },
           {
             "in": "query",
@@ -2581,7 +2584,7 @@
             "schema": {
               "type": "number"
             },
-            "description": "Minimum organic score filter"
+            "description": "Minimum organic score filter. `SOL` only; ignored on `ROBINHOOD`."
           },
           {
             "in": "query",
@@ -2589,7 +2592,7 @@
             "schema": {
               "type": "number"
             },
-            "description": "Maximum organic score filter"
+            "description": "Maximum organic score filter. `SOL` only; ignored on `ROBINHOOD`."
           },
           {
             "in": "query",
@@ -2629,7 +2632,7 @@
             "schema": {
               "type": "number"
             },
-            "description": "Minimum liquidity filter"
+            "description": "Minimum liquidity (TVL, USD) filter. When omitted on `ROBINHOOD`, a $5,000 floor applies unless `show_small_pools=true` or `search` is set. No default floor on `SOL`."
           },
           {
             "in": "query",
@@ -2702,7 +2705,27 @@
             "schema": {
               "type": "string"
             },
-            "description": "Search by pool name or token address"
+            "description": "Exact match on the pool ID or either token address (not a name search). On `ROBINHOOD`, `0x` addresses and 32-byte Uniswap V4 pool IDs are matched case-insensitively, so checksummed addresses work. Solana base58 addresses are case-sensitive. Setting `search` also skips the `ROBINHOOD` liquidity floor and painted-TVL filter."
+          },
+          {
+            "in": "query",
+            "name": "show_small_pools",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "`ROBINHOOD` only: set `true` to drop the default $5,000 liquidity floor. No effect on `SOL`, which has no default floor."
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "stock"
+              ]
+            },
+            "description": "Only pools where at least one token carries this label. `stock` marks tokenized stocks from Robinhood's on-chain asset registry, so it is meaningful on `ROBINHOOD`; on `SOL` no tokens are labelled and the result is empty. Unknown values are ignored."
           }
         ],
         "responses": {

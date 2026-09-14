@@ -105,6 +105,22 @@ conventions. Handle these explicitly rather than assuming Solana shapes.
     | --- | --- |
     | `WETH` / `ETH` | `0x0bd7d308f8e1639fab988df18a8011f41eacad73` |
     | `USDG` | `0x5fc5360d0400a0fd4f2af552add042d716f1d168` |
+
+    Pass the **symbol** (`quote_token=USDG`), not the address.
+  </Accordion>
+
+  <Accordion title="Pool discovery filters on Robinhood">
+    `GET /pools/discover?chain=ROBINHOOD` differs from Solana in a few ways:
+
+    - `min_bin_step`, `max_bin_step`, `min_organic_score` and `max_organic_score` are
+      Solana concepts and are ignored.
+    - Browsing hides pools under $5,000 liquidity. Pass `min_liquidity`,
+      `show_small_pools=true` or `search` to see them.
+    - Browsing also hides pools that claim at least $50,000 TVL on under $500 of 24h
+      volume, the signature of TVL painted by a single-sided deposit. `search` skips this.
+    - `category=stock` narrows to pools holding a tokenized stock from Robinhood's
+      on-chain asset registry.
+    - `search` matches `0x` addresses and Uniswap V4 pool IDs in any letter case.
   </Accordion>
 
   <Accordion title="Transaction history is filtered differently">
