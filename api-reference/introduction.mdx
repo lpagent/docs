@@ -34,10 +34,15 @@ These endpoints are chain-aware:
 | `GET` | `/pools/discover` |
 | `GET` | `/token/balance` |
 | `GET` | `/pools/{poolId}/positions` |
+| `GET` | `/pools/{poolId}/onchain-stats` |
 | `GET` | `/pools/{poolId}/top-lpers` |
 
-On `/pools/{poolId}/top-lpers`, `chain` is optional: when omitted it is inferred from the
-pool ID (`0x` IDs are Robinhood Chain, anything else Solana).
+On `/pools/{poolId}/onchain-stats` and `/pools/{poolId}/top-lpers`, `chain` is optional: when
+omitted it is inferred from the pool ID (`0x` IDs are Robinhood Chain, anything else Solana).
+
+Every endpoint that filters by protocol takes it as `platform`, a comma-separated list such as
+`uniswap_v3,uniswap_v4`. The older names `protocol` (overview, revenue) and `type` (discover)
+are still accepted.
 
 Every other endpoint is Solana only. The remaining `/pools/{poolId}/*` routes read Meteora
 pool state, and the transaction-building, Jito, and RPC routes are Solana specific. See

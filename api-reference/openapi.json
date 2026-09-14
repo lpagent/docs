@@ -1012,12 +1012,21 @@
           },
           {
             "in": "query",
-            "name": "protocol",
+            "name": "platform",
             "schema": {
               "type": "string"
             },
             "description": "Comma-separated protocols to filter by. Omit it to get every protocol served on the chain (`meteora,meteora_damm_v2` on `SOL`, `uniswap_v3,uniswap_v4` on `ROBINHOOD`).",
             "example": "uniswap_v4"
+          },
+          {
+            "in": "query",
+            "name": "protocol",
+            "deprecated": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Older name for `platform`, still accepted. `platform` wins when both are sent."
           }
         ],
         "responses": {
@@ -2723,12 +2732,22 @@
           },
           {
             "in": "query",
+            "name": "platform",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated protocols to filter by. Omit it (or send `all`) to keep every protocol on the chain. On `SOL`, `meteora` for DLMM and `meteora_damm_v2` for DAMM V2. On `ROBINHOOD`, `uniswap_v3` or `uniswap_v4`.",
+            "example": "uniswap_v3,uniswap_v4"
+          },
+          {
+            "in": "query",
             "name": "type",
+            "deprecated": true,
             "schema": {
               "type": "string",
               "default": "all"
             },
-            "description": "Pool protocol filter; `all` keeps every protocol on the chain. On `SOL`, `meteora` for DLMM and `meteora_damm_v2` for DAMM V2. On `ROBINHOOD`, `uniswap_v3` or `uniswap_v4`."
+            "description": "Older name for `platform`, still accepted. `platform` wins when both are sent."
           },
           {
             "in": "query",
@@ -3510,7 +3529,7 @@
     "/pools/{poolId}/onchain-stats": {
       "get": {
         "summary": "Get onchain statistics for a specific pool",
-        "description": "Retrieve aggregated statistics including total open positions, input values, and unique users for a pool **Solana only** - this endpoint has no Robinhood Chain (EVM) equivalent.",
+        "description": "Retrieve aggregated statistics including total open positions, input values, and unique users for a pool. Works on Solana (Meteora DLMM, DAMM V2) and Robinhood Chain (Uniswap V3, Uniswap V4); pick the network with `chain` and narrow the protocols with `platform`.",
         "tags": [
           "Pools"
         ],
@@ -3522,8 +3541,29 @@
             "schema": {
               "type": "string"
             },
-            "description": "The pool address",
+            "description": "Pool ID. On Solana, the Meteora pool address. On Robinhood Chain, the Uniswap V3 pool address or the Uniswap V4 pool ID (32-byte `0x` hash), in any letter case.",
             "example": "7d51qGEeAKiPakkxLoHda9egShXQLJcjFYpHEcX4d3EM"
+          },
+          {
+            "in": "query",
+            "name": "chain",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SOL",
+                "ROBINHOOD"
+              ]
+            },
+            "description": "Blockchain network the pool lives on. `SOL` counts Meteora (DLMM / DAMM v2) positions; `ROBINHOOD` counts Uniswap V3 and V4 positions on Robinhood Chain (EVM, chain id 4663). When omitted, it is inferred from `poolId`: a `0x` ID is `ROBINHOOD`, anything else is `SOL`. An unrecognised value falls back to `SOL`."
+          },
+          {
+            "in": "query",
+            "name": "platform",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated protocols to count. Omit it to count every protocol in the pool. Valid values are `meteora` and `meteora_damm_v2` on `SOL`, `uniswap_v3` and `uniswap_v4` on `ROBINHOOD`. A protocol that is not served on the requested chain simply counts nothing.",
+            "example": "meteora,meteora_damm_v2"
           }
         ],
         "responses": {
@@ -3932,12 +3972,21 @@
           },
           {
             "in": "query",
-            "name": "protocol",
+            "name": "platform",
             "schema": {
               "type": "string"
             },
             "description": "Comma-separated protocols to filter by. Omit it to aggregate every protocol served on the chain. Valid values are `meteora` and `meteora_damm_v2` on `SOL`, `uniswap_v3` and `uniswap_v4` on `ROBINHOOD`.",
             "example": "meteora,meteora_damm_v2"
+          },
+          {
+            "in": "query",
+            "name": "protocol",
+            "deprecated": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Older name for `platform`, still accepted. `platform` wins when both are sent."
           }
         ],
         "responses": {

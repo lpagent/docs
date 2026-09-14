@@ -47,16 +47,17 @@ typo produces Solana data — not a `400`. Check the value you send.
     | `GET` | `/pools/discover` |
     | `GET` | `/token/balance` |
     | `GET` | `/pools/{poolId}/positions` |
+    | `GET` | `/pools/{poolId}/onchain-stats` |
     | `GET` | `/pools/{poolId}/top-lpers` |
 
     `/pools/{poolId}/positions` needs `chain=ROBINHOOD` for a Robinhood pool. On Robinhood
     its `positionState` is always empty and `activeBin` is omitted, since both are Meteora
     DLMM bin data, and `platform` is ignored in favour of the pool's own protocol.
 
-    `/pools/{poolId}/top-lpers` accepts `chain` and `platform` like the other endpoints.
-    `chain` is optional there: a Uniswap V3 pool address or Uniswap V4 pool ID (the 32-byte
-    `0x` hash) is treated as Robinhood when you leave it out. Either ID works in any letter
-    case.
+    `/pools/{poolId}/onchain-stats` and `/pools/{poolId}/top-lpers` accept `chain` and
+    `platform` like the other endpoints. `chain` is optional there: a Uniswap V3 pool address
+    or Uniswap V4 pool ID (the 32-byte `0x` hash) is treated as Robinhood when you leave it
+    out. Either ID works in any letter case.
   </Accordion>
 
   <Accordion title="Solana only">
@@ -67,7 +68,6 @@ typo produces Solana data — not a `400`. Check the value you send.
     | Method | Endpoint | Why |
     | --- | --- | --- |
     | `GET` | `/pools/{poolId}/info` | Meteora DLMM / DAMM v2 pool state |
-    | `GET` | `/pools/{poolId}/onchain-stats` | Meteora pool state |
     | `POST` | `/pools/{poolId}/add-tx` | Builds Solana transactions |
     | `POST` | `/pools/landing-add-tx` | Jito bundle landing |
     | `POST` | `/position/decrease-quotes` | Solana zap-out quoting |
@@ -136,9 +136,10 @@ conventions. Handle these explicitly rather than assuming Solana shapes.
   </Accordion>
 
   <Accordion title="Protocol defaults per chain">
-    Endpoints that take a `platform` or `protocol` parameter default to every protocol
-    served on the requested chain: `meteora,meteora_damm_v2` on `SOL`,
-    `uniswap_v3,uniswap_v4` on `ROBINHOOD`. Pass the parameter to narrow it to one.
+    Endpoints that take a `platform` parameter default to every protocol served on the
+    requested chain: `meteora,meteora_damm_v2` on `SOL`, `uniswap_v3,uniswap_v4` on
+    `ROBINHOOD`. Pass it to narrow the result. The older names `protocol` (overview,
+    revenue) and `type` (discover) are still accepted.
   </Accordion>
 </AccordionGroup>
 
