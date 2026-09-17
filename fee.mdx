@@ -8,7 +8,7 @@ description: "Simple and transparent fee structure for LP Agent services"
 LP Agent maintains a simple and transparent fee structure to ensure you always know exactly what you're paying.
 
 <Note>
-  We only charge 8% on your actual earnings - no upfront costs, no swap fees.
+  Our main fee is 8% on your actual earnings - no upfront costs, no swap fees.
   You only pay when you earn!
 </Note>
 
@@ -21,7 +21,7 @@ Our pricing model is simple: you only pay when you earn.
     <div className="mt-2">
       <span className="text-2xl font-bold text-primary">0% Swap Fee</span>
       <div className="mt-2 text-sm">
-        No charge when opening or closing positions.
+        No swap fee when opening or closing positions. Manual zap in/out carries a small 0.1% fee.
       </div>
     </div>
   </Card>
@@ -63,8 +63,9 @@ Our pricing model is simple: you only pay when you earn.
 <Check>No withdrawal lockups</Check>
 
 <Warning>
-  While LP Agent only charges 8% on your earnings, normal protocol fees (like
-  network gas fees and pool trading fees) still apply.
+  The 8% applies when positions are handled by auto take-profit / stop-loss;
+  manual zap in/out uses a 0.1% fee instead. Normal protocol fees (like network
+  gas fees and pool trading fees) still apply.
 </Warning>
 
 <Card title="Ready to Start?" icon="rocket" href="/quickstart">
