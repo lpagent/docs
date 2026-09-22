@@ -5,69 +5,48 @@ description: "Simple and transparent fee structure for LP Agent services"
 
 ## Our Fee Structure
 
-LP Agent maintains a simple and transparent fee structure to ensure you always know exactly what you're paying.
-
-<Note>
-  Our main fee is 8% on your actual earnings - no upfront costs, no swap fees.
-  You only pay when you earn!
-</Note>
-
-### Fee Structure
-
-Our pricing model is simple: you only pay when you earn.
+LP Agent charges one of two fees, depending on how your position is managed.
 
 <CardGroup cols={2}>
-  <Card title="Swap Fee" icon="percent">
+  <Card title="Automated" icon="robot">
     <div className="mt-2">
-      <span className="text-2xl font-bold text-primary">0% Swap Fee</span>
+      <span className="text-2xl font-bold text-primary">8%</span>
       <div className="mt-2 text-sm">
-        No swap fee when opening or closing positions. Manual zap in/out carries a small 0.1% fee.
+        Of claimed LP fees on positions run by automation: **Copy LP**, **Take Profit**, and **Stop Loss**.
       </div>
     </div>
   </Card>
-  <Card title="Claimed Fee" icon="coins">
+  <Card title="Manual" icon="hand-pointer">
     <div className="mt-2">
-      <span className="text-2xl font-bold text-primary">8% Claimed Fee</span>
+      <span className="text-2xl font-bold text-primary">0.1%</span>
       <div className="mt-2 text-sm">
-        Fee taken from 8% when you claim your position fee.
+        Of the amount when you manually add or remove liquidity from the **pool page**.
       </div>
     </div>
   </Card>
 </CardGroup>
 
-**Example:** You open a position on SOL/USDC with any amount - there's no swap fee charged when entering or exiting the position.
+| How the position is handled                 | Fee                      |
+| ------------------------------------------- | ------------------------ |
+| Copy LP                                     | 8% of claimed LP fees    |
+| Auto Take Profit                            | 8% of claimed LP fees    |
+| Auto Stop Loss                              | 8% of claimed LP fees    |
+| Manual add / remove liquidity via pool page | 0.1% of the amount       |
 
-**Example:** When you claim your position fee, LP Agent takes 8% as a claimed fee. If you don't claim any position fee, you pay nothing at all.
+**Example (automated):** A Copy LP position earns $100 in LP fees. When those fees are claimed, LP Agent takes $8. If the position earns nothing, you pay nothing.
 
-## What's Included
-
-### Free Services
-
-<CardGroup cols={3}>
-  <Card title="AI Management" icon="robot">
-    24/7 position monitoring and optimization
-  </Card>
-  <Card title="Auto-Compound" icon="rotate">
-    Automatic reinvestment of earned fees
-  </Card>
-  <Card title="Risk Management" icon="shield-check">
-    Stop-loss and take-profit execution
-  </Card>
-</CardGroup>
+**Example (manual):** You add $1,000 of liquidity from the pool page. LP Agent takes $1.
 
 ## No Hidden Fees
 
 <Check>No monthly subscription fees</Check>
 <Check>No management fees</Check>
-<Check>No performance fees</Check>
 <Check>No withdrawal lockups</Check>
 
 <Warning>
-  The 8% applies when positions are handled by auto take-profit / stop-loss;
-  manual zap in/out uses a 0.1% fee instead. Normal protocol fees (like network
-  gas fees and pool trading fees) still apply.
+  Normal protocol costs, such as network gas fees and pool trading fees, still apply.
 </Warning>
 
 <Card title="Ready to Start?" icon="rocket" href="/quickstart">
   Start optimizing your liquidity positions with our transparent fee structure
-</Card>{" "}
+</Card>
