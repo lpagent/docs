@@ -1,0 +1,56 @@
+---
+title: "简介"
+description: ""
+---
+
+请前往 [LP Agent Portal](https://portal.lpagent.io/) 获取 API key。
+
+## 认证
+
+所有 API 接口都通过 `x-api-key` header 进行认证。
+
+## 支持的链
+
+大部分读取类接口都接受 `chain` 查询参数。默认值是 `SOL`，所以现有的集成不需要任何改动。
+
+| 值 | 网络 | 协议 |
+| ----- | ------- | -------- |
+| `SOL` | Solana | Meteora（DLMM、DAMM v2） |
+| `ROBINHOOD` | Robinhood Chain（EVM，chain ID `4663`） | Uniswap V3、Uniswap V4 |
+
+无法识别的值会回退到 `SOL`，而不是返回错误。
+
+以下接口支持多链：
+
+| 方法 | 接口 |
+| ------ | -------- |
+| `GET` | `/lp-positions/opening` |
+| `GET` | `/lp-positions/historical` |
+| `GET` | `/lp-positions/overview` |
+| `GET` | `/lp-positions/logs` |
+| `GET` | `/lp-positions/position` |
+| `GET` | `/lp-positions/revenue/{owner}` |
+| `GET` | `/pools/discover` |
+| `GET` | `/token/balance` |
+| `GET` | `/pools/{poolId}/positions` |
+| `GET` | `/pools/{poolId}/onchain-stats` |
+| `GET` | `/pools/{poolId}/top-lpers` |
+
+在 `/pools/{poolId}/onchain-stats` 和 `/pools/{poolId}/top-lpers` 上，`chain` 是可选的：不传时会根据池子 ID 推断（`0x` 开头的 ID 是 Robinhood Chain，其他都是 Solana）。
+
+所有按协议筛选的接口都用 `platform` 参数，值是逗号分隔的列表，例如 `uniswap_v3,uniswap_v4`。旧的参数名 `protocol`（overview、revenue）和 `type`（discover）仍然可用。
+
+其他接口都只支持 Solana。其余的 `/pools/{poolId}/*` 路由读取的是 Meteora 池子状态，交易构建、Jito 和 RPC 路由都是 Solana 专用的。响应上的差异和当前的数据限制，见 [Robinhood Chain 集成](/zh/integration/robinhood)。
+
+## Premium 接口
+
+以下接口需要 **Premium** 或 **Enterprise** API key 套餐。**Basic** API key 套餐无法访问这些路由。
+
+| 标签 | 方法 | 接口 |
+| ----- | ------ | --------------------------- |
+| Pools | `GET`  | `/pools/{poolId}/top-lpers` |
+| RPC   | `POST` | `/rpc`                      |
+| RPC   | `POST` | `/rpc/historical`           |
+| RPC   | `POST` | `/jito`                     |
+
+如需升级，请在 [LP Agent Portal](https://portal.lpagent.io/) 管理你的 API key 和账单。

@@ -1,154 +1,111 @@
 ---
 title: "Copy LP"
-description: "Automatically copy the strategies of successful liquidity providers"
+description: "Copy the positions of top liquidity providers, scaled to your wallet"
 ---
 
-## What is Copy LP ?
+## What is Copy LP?
 
-Our Copy LP feature allows you to automatically replicate the positions and strategies of experienced liquidity providers on LP Agent.
+Copy LP follows a wallet you choose (the **leader**) and repeats its LP moves in your agent wallet, scaled to your size. When the leader opens a position, you open the same pool and range. When it adds, removes, claims or closes, your copy does the same.
 
-- Find successful wallets
-- Copy their moves
-- And potentially achieve similar returns without needing deep market knowledge.
+It works on both networks:
+
+| Network | Pools copied |
+| --- | --- |
+| Solana | Meteora DLMM (Spot, Curve, Bid-Ask and custom shapes) and DAMM v2 |
+| Robinhood Chain | Uniswap V3 and V4 (hooked V4 pools only if you allow them) |
 
 <div className="my-6">
   <iframe
     width="100%"
     className="aspect-video"
     src="https://www.youtube.com/embed/7z1bXwxur3k"
-    title="YouTube video player: Copy LP Trading"
+    title="YouTube video player: Copy LP"
     frameborder="0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowfullscreen
   ></iframe>
 </div>
 
-## How to Copy a Wallet
-
-Follow these steps to start copying a successful LP:
+## How to start copying
 
 <Steps>
-  <Step title="Prerequisite: Delegate & Fund Copy Wallet">
-    Before you can copy, you need to create a dedicated wallet for Copy LP operations. This involves delegating authority to LP Agent for this specific wallet and funding it with the SOL or USDC you want to use for copying. This keeps your main wallet funds separate and secure.
-
-    Watch this guide for detailed instructions:
-    <div className="my-6">
-      <iframe
-        width="100%"
-        className="aspect-video"
-        src="https://www.youtube.com/embed/cpXiWul-xMg"
-        title="YouTube video player: LP Agent Delegate & Fund Wallet"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
-      ></iframe>
-    </div>
-
+  <Step title="Fund your agent wallet">
+    Copies run from your [agent wallet](/account-and-wallet#your-agent-wallet). There is no separate copy wallet. Deposit SOL (Solana) or ETH (Robinhood Chain). Keep some spare for fees and gas.
   </Step>
-  <Step title="Find a Wallet to Copy">
-    Browse the Portfolio Leaderboard or explore user profiles to find wallets
-    with performance metrics you like.
+  <Step title="Find a wallet on Smart LP">
+    Look for a good win rate, fees that make up a real share of profit, and an average hold time that is not too short. See [Smart LP](/features/smart-lp).
   </Step>
-  <Step title="Click 'Copy'">
-    <Frame>
-    ![LP Agent Copy button](/images/copy-button.png)
-    <em>Copy button</em>
-    </Frame>
-    Once you've chosen a wallet, navigate to their profile and click the "Copy"
-    button.
+  <Step title="Press Copy LP on its portfolio">
+    The copy dialog opens with a suggested size.
   </Step>
-  <Step title="Configure Copy Settings">
-      <Frame>
-    ![LP Agent Copy LP Settings](/images/copy-lp.png)
-    <em>LP Agent Copy LP Setting</em>
-    </Frame>
-    Set up your copy parameters:
-    - **Copy Percentage:** Allocate a percentage of value you want to copy
-    - **Max Amount:** Set a maximum total value (in SOL or USDC) that this copy strategy can use.
-    - **Take Profit (TP):** Automatically stop copying and secure profits when the copied position reaches a certain % gain.
-    - **Stop Loss (SL):** Automatically stop copying to limit potential losses if the copied position reaches a certain % loss.
-
-    Example:
-    - Your settings: **Copy 50%, Max amount $30**
-    - If original wallet: Open a position `$20`, you open a position worth `$10` (`$20*50% = $10`)
-    - If original wallet: Open a position `$100`, you open a position worth `$30` (`$100*50% = $50` but it is bigger than Max Amount, so Max Amount is used)
-
+  <Step title="Set your rules and press Copy">
+    Five short steps: **Sizing**, **Exit rules**, **What to copy**, **Protection** and **Label**. See [Copy Settings](/features/copy-settings).
   </Step>
-  <Step title="Start Copying">
-    Confirm your settings and activate the copy trade. LP Agent will now
-    automatically replicate the selected wallet's LP actions within your defined
-    parameters.
+  <Step title="Track it under Copy LP">
+    The **Copy LP** page lists your copied wallets, your results and a log of every copy. See [Managing Your Copies](/features/copy-management).
   </Step>
 </Steps>
 
-## Key Configuration Details
+## What gets copied
 
-- **Proportional Copying:** Trades are typically copied proportionally based on the percentage you allocate relative to the copied wallet's size and your available capital.
-- **Risk Management:** TP and SL settings apply specifically to your copied position, allowing you to manage risk independently.
-- **Dynamic Adjustments:** LP Agent monitors the source wallet and automatically adjusts your copied position when they make changes (e.g., rebalancing, adding/removing liquidity), respecting your max amount and risk settings.
+| Leader does | Your copy does | Solana | Robinhood Chain |
+| --- | --- | --- | --- |
+| Opens a position | Opens the same pool and range at your size | Yes | Yes |
+| Adds liquidity | Adds the leader's amount x your copy % (capped by your max) | Yes | Yes |
+| Removes part of a position | Removes the same share of your position | Yes | Yes |
+| Closes a position | Closes your copy | Yes | Yes |
+| Claims fees | Claims fees on your copy | Yes | Yes |
+| Compounds | Compounds your copy | Yes | Yes |
+| Rebalances | Moves your copy the same way | Yes | Shows up as a close and a new open |
 
-## Frequently Asked Questions
+- Only positions the leader opens **after** you start copying are copied.
+- Adds, removes and closes only apply to positions you hold a copy of.
+- Your own **take profit** and **stop loss** can close a copy before the leader does. Whichever comes first wins.
+
+## How sizing works
+
+Your size is set by two numbers in the **Sizing** step:
+
+- **Copy Percentage**: the share of each leader position you copy. The dialog suggests one from your net worth and the leader's, so each position is the same share of your wallet as it is of theirs.
+- **Max Increase Amount per Tx** (optional): a cap on each copied open and each copied add.
+
+**Example:** Copy Percentage 80%, Max 8 SOL.
+
+1. The leader opens with 1 SOL. You open 0.8 SOL.
+2. The leader adds 29 SOL. 80% would be 23.2 SOL, so your add is capped at 8 SOL.
+3. Your copy now holds 8.8 SOL.
+
+The cap applies **per transaction**, not per position. Removes and closes are percentage based and are never capped.
+
+## What you need in your wallet
+
+| Network | Keep in your agent wallet |
+| --- | --- |
+| Solana | The copy amount, plus position rent (returned when the position closes), plus about 0.03 SOL for fees. We suggest at least **5 SOL** of net worth to copy. |
+| Robinhood Chain | ETH for gas on every copy. Each copy keeps back at least 0.001 ETH to pay for its own exit. WETH does not pay gas. We suggest at least **0.08 ETH** of net worth. |
+
+On Robinhood Chain you can fund copies in **ETH or USDG** (**Settings > General > Base Token**). A copy closes back into the currency it was opened with. On Solana, closes swap back to SOL.
+
+<Warning>
+  Copy LP carries real risk. A leader's past results don't guarantee yours: your copy lands a moment after theirs, at a slightly different price, and pays its own swap and network costs. Size small first and use a stop loss.
+</Warning>
+
+## FAQ
 
 <AccordionGroup>
-  <Accordion title="Why do I need to delegate authority and fund a separate wallet for Copy LP?">
-    Delegating authority to a separate, dedicated wallet allows LP Agent to
-    execute copy trades automatically on your behalf without needing permission
-    for every single transaction. Funding this specific wallet defines the
-    capital allocated exclusively for your Copy LP activities, separating it
-    from your main funds and enhancing security. It ensures LP Agent can only
-    access the funds you've explicitly designated for copying.
-  </Accordion>
-  <Accordion title="How exactly does copying work?">
-    When you copy a wallet, LP Agent monitors the source wallet's LP actions on
-    supported protocols (Meteora). When they open, close, or modify a position,
-    our system automatically replicates that action in your account, scaled
-    according to your settings.
-  </Accordion>
   <Accordion title="Can I copy more than one wallet?">
-    Yes, you can copy multiple wallets simultaneously, allocating different
-    amounts or percentages of your capital to each, as long as you have
-    sufficient funds.
+    Yes. Each copied wallet has its own settings. Make sure your agent wallet can fund all of them.
   </Accordion>
-  <Accordion title="How are opening and closing positions handled when copying?">
-    When the source wallet opens a new position, LP Agent will automatically
-    perform a "zap-in" transaction for you using your chosen base token
-    (typically SOL or USDC) to create the equivalent position according to your
-    copy settings (percentage, max amount). Similarly, when the source wallet
-    closes a position, LP Agent will automatically "zap-out" your corresponding
-    position, converting the assets back to your base token.
+  <Accordion title="What happens when I pause a wallet?">
+    Nothing from that wallet is copied while it is paused, **including closes**. Your open copies stay open and keep their own take profit and stop loss. Close them yourself if you want out.
   </Accordion>
-  <Accordion title="What happens if the wallet I'm copying changes their strategy?">
-    Your copied position will automatically follow the changes made by the
-    source wallet, provided the actions align with your configured settings (Max
-    Amount, TP, SL).
+  <Accordion title="Why was a copy not opened?">
+    Open **Copy LP > Copy Logs**. Every copy that did not open shows why (low balance, price moved, token filters, meme protection and more) and usually a button to fix it.
   </Accordion>
-  <Accordion title="Are there extra fees for using the Copy LP feature?">
-    Please refer to our standard [Fee Structure](/fee) documentation. The usual
-    zap-in/zap-out fees apply if single-token operations are required to
-    replicate trades. There are no specific *additional* fees just for copying.
+  <Accordion title="What does Copy LP cost?">
+    Opening a copy is free. When a copy closes or claims fees because the leader did, LP Agent takes 8% of the LP fees collected. See [Fees](/fee).
   </Accordion>
-  <Accordion title="How do I stop copying a wallet?">
-    You can stop copying any wallet at any time through your dashboard. Go to
-    your "Copy LP" section, select the active copy, and choose the "Disable"
-    option.
-  </Accordion>
-  <Accordion title="What are the risks involved in Copy LP Trading?">
-    While Copy LP Trading allows you to leverage the expertise of others, it
-    still involves risks. Past performance is not indicative of future results.
-    The wallet you copy might make poor decisions, or market conditions could
-    change rapidly. Always use the risk management tools (SL/TP, Max Amount) and
-    only invest capital you can afford to lose.
-  </Accordion>
-  <Accordion title="What happens if I set a Take Profit (TP) or Stop Loss (SL) on my copied position?">
-    Your copied position will be closed or adjusted based on whichever condition
-    is met first: either your predefined TP/SL level is reached, or the wallet
-    you are copying takes an action (e.g., closes their position). This ensures
-    your risk management settings are respected while still following the source
-    wallet's activity.
+  <Accordion title="Where can I learn to pick and size copies?">
+    Read [Copy LP Best Practices](/tutorials/copy-lp-best-practices) (Solana) and [Copy LP on Robinhood Chain](/tutorials/copy-robinhood-best-practices).
   </Accordion>
 </AccordionGroup>
-
-<Note>
-  Copy LP Trading is a powerful tool, but it's important to understand the risks
-  and configure your settings carefully.
-</Note>

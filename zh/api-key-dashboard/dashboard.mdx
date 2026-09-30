@@ -1,0 +1,63 @@
+---
+title: "仪表盘"
+description: ""
+mode: "custom"
+---
+
+import { MetricCard } from "/snippets/MetricCard.jsx";
+import { BtnLogin } from "/snippets/BtnLogin.jsx";
+import { PremiumPlan } from "/snippets/PremiumPlan.jsx";
+import { FreePlan } from "/snippets/FreePlan.jsx";
+import { EnterprisePlan } from "/snippets/EnterprisePlan.jsx";
+
+<div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900">
+  <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col gap-6">
+
+<div className="flex flex-col gap-4">
+<div className="flex flex-col gap-2">
+
+<div className="text-4xl text-black dark:text-white font-bold leading-[45px]">
+  用 LP 数据<br /> 加速你的开发
+  <br />
+</div>
+
+## 用 LP Agent Data 全面掌握 Meteora DLMM、DAMM V2 数据：最值得信赖的独立数据源。
+
+</div>
+
+<BtnLogin />
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
+  <FreePlan />
+  <PremiumPlan />
+  <EnterprisePlan />
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-4">
+  <MetricCard title="总交易量" value="$1,079,825,250+" />
+  <MetricCard title="已开仓位" value="2,208+" />
+  <MetricCard title="累计利润" value="$1,645,861" />
+  <MetricCard title="每月调用次数" value="300M+" />
+</div>
+
+<div className="flex flex-col gap-3">
+  <CardGroup cols={2}>
+    <Card title="实时更新" icon="clock">
+      每隔几秒自动更新，实时监控你的指标。
+    </Card>
+    <Card title="交互式图表" icon="chart-bar">
+      用美观的交互式图表和图形直观展示你的数据。
+    </Card>
+    <Card title="活动追踪" icon="list-check">
+      追踪你系统里所有重要的事件和活动。
+    </Card>
+    <Card title="快捷操作" icon="bolt">
+      在仪表盘上一键使用常用操作。
+    </Card>
+  </CardGroup>
+</div>
+
+
+  </div>
+</div>

@@ -1,113 +1,52 @@
 ---
 title: "Take Profit & Stop Loss"
-description: "Protect your positions with automated Take Profit and Stop Loss features"
+description: "Close a position automatically when it is up or down by the percentage you choose"
 ---
 
-## Automated Position Protection
+Take profit (TP) and stop loss (SL) close a position for you when its PnL reaches your threshold. They work on both networks and keep watching while you are offline.
 
-LP Agent provides sophisticated risk management tools to protect your liquidity positions and lock in profits automatically.
+## Set TP/SL on a position
 
-## Take Profit
+In your [Portfolio](/features/portfolio), click the **Settings** badge on an open position (it reads **Set TP** / **Set SL** when nothing is set).
 
-Our Take Profit feature helps you secure gains automatically when certain profit targets are met.
+| Option | What it does |
+| --- | --- |
+| **TP/SL Currency** | Measure PnL in SOL or USD (Solana), or ETH or USD (Robinhood Chain). |
+| **Take Profit** | Close the position when it is up this many percent. |
+| **Stop Loss** | Close the position when it is down this many percent. |
 
-### How Take Profit Works
+Tick a box to turn that side on, then press **Save Changes**. Untick it to turn it off.
 
-<Steps>
-  <Step title="Set Profit Target">
-    Define your desired profit percentage or absolute value
-  </Step>
-  <Step title="Choose Exit Strategy">
-    Select between partial or full position exit
-  </Step>
-  <Step title="Configure Execution">
-    Set execution preferences like slippage tolerance and timing
-  </Step>
-  <Step title="Automatic Execution">
-    LP Agent monitors and executes when conditions are met
-  </Step>
-</Steps>
+<Tip>
+  The currency matters. A SOL/USDC position can be up in USD and down in SOL at the same time. Pick the currency you actually count your gains in.
+</Tip>
 
-### Configuration Options
+TP and SL work on positions in your agent wallet. A position sitting in your sign-in wallet can't use them.
 
-<CardGroup cols={2}>
-  <Card title="Profit Targets" icon="bullseye">
-    Set multiple take-profit levels for staged exits
-  </Card>
-  <Card title="Exit Strategy" icon="door-open">
-    Choose between partial or complete position withdrawal
-  </Card>
-  <Card title="Reinvestment Rules" icon="rotate">
-    Configure automatic reinvestment of profits
-  </Card>
-  <Card title="Time Conditions" icon="clock">
-    Add time-based conditions to your take-profit rules
-  </Card>
-</CardGroup>
+## Give every new position TP/SL: Auto TP/SL
 
-## Stop Loss
+Go to **Settings > General > Auto TP/SL**.
 
-Protect your capital with automated stop-loss triggers that help minimize potential losses.
-
-### How Stop Loss Works
-
-<Steps>
-  <Step title="Set Loss Threshold">
-    Define maximum acceptable loss percentage
-  </Step>
-  <Step title="Configure Protection">
-    Set up protection parameters and triggers
-  </Step>
-  <Step title="Monitor Positions">
-    Continuous real-time position monitoring
-  </Step>
-  <Step title="Automatic Execution">
-    Swift execution when stop-loss conditions are met
-  </Step>
-</Steps>
-
-### Protection Features
-
-- Dynamic stop-loss adjustments based on market conditions
-- Trailing stop-loss to lock in profits
-- Slippage protection during execution
-- Smart routing for optimal exit prices
-
-## Advanced Settings
-
-<AccordionGroup>
-  <Accordion title="Price Feeds">
-    Configure which price feeds to use for triggering take-profit and stop-loss orders:
-    - Time-weighted average price (TWAP)
-    - Oracle prices
-    - DEX prices
-  </Accordion>
-  
-  <Accordion title="Execution Parameters">
-    Customize how your orders are executed:
-    - Maximum slippage tolerance
-    - Gas price limits
-    - Execution timeouts
-    - Partial fill settings
-  </Accordion>
-
-  <Accordion title="Notification Settings">
-    Set up alerts for:
-    - Approaching trigger levels
-    - Order execution
-    - Failed transactions
-    - Position updates
-  </Accordion>
-</AccordionGroup>
+- Off by default. When it is off, you set TP/SL on each position yourself.
+- When it is on, every **new** position gets the defaults below:
+  - **Currency** (SOL/ETH or USD)
+  - **Take Profit**: 10% by default
+  - **Stop Loss**: 10% by default
+- It does not change positions you already have.
 
 <Note>
-  All risk management settings can be adjusted through your dashboard at any
-  time. We recommend regularly reviewing and adjusting these parameters based on
-  market conditions.
+  **Copied positions don't use Auto TP/SL.** They take the TP/SL from the copied wallet's [Exit rules](/features/copy-settings#step-2-exit-rules). Whichever comes first closes the copy: your TP/SL, or the leader's own exit.
 </Note>
 
+## What happens when it triggers
+
+1. LP Agent closes the position from your agent wallet and swaps it back (SOL on Solana; the currency you opened with on Robinhood Chain).
+2. The position moves to **Historical positions** with its final PnL.
+3. If you turned on notifications, you get a **Take profit hit** or **Stop loss hit** push with the result. See [Notifications](/features/notifications).
+4. The position's **Logs** show each step, such as take profit queued and close success.
+
+A TP or SL close counts as an automated action: LP Agent takes 8% of the LP fees collected. See [Fees](/fee).
+
 <Warning>
-  While our risk management tools are designed to protect your positions, they
-  cannot guarantee against all losses. Always invest responsibly and within your
-  risk tolerance.
-</Warning>{" "}
+  A stop loss limits losses but can't guarantee a price. In a fast market the close lands at whatever the price is when the transaction goes through, and each close pays swap and network costs. A very tight stop on a small position can cost more than it saves.
+</Warning>

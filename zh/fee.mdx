@@ -1,0 +1,59 @@
+---
+title: "费用结构"
+description: "LP Agent 收哪些费用，什么时候收"
+---
+
+## 费用怎么算
+
+你付多少，取决于**谁按下了按钮**：是你自己，还是替你操作的 LP Agent 自动化功能。
+
+<CardGroup cols={2}>
+  <Card title="自动化操作时" icon="robot">
+    <div className="mt-2">
+      <span className="text-2xl font-bold text-primary">8%</span>
+      <div className="mt-2 text-sm">
+        按 LP Agent 替你平仓或领取手续费时收到的 LP 手续费收益计算。适用于 **Copy LP** 跟随带单钱包、**Take Profit**（止盈）和 **Stop Loss**（止损）。
+      </div>
+    </div>
+  </Card>
+  <Card title="你自己操作时" icon="hand-pointer">
+    <div className="mt-2">
+      <span className="text-2xl font-bold text-primary">0.1%</span>
+      <div className="mt-2 text-sm">
+        按你自己添加或移除流动性时的金额计算：Zap In（单币入池）、加仓、减仓或 Zap Out（一键出池）。
+      </div>
+    </div>
+  </Card>
+</CardGroup>
+
+| 操作 | 费用 |
+| --- | --- |
+| Copy LP 替你开仓 | 0% |
+| 带单钱包平仓、减仓或领取手续费时，Copy LP 跟着替你操作 | 所收 LP 手续费收益的 8% |
+| 止盈或止损触发平仓 | 所收 LP 手续费收益的 8% |
+| 你添加流动性（Zap In、加仓） | 投入金额的 0.1% |
+| 你移除流动性（减仓、Zap Out、平仓） | 取出金额的 0.1% |
+| 复投（Compound，Solana DLMM） | 0% |
+| 兑换（swap） | 0% |
+| [Claim SOL](/zh/features/claim-sol) | 0% |
+| 充值和提现 | 0% |
+
+收费规则看的是这次操作，而不是仓位当初怎么开的。你自己开的仓位，如果被你设的止损平掉，要付其 LP 手续费收益的 8%。跟单开的仓位，如果你自己手动平仓，付 0.1%。
+
+**示例（自动化）**：一个跟单仓位赚了 1 SOL 的 LP 手续费收益。带单钱包退出、你的跟单仓位随之平仓时，LP Agent 收取 0.08 SOL。如果这个仓位没赚到手续费，你什么都不用付。
+
+**示例（手动）**：你在池子页面 Zap In 了 10 SOL。LP Agent 收取 0.01 SOL。
+
+## 没有隐藏费用
+
+<Check>无订阅费</Check>
+<Check>不对你的本金收管理费</Check>
+<Check>无提现手续费，无锁仓期</Check>
+
+<Warning>
+  网络成本仍需自付：Solana 的交易手续费和仓位租金、Robinhood Chain 的 Gas、兑换滑点，以及池子本身的交易手续费。如果你是某个价格 bin 里的第一个 LP，Meteora 还会收一笔一次性租金。创建仓位前，应用会先显示这笔费用。
+</Warning>
+
+<Tip>
+  推荐返现每月会把这些平台手续费的一部分返还给你。详见[推荐计划](/zh/referral)。
+</Tip>

@@ -1,0 +1,64 @@
+---
+title: "设置"
+description: "出资币种、自动 TP/SL、滑点、代币筛选、通知和你的私钥"
+---
+
+点击顶栏里你的地址打开账户面板，再打开 **Settings**（设置）。它有四个标签页：**General**、**Swap**、**Security** 和 **Account**。改完后按 **Save Changes**。
+
+## General
+
+<Frame>
+  ![Settings 的 General 标签页](/images/app/settings-general.png)
+  <em>Robinhood Chain 上的 General：Base Token、钱包余额、Keep ETH 和 Auto TP/SL</em>
+</Frame>
+
+| 设置项 | 作用 |
+| --- | --- |
+| **Base Token**（Robinhood Chain） | 用 **ETH** 或 **USDG** 为新仓位（包括跟单）出资。已有仓位不变。 |
+| **Wallet balances**（Robinhood Chain） | 你的本金（用来开仓的钱）和你的 Gas（ETH）。 |
+| **Keep ETH**（Robinhood Chain，Base Token 为 USDG 时） | 让 ETH 保持充足用来付 Gas。ETH 低于 **Refill below**（默认 0.002 ETH）时，会兑换足够的 USDG，把 ETH 补回到 **Refill up to**（默认 0.008 ETH）。 |
+| **Auto TP/SL** | 默认关闭。开启后，每个新仓位都会用它下面设置的默认止盈和止损（10% / 10%）。跟单改用它自己的退出规则。见[止盈与止损](/zh/features/take-profit-stop-loss)。 |
+| **Manage Manual Position** | 让 LP Agent 管理你在 LP Agent 之外开的仓位，比如直接在 Meteora 上开的，这样你也能给它们用 TP/SL。新账户默认开启。 |
+| **Realtime Portfolio**（Solana） | 实时推送当前仓位，而不是每 10 秒刷新一次。只保存在这台设备上。 |
+| **Realtime Numbers** | **Highlight** 或 **Animate**：实时数值变化时怎么显示。只保存在这台设备上。 |
+
+<Frame>
+  ![更多 General 设置](/images/app/settings-general-more.png)
+  <em>Manage Manual Position、Realtime Portfolio 和 Realtime Numbers</em>
+</Frame>
+
+## Swap
+
+| 设置项 | 作用 |
+| --- | --- |
+| **Slippage** | 兑换（swap）时价格对你不利的最大变动幅度，单位 %。适用于代理（agent）替你做的每一次兑换：Zap In（单币入池）、跟单、平仓和换回（swap back）。超过 7% 会显示警告。 |
+| **Method**（Solana） | 优先使用哪条兑换路由：**OKX**（默认）或 **Jupiter Ultra**。 |
+
+<Tip>
+  如果跟单因为 **Price moved** 失败，Copy Logs（跟单日志）里的修复按钮会打开这个标签页，并给出建议滑点。波动大的代币通常需要留更多空间。
+</Tip>
+
+## Security
+
+<Frame>
+  ![Settings 的 Security 标签页](/images/app/settings-security.png)
+  <em>开仓或跟单前会先检查的代币筛选</em>
+</Frame>
+
+这些筛选在任何仓位开仓或跟单之前生效。任何一项不通过的代币都会被跳过，Copy Logs 会告诉你是哪一项拦下了它。
+
+| 筛选项 | 新账户默认值 |
+| --- | --- |
+| **Jupiter Organic Score**（Solana） | 50（0 到 100）。代币真实的链上活跃度，已剔除机器人和女巫地址。 |
+| **Minimum Market Cap** | $500,000 |
+| **Minimum 24h Volume** | $100,000 |
+| **Minimum Holders** | 100。设为 0 表示不设下限。 |
+| **Blacklist** | 你永远不想做 LP 或跟单的代币。按 **Manage**，粘贴代币地址，再按 **Add**。每个网络有自己的名单。 |
+
+## Account
+
+| 设置项 | 作用 |
+| --- | --- |
+| **Export Private Key** | 导出你代理钱包（agent wallet）的私钥。见[账户与钱包](/zh/account-and-wallet)。 |
+| **Account Linking** | 只适用于钱包升级之前创建的账户：绑定额外的邮箱和钱包。 |
+| **System Notifications** | 止盈、止损和跟单事件的推送通知，每种事件都有单独的开关。见[通知](/zh/features/notifications)。 |

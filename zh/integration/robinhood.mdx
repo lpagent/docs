@@ -1,0 +1,153 @@
+---
+title: "Robinhood Chain 集成" description: "Robinhood Chain 上的 Uniswap V3 和 V4：在 App 里用，以及通过 LP Agent API 用"
+---
+
+## 在 App 里
+
+用 EVM 钱包（MetaMask、Rabby 等）登录，或者用邮箱注册时选 **Robinhood**，你的账户就会跑在 Robinhood Chain 上。
+
+<CardGroup cols={2}>
+  <Card title="用 ETH 或 USDG 出资" icon="coins" href="/zh/features/settings">
+    ETH 用来付 Gas。选 **ETH** 或 **USDG** 作为新仓位的 **Base Token**（基础代币）。用 USDG 时，**Keep ETH** 会自动帮你补 Gas。
+  </Card>
+  <Card title="Uniswap V3 和 V4" icon="water" href="/zh/features/create-position">
+    用 ETH 或 USDG Zap In（单币入池），选好价格区间，平仓时换回开仓用的币种。
+  </Card>
+  <Card title="代币化股票" icon="building-columns" href="/zh/features/pools">
+    **Stocks** 筛选会显示持有 Robinhood 发行的股票代币的池子，按合约地址匹配。
+  </Card>
+  <Card title="带防护的 Copy LP" icon="shield-check" href="/zh/features/copy-settings">
+    带 Hook 的 V4 池子只有在你允许时才会跟单，快进快出的带单钱包会有警告，利润不是来自手续费的带单钱包会被停掉。
+  </Card>
+</CardGroup>
+
+和 Solana 不一样的地方：
+
+- 仓位用它的 Uniswap token ID 标识，显示为 `#1234567`。
+- 每个跟单都会留一点 ETH（至少 0.001 ETH），用来付它自己退出时的费用。WETH 不能付 Gas。
+- 如果开仓加平仓的 Gas 超过仓位大小的 3%，自动跟单会被跳过，标为 **Too small for gas**。我们建议净资产至少 **0.08 ETH** 再跟单。详见 [Robinhood Chain 上的 Copy LP](/zh/tutorials/copy-robinhood-best-practices)。
+- Claim SOL、资金保护和复投只支持 Solana。
+
+本页剩下的内容是给用 API 的开发者看的。
+
+## 概览
+
+LP Agent 为 **Robinhood Chain**（一个 EVM 网络）上的 Uniswap V3 和 Uniswap V4 流动性建立索引。公开 API 通过你在 Solana 上已经在用的同一套 endpoint 提供这些数据：用 `chain` query 参数选择网络。
+
+| | |
+| --- | --- |
+| 网络 | Robinhood Chain |
+| Chain ID | `4663` |
+| 协议 | Uniswap V3（`uniswap_v3`）、Uniswap V4（`uniswap_v4`） |
+| 原生币 | ETH（18 位小数） |
+| API 取值 | `chain=ROBINHOOD` |
+
+<Note>
+  `chain` 默认是 `SOL`。现有的集成都不用改，照常工作：只有在你想要 Robinhood 数据的请求上才传 `chain=ROBINHOOD`。
+</Note>
+
+## 选择链
+
+```bash
+curl -H "x-api-key: $LPAGENT_API_KEY" \
+  "https://api.lpagent.io/open-api/v1/lp-positions/opening?owner=0xYourWallet&chain=ROBINHOOD"
+```
+
+无法识别的 `chain` 值会回退到 `SOL`，而不是返回错误，所以拼错了会拿到 Solana 的数据，而不是 `400`。请检查你传的值。
+
+## Endpoint 支持情况
+
+<AccordionGroup>
+  <Accordion title="SOL 和 ROBINHOOD 都支持">
+    | Method | Endpoint |
+    | --- | --- |
+    | `GET` | `/lp-positions/opening` |
+    | `GET` | `/lp-positions/historical` |
+    | `GET` | `/lp-positions/overview` |
+    | `GET` | `/lp-positions/logs` |
+    | `GET` | `/lp-positions/position` |
+    | `GET` | `/lp-positions/revenue/{owner}` |
+    | `GET` | `/pools/discover` |
+    | `GET` | `/token/balance` |
+    | `GET` | `/pools/{poolId}/positions` |
+    | `GET` | `/pools/{poolId}/onchain-stats` |
+    | `GET` | `/pools/{poolId}/top-lpers` |
+
+    查 Robinhood 池子时，`/pools/{poolId}/positions` 需要传 `chain=ROBINHOOD`。在 Robinhood 上，它的 `positionState` 始终为空，`activeBin` 会被省略，因为这两个都是 Meteora DLMM 的 bin 数据；`platform` 会被忽略，改用池子自己的协议。
+
+    `/pools/{poolId}/onchain-stats` 和 `/pools/{poolId}/top-lpers` 跟其他 endpoint 一样接受 `chain` 和 `platform`。这两个 endpoint 的 `chain` 是可选的：不传时，Uniswap V3 池子地址或 Uniswap V4 pool ID（32 字节的 `0x` 哈希）会被当作 Robinhood。两种 ID 都不区分大小写。
+  </Accordion>
+
+  <Accordion title="仅 Solana">
+    这些 endpoint 目前在 Robinhood Chain 上没有对应的版本。它们要么读取 Solana 特有的池子状态，要么通过 Jito bundle 构建并上链 Solana 交易，而这在 EVM 上没有对应的东西。
+
+    | Method | Endpoint | 原因 |
+    | --- | --- | --- |
+    | `GET` | `/pools/{poolId}/info` | Meteora DLMM / DAMM v2 池子状态 |
+    | `POST` | `/pools/{poolId}/add-tx` | 构建 Solana 交易 |
+    | `POST` | `/pools/landing-add-tx` | Jito bundle 上链 |
+    | `POST` | `/position/decrease-quotes` | Solana Zap Out 报价 |
+    | `POST` | `/position/decrease-tx` | 构建 Solana 交易 |
+    | `POST` | `/position/landing-decrease-tx` | Jito bundle 上链 |
+    | `POST` | `/position/claim-fee-tx` | 构建 Solana 交易 |
+    | `POST` | `/position/landing-claim-fee-tx` | Jito bundle 上链 |
+    | `POST` | `/rpc`, `/rpc/historical`, `/jito` | Solana RPC 透传 |
+  </Accordion>
+</AccordionGroup>
+
+## 响应上要注意的差异
+
+Robinhood 的响应和 Solana 用同一个外层结构（envelope），但有几个字段的约定不一样。请显式处理这些差异，不要默认它们和 Solana 的格式一样。
+
+<AccordionGroup>
+  <Accordion title="仓位 ID 是 manager 地址 + token ID">
+    Robinhood 仓位 ID 由 Uniswap V3 position-manager 地址和 NFT token ID 组成，中间用连字符连接：`0x1234…abcd-5678`。API 也接受带完整前缀的 `robinhood:0x1234…abcd-5678` 格式。
+
+    因为这种格式本身就能看出是哪条链，所以你不传 `chain` 时，`GET /lp-positions/position` 会从 ID 推断出链。Solana 仓位 ID 仍然是 base58 的 mint 地址。
+  </Accordion>
+
+  <Accordion title="原生 ETH 记在 wrapped 地址下">
+    `GET /token/balance` 会把原生 ETH 余额记在 **wrapped** 原生代币地址下，而不是零地址。在 Solana 上，原生 SOL 显示在 wrapped SOL 的 mint 下，而且响应还会额外过滤，只保留价值高于 $0.02 的持仓；Robinhood 的响应没有这种粉尘过滤。
+  </Accordion>
+
+  <Accordion title="池子发现用的报价代币">
+    `GET /pools/discover?chain=ROBINHOOD` 按这些报价代币（quote token）筛选：
+
+    | Symbol | Address |
+    | --- | --- |
+    | `WETH` / `ETH` | `0x0bd7d308f8e1639fab988df18a8011f41eacad73` |
+    | `USDG` | `0x5fc5360d0400a0fd4f2af552add042d716f1d168` |
+
+    传**符号**（`quote_token=USDG`），不要传地址。
+  </Accordion>
+
+  <Accordion title="Robinhood 上的池子发现筛选">
+    `GET /pools/discover?chain=ROBINHOOD` 和 Solana 有几点不同：
+
+    - `min_bin_step`、`max_bin_step`、`min_organic_score` 和 `max_organic_score` 是 Solana 的概念，会被忽略。
+    - 浏览时会隐藏流动性低于 $5,000 的池子。传 `min_liquidity`、`show_small_pools=true` 或 `search` 就能看到它们。
+    - 浏览时还会隐藏声称 TVL 至少 $50,000、但 24h 交易量不到 $500 的池子，这是用单边存入刷出来的 TVL 的典型特征。`search` 不受这条限制。
+    - `category=stock` 只显示持有 Robinhood 链上资产注册表里代币化股票的池子。
+    - `search` 匹配 `0x` 地址和 Uniswap V4 pool ID，不区分大小写。
+  </Accordion>
+
+  <Accordion title="交易历史的过滤方式不一样">
+    `GET /lp-positions/logs` 只返回经济事件。在 Solana 上，`open` 和 `close` 行属于元数据，会被丢掉。在 Robinhood 上，被丢掉的是 `close` 和 `collectGross`（`collectGross` 是 Uniswap Collect 的原始到账，API 会把它拆成单独的减仓行和手续费行），而 `open` 会保留，因为 Uniswap V3 把初始存入记在那里。每个仓位的日志最多 200 行。
+  </Accordion>
+
+  <Accordion title="各条链的默认协议">
+    带 `platform` 参数的 endpoint，默认包含所请求的链上的所有协议：`SOL` 上是 `meteora,meteora_damm_v2`，`ROBINHOOD` 上是 `uniswap_v3,uniswap_v4`。传这个参数可以缩小结果范围。旧的参数名 `protocol`（overview、revenue）和 `type`（discover）仍然可以用。
+  </Accordion>
+</AccordionGroup>
+
+## 已知限制
+
+<Warning>
+  **Robinhood 仓位的盈亏（PnL）还不完整。** 下面这些字段只能当参考，不是已结算的账目；涉及资金的事，请对照链上数据核对。
+</Warning>
+
+- **兑换环节不在账本里。** 仓位盈亏只算流动性这一部分。进出仓位时的兑换（每个周期最多四次）没有记进去，而它们的成本相对一般的 LP 收益来说不小。
+- **当前仓位没有实时价值。** 当前仓位存储的现值不会持续刷新，所以仓位还开着时，基于它算出的盈亏不可靠。要实时读取请用 `GET /lp-positions/position`。
+- **Robinhood 上还没用上校正后的盈亏。** 用来校正 Solana 仓位盈亏的审计流程目前不覆盖 Robinhood 的数据，所以 Robinhood 的数值是账本里的原始数字。
+
+目前 Robinhood 上最可靠的数字是已平仓仓位和已实现的手续费。

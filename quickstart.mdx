@@ -1,144 +1,91 @@
 ---
 title: "Quick Start"
-description: "Get started with LP Agent in minutes"
+description: "Sign in, fund your agent wallet and open or copy your first position"
 ---
 
-## Getting Started
+This guide takes you from zero to your first position. It works the same on Solana and Robinhood Chain; the differences are called out where they matter.
 
-Follow these simple steps to start using LP Agent's AI-powered liquidity management.
-
-### 1. Login and Wallet Setup
+## 1. Sign in
 
 <Steps>
-  <Step title="Connect with Privy">
-    Click "Login" and choose your preferred authentication method: - Email -
-    Google account - Discord account
+  <Step title="Open the app">
+    Go to [app.lpagent.io](https://app.lpagent.io) and press **Connect Wallet** in the header.
   </Step>
-  <Step title="Create Wallet">
-    A secure Privy-powered wallet will be automatically created for you: -
-    Non-custodial wallet - Fully controlled by you - Optimized for DeFi
-    operations
+  <Step title="Pick how you sign in">
+    - **A wallet extension** such as Phantom, Solflare, MetaMask or Rabby. You approve one sign-in message: no transaction, no gas.
+    - **WalletConnect** on desktop: scan the QR code with your phone's wallet.
+    - **On your phone**: pick your wallet from the list (search works), or open LP Agent inside your wallet's built-in browser.
+    - **Continue with email**: you get a 6-digit code by email. New email accounts choose **Solana** or **Robinhood** once.
+  </Step>
+  <Step title="Your agent wallet is created">
+    New accounts get an **agent wallet** straight away. It is the wallet your positions and copies run from. See [Account & Wallet](/account-and-wallet) for how it works.
   </Step>
 </Steps>
-
-<div className="my-6">
-  <iframe
-    width="100%"
-    className="aspect-video"
-    src="https://www.youtube.com/embed/cpXiWul-xMg"
-    title="YouTube video player: Login and Wallet Setup"
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowfullscreen
-  ></iframe>
-</div>
 
 <Note>
-  Your wallet is secured by Privy's enterprise-grade security infrastructure and
-  remains under your complete control.
+  An account belongs to one network. Sign in with a Solana wallet for Meteora pools, or with an EVM wallet for Robinhood Chain pools.
 </Note>
 
-### 2. Fund Your Wallet
+## 2. Fund your agent wallet
 
-<Steps>
-  <Step title="Transfer SOL">
-    Send SOL to your new wallet address: - From an existing wallet - Through a
-    centralized exchange - Using a direct fiat on-ramp
-  </Step>
-  <Step title="Verify Balance">
-    Ensure your funds have arrived before proceeding to position creation
-  </Step>
-</Steps>
+Press **Deposit** in the header.
 
-<div className="my-6">
-  <iframe
-    width="100%"
-    className="aspect-video"
-    src="https://www.youtube.com/embed/dwyxS5sD2rk"
-    title="YouTube video player: Fund Your Wallet"
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowfullscreen
-  ></iframe>
-</div>
+<Frame>
+  ![Deposit dialog](/images/app/rh-deposit.png)
+  <em>Deposit from your connected wallet, or send funds to the address shown under Receive</em>
+</Frame>
+
+- **From your wallet**: type an amount (or press **Max**) and confirm in your wallet.
+- **Receive**: scan the QR code or copy the address and send from any wallet or exchange. Only send on the network shown.
+
+| Network | What to deposit |
+| --- | --- |
+| Solana | SOL. Keep some SOL spare for transaction fees and position rent. |
+| Robinhood Chain | ETH. ETH also pays gas. You can fund positions in ETH or USDG (set in **Settings > General > Base Token**). |
 
 <Warning>
-  Always double-check the wallet address when transferring funds. Start with a
-  small test transaction if you're unsure.
+  Don't go too small. A tiny wallet struggles to earn back swap and gas costs, especially when copying. As a rule of thumb, copy with at least **5 SOL** on Solana or **0.08 ETH** on Robinhood Chain, then scale up once you trust the setup.
 </Warning>
 
-### 3. Deploy with AI Suggestions
+## 3. Choose how you want to LP
 
-<Steps>
-  <Step title="Review Suggestions">
-    <Frame>
-      ![One Click Deploy](/images/suggest.png)
-      <em>
-        Our AI analyzes market conditions and suggests optimal positions based
-        on your risk profile
-      </em>
-    </Frame>
-    Our AI analyzes market conditions and suggests optimal positions based on your
-    risk profile
-  </Step>
-  <Step title="One-Click Deploy">
-    <Frame>
-      ![One Click Deploy](/images/deploy.png)
-      <em>Deploy optimized positions with a single click</em>
-    </Frame>
-    Deploy your chosen position with a single click - no complex setup required
-  </Step>
-  <Step title="Flex your results">
-    <Frame>
-      ![One Click Deploy](/images/share.png)
-      <em>Flex your results with a single click</em>
-    </Frame>
-    Flex your results and show off with your friends
-  </Step>
-</Steps>
+<Tabs>
+  <Tab title="Copy a top LP">
+    <Steps>
+      <Step title="Find a wallet">
+        Open **Smart LP** and sort by all-time PnL, win rate or fees. Check the wallet's average hold time: fast flippers cost you more.
+      </Step>
+      <Step title="Open its portfolio and press Copy LP">
+        The copy dialog suggests a copy percentage from your net worth and the leader's.
+      </Step>
+      <Step title="Set your rules and press Copy">
+        Pick your size, take profit and stop loss, which pool types to follow and your protections. See [Copy Settings](/features/copy-settings).
+      </Step>
+    </Steps>
+    From then on, every new position the wallet opens is copied into your agent wallet. Track it all under **Copy LP**.
+  </Tab>
+  <Tab title="Open a position yourself">
+    <Steps>
+      <Step title="Find a pool">
+        Open **Pools**, filter by quote token, protocol and liquidity, and sort by fee/TVL, volume or fees.
+      </Step>
+      <Step title="Zap in">
+        On the pool page, type an amount, pick a price range (and on Meteora DLMM a strategy), then press **Create Position** (Solana) or **Zap In** (Robinhood Chain).
+      </Step>
+      <Step title="Protect it">
+        Set take profit and stop loss on the position, or turn on **Auto TP/SL** in Settings so every new position gets them.
+      </Step>
+    </Steps>
+    See [Create a Position](/features/create-position).
+  </Tab>
+</Tabs>
 
-<div className="my-6">
-  <iframe
-    width="100%"
-    className="aspect-video"
-    src="https://www.youtube.com/embed/O4mzJ1qRnZ4"
-    title="YouTube video player: Deploy with AI Suggestions"
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowfullscreen
-  ></iframe>
-</div>
+## 4. Watch and manage
 
-## What Happens Next?
+- **Portfolio** shows your net worth, PnL history, open positions and closed positions.
+- From a position's menu you can **Increase**, **Decrease**, **Zap out**, claim fees and more. See [Manage Positions](/features/manage-positions).
+- Turn on push notifications to get a ping when a copy opens, closes or fails. See [Notifications](/features/notifications).
 
-Once your position is deployed, LP Agent's automation takes over:
-
-<CardGroup cols={2}>
-  <Card title="Active Management" icon="robot">
-    - 24/7 position monitoring - Automatic rebalancing - Fee collection &
-    compounding - Risk management
-  </Card>
-  <Card title="Real-time Updates" icon="chart-line">
-    - Performance tracking - Profit/loss monitoring - Strategy adjustments -
-    Market analysis
-  </Card>
-</CardGroup>
-
-## Dashboard Access
-
-Monitor your positions through our comprehensive dashboard:
-
-- Real-time performance metrics
-- AI-powered insights
-- Position management tools
-- Historical analytics
-
-<Note>
-  Our AI continuously monitors market conditions and will suggest optimizations
-  to improve your position's performance.
-</Note>
-
-<Card title="Need Help?" icon="headset">
-  Join our [Discord community](https://discord.gg/h8YDHtzmRU) for support and
-  connect with other LP Agent users.
+<Card title="Need help?" icon="discord" href="https://discord.gg/h8YDHtzmRU">
+  Join our Discord for support.
 </Card>

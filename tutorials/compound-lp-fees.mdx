@@ -12,17 +12,17 @@ A compound bot that runs on a loop and:
 3. **Swaps** the claimed tokens into SOL in the same flow
 4. **Re-deposits** the SOL back into the same pool to compound your yield
 
-No smart contract knowledge needed — the bot uses LP Agent's Open API end-to-end.
+No smart contract knowledge needed: the bot uses LP Agent's Open API end-to-end.
 
 <Tip>
-The new `claim-fee-tx` endpoint can return swap-to-SOL transactions in the same response, so you don't need a separate swap step before re-depositing. All transactions are landed via Jito for a much higher landing rate — for free.
+The new `claim-fee-tx` endpoint can return swap-to-SOL transactions in the same response, so you don't need a separate swap step before re-depositing. All transactions are landed via Jito for a much higher landing rate: for free.
 </Tip>
 
 ---
 
 ## How Compounding Works
 
-LP fees accrue inside your position but don't earn additional fees on their own — they sit idle until you claim and redeploy them. A compound cycle turns those idle fees into more liquidity:
+LP fees accrue inside your position but don't earn additional fees on their own: they sit idle until you claim and redeploy them. A compound cycle turns those idle fees into more liquidity:
 
 ```
 Fees accrue inside your position:
@@ -70,7 +70,7 @@ Every check interval, the bot follows this flow:
 | Decision | How It's Handled |
 |----------|------------------|
 | **When to compound?** | When `uncollectedFee` (USD) crosses `MIN_FEE_USD` |
-| **Should I swap to SOL first?** | Yes — `claim-fee-tx` does it in one round-trip with `swapToNative: true` |
+| **Should I swap to SOL first?** | Yes: `claim-fee-tx` does it in one round-trip with `swapToNative: true` |
 | **How much to re-deposit?** | The post-claim SOL balance gain, minus a small reserve for fees |
 
 ---
@@ -93,7 +93,7 @@ Tune these settings before running the bot:
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `CHECK_INTERVAL_MS` | `300000` | How often to check positions (ms). 5 min is a good starting point — fees accrue slowly. |
+| `CHECK_INTERVAL_MS` | `300000` | How often to check positions (ms). 5 min is a good starting point: fees accrue slowly. |
 | `MIN_FEE_USD` | `1` | Minimum uncollected fee value (USD) before claiming. Below this, the gas cost outweighs the gain. |
 | `SLIPPAGE_BPS` | `500` | Slippage tolerance for the swap-to-SOL leg (500 = 5%) |
 | `RESERVE_SOL` | `0.05` | SOL kept in the wallet for future tx fees |
@@ -158,7 +158,7 @@ const compoundable = positionsRes.data.filter((pos: any) => {
 console.log(`${compoundable.length} of ${positionsRes.count} positions ready to compound`);
 ```
 
-Fees are claimable regardless of whether the position is in range — accrued fees stay in the position until you collect them. If a position has drifted out of range, you can still claim and either re-deposit elsewhere or pair this with [rebalancing](/tutorials/auto-rebalance-bot).
+Fees are claimable regardless of whether the position is in range: accrued fees stay in the position until you collect them. If a position has drifted out of range, you can still claim and either re-deposit elsewhere or pair this with [rebalancing](/tutorials/auto-rebalance-bot).
 
 ### Step 3: Generate Claim + Swap-to-SOL Transactions
 
@@ -190,7 +190,7 @@ console.log(`Raw fee0: ${claimRes.data.meta.rawFee0}, raw fee1: ${claimRes.data.
 | `meta` | Position metadata, including raw fee amounts at build time |
 
 <Note>
-If a fee token is already SOL, no swap tx is generated for it — it's transferred to your wallet directly by the claim tx.
+If a fee token is already SOL, no swap tx is generated for it: it's transferred to your wallet directly by the claim tx.
 </Note>
 
 ### Step 4: Sign & Land
@@ -213,7 +213,7 @@ console.log(`Claim landed: https://solscan.io/tx/${landRes.data.signature}`);
 ```
 
 <Tip>
-Always use `landing-claim-fee-tx` instead of submitting the txs yourself via RPC. LP Agent's Jito integration provides a much better landing rate — for free.
+Always use `landing-claim-fee-tx` instead of submitting the txs yourself via RPC. LP Agent's Jito integration provides a much better landing rate: for free.
 </Tip>
 
 ### Step 5: Re-Deposit Into the Same Pool
@@ -264,7 +264,7 @@ console.log(`Compounded! New deposit tx: https://solscan.io/tx/${addLandRes.data
 ```
 
 <Note>
-This example opens a fresh position centered on the current price rather than topping up the original position. Most strategies prefer this — it keeps your range tight around the current price even as the market moves.
+This example opens a fresh position centered on the current price rather than topping up the original position. Most strategies prefer this: it keeps your range tight around the current price even as the market moves.
 </Note>
 
 ---
@@ -273,7 +273,7 @@ This example opens a fresh position centered on the current price rather than to
 
 ### Choosing `MIN_FEE_USD`
 
-Each compound cycle costs roughly **0.01–0.03 SOL** in transaction fees (claim + swap-to-SOL + zap-in). At ~$150/SOL, that's $1.50–$4.50. Set `MIN_FEE_USD` so the gain comfortably covers the cost — `$5` is a safe default for most users.
+Each compound cycle costs roughly **0.01–0.03 SOL** in transaction fees (claim + swap-to-SOL + zap-in). At ~$150/SOL, that's $1.50–$4.50. Set `MIN_FEE_USD` so the gain comfortably covers the cost: `$5` is a safe default for most users.
 
 ### Common Errors
 
@@ -282,14 +282,14 @@ Each compound cycle costs roughly **0.01–0.03 SOL** in transaction fees (claim
 | `No claim fee transactions to build` | Position has 0 fees to claim | Wait for fees to accrue |
 | `Token X price unavailable` | Price feed missing for swap | Try again later or skip swap (`swapToNative: false`) |
 | Transaction expired | `lastValidBlockHeight` has passed | Re-generate and re-sign within ~60s |
-| `Fees claimed, but swap execution failed` | Swap leg failed on-chain | Fees are still claimed in your wallet — you can swap manually or retry |
+| `Fees claimed, but swap execution failed` | Swap leg failed on-chain | Fees are still claimed in your wallet: you can swap manually or retry |
 
 ### Tips
 
 - **Run on a slow cadence**: Fees accrue over hours, not seconds. Checking every 5–15 minutes is plenty and keeps API usage low.
 - **Out-of-range positions**: Fees are still claimable, but if you re-deposit into the same range you'll be adding to dead liquidity. Consider [rebalancing](/tutorials/auto-rebalance-bot) instead, or set the new bin range around the current active bin (which is what the example bot does).
-- **Consider tax implications**: Each claim is a taxable event in many jurisdictions — check with your local rules.
-- **DAMM V2 support**: The same code works for DLMM and DAMM V2 — the only difference is the `type` field in the request body.
+- **Consider tax implications**: Each claim is a taxable event in many jurisdictions: check with your local rules.
+- **DAMM V2 support**: The same code works for DLMM and DAMM V2: the only difference is the `type` field in the request body.
 
 ---
 
@@ -508,6 +508,6 @@ main().catch(console.error);
 
 ## Next Steps
 
-- [Auto-Rebalancing Bot](/tutorials/auto-rebalance-bot) — Compound + rebalance go well together
-- [Zap-In & Zap-Out Tutorial](/tutorials/add-liquidity-api) — Understand the underlying zap flow
+- [Auto-Rebalancing Bot](/tutorials/auto-rebalance-bot): Compound + rebalance go well together
+- [Zap-In & Zap-Out Tutorial](/tutorials/add-liquidity-api): Understand the underlying zap flow
 - Explore the full [API Reference](/api-reference/introduction)

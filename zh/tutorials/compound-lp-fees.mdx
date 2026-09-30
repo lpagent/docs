@@ -1,0 +1,513 @@
+---
+title: "复投 LP 手续费收益"
+description: "构建一个机器人，领取仓位里累积的 LP 手续费收益，并以 SOL 重新存入，实现收益复投"
+---
+
+## 你将构建什么
+
+一个循环运行的复投机器人，它会：
+
+1. **监控**你当前 LP 仓位里累积的手续费
+2. 手续费超过可配置的阈值后**领取**
+3. 在同一个流程里把领取到的代币**兑换**成 SOL
+4. 把 SOL **重新存入**同一个池子，实现收益复投（Compound）
+
+不需要智能合约知识：机器人全程使用 LP Agent 的 Open API。
+
+<Tip>
+新的 `claim-fee-tx` 接口可以在同一个响应里返回兑换成 SOL 的交易，所以重新存入之前不需要再单独做一次兑换。所有交易都通过 Jito 上链，上链成功率高得多：而且免费。
+</Tip>
+
+---
+
+## 复投的原理
+
+LP 手续费收益会在你的仓位里累积，但它们本身不会再赚手续费：在你领取并重新投入之前，它们一直闲置着。一次复投就是把这些闲置的手续费变成更多流动性：
+
+```
+Fees accrue inside your position:
+  [-----your position-----]
+                  $$$ uncollected fees (idle)
+
+After compounding:
+  [-------your position-------]
+   ↑ liquidity grows, earning fees on a larger base
+```
+
+### 机器人的决策循环
+
+每个检查周期，机器人都按下面的流程执行：
+
+```
+ ┌──────────────────────────────┐
+ │  Fetch all open positions    │
+ │  GET /lp-positions/opening   │
+ └──────────┬───────────────────┘
+            │
+            ▼
+ ┌──────────────────────────────┐
+ │  For each position:          │
+ │  uncollectedFee >= threshold │
+ └──────┬────────────┬──────────┘
+        │ NO         │ YES
+        ▼            ▼
+    Skip it    ┌──────────────────────────────────┐
+               │ 1. CLAIM fees + swap to SOL      │
+               │    POST /position/claim-fee-tx   │
+               │    POST /position/landing-...    │
+               │                                  │
+               │ 2. Check SOL balance             │
+               │    GET /token/balance            │
+               │                                  │
+               │ 3. ADD liquidity back to pool    │
+               │    POST /pools/{id}/add-tx       │
+               │    POST /pools/landing-add-tx    │
+               └──────────────────────────────────┘
+```
+
+### 机器人要做的关键决策
+
+| 决策 | 处理方式 |
+|----------|------------------|
+| **什么时候复投？** | 当 `uncollectedFee`（USD）超过 `MIN_FEE_USD` 时 |
+| **要先兑换成 SOL 吗？** | 要：`claim-fee-tx` 配合 `swapToNative: true`，一次请求往返就能搞定 |
+| **重新存入多少？** | 领取后 SOL 余额的增加量，减去一小部分手续费预留 |
+
+---
+
+## 前置条件
+
+- 一个 LP Agent API key（在 [API Dashboard](https://app.lpagent.io/open-api) 获取）
+- 一个有 SOL 可以付交易手续费的 Solana 钱包
+- Node.js >= 18
+
+```bash
+npm install @solana/web3.js bs58
+```
+
+---
+
+## 配置
+
+运行机器人之前，先调整这些设置：
+
+| 设置 | 默认值 | 说明 |
+|---------|---------|-------------|
+| `CHECK_INTERVAL_MS` | `300000` | 检查仓位的频率（毫秒）。5 分钟是个不错的起点：手续费累积得很慢。 |
+| `MIN_FEE_USD` | `1` | 领取前未领取手续费的最低价值（USD）。低于这个值，Gas 成本会超过收益。 |
+| `SLIPPAGE_BPS` | `500` | 兑换成 SOL 这一步的滑点容忍度（500 = 5%） |
+| `RESERVE_SOL` | `0.05` | 留在钱包里、用来付后续交易手续费的 SOL |
+| `STRATEGY` | `Spot` | 重新存入时的分布方式：`Spot`、`Curve` 或 `BidAsk` |
+| `BIN_RANGE` | `34` | 重新存入时 active bin 每边的 bin 数量 |
+| `POOL_FILTER` | `undefined` | 只复投某个指定的池子，设为 `undefined` 则处理所有池子 |
+
+---
+
+## 分步教程
+
+### 第 1 步：初始化
+
+配置好 API 客户端和钱包（和 [zap-in 教程](/zh/tutorials/add-liquidity-api) 里的样板代码一样）：
+
+```typescript
+import { Keypair, Transaction, VersionedTransaction } from "@solana/web3.js";
+import bs58 from "bs58";
+
+const API_BASE = "https://api.lpagent.io/open-api/v1";
+const API_KEY = "your-api-key-here";
+
+const wallet = Keypair.fromSecretKey(bs58.decode("your-base58-private-key"));
+const OWNER = wallet.publicKey.toBase58();
+
+async function apiCall(method: string, path: string, body?: object) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: { "Content-Type": "application/json", "x-api-key": API_KEY },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) throw new Error(`API ${method} ${path} failed: ${await res.text()}`);
+  return res.json();
+}
+
+function signTx(base64Tx: string): string {
+  const buffer = Buffer.from(base64Tx, "base64");
+  try {
+    const tx = VersionedTransaction.deserialize(buffer);
+    tx.sign([wallet]);
+    return Buffer.from(tx.serialize()).toString("base64");
+  } catch {
+    const tx = Transaction.from(buffer);
+    tx.partialSign(wallet);
+    return tx.serialize({ requireAllSignatures: false, verifySignatures: false }).toString("base64");
+  }
+}
+```
+
+### 第 2 步：找出有累积手续费的仓位
+
+查询你的当前仓位，挑出未领取手续费值得领取的那些。
+
+```typescript
+const positionsRes = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}`);
+
+const compoundable = positionsRes.data.filter((pos: any) => {
+  const uncollected = parseFloat(pos.uncollectedFee || "0");
+  return uncollected >= 1; // $1 threshold
+});
+
+console.log(`${compoundable.length} of ${positionsRes.count} positions ready to compound`);
+```
+
+不管仓位在不在区间内，手续费都可以领取：累积的手续费会一直留在仓位里，直到你领取为止。如果某个仓位已经偏离区间，你照样可以领取，然后要么存到别的地方，要么配合[再平衡](/zh/tutorials/auto-rebalance-bot)一起用。
+
+### 第 3 步：生成领取 + 兑换成 SOL 的交易
+
+传入 `swapToNative: true` 时，`claim-fee-tx` 接口可以在一次调用里同时返回领取交易和兑换成 SOL 的交易。
+
+```typescript
+const pos = compoundable[0];
+
+const claimRes = await apiCall("POST", "/position/claim-fee-tx", {
+  position_id: pos.id,
+  owner: OWNER,
+  slippage_bps: 500,
+  swapToNative: true,                    // claim AND swap to SOL in one round-trip
+  type: pos.protocol === "meteora_damm_v2" ? "meteora_damm_v2" : "meteora",
+});
+
+console.log(`Claim txs: ${claimRes.data.claimTxsWithJito.length}`);
+console.log(`Swap-to-SOL txs: ${claimRes.data.swapTxsWithJito.length}`);
+console.log(`Raw fee0: ${claimRes.data.meta.rawFee0}, raw fee1: ${claimRes.data.meta.rawFee1}`);
+```
+
+**返回内容：**
+
+| 字段 | 说明 |
+|-------|-------------|
+| `claimTxsWithJito[]` | 未签名的领取手续费交易（base64），已经附带 Jito tip |
+| `swapTxsWithJito[]` | 未签名的兑换交易（base64）。如果 `swapToNative: false` 则为空。否则：每个非 SOL 的手续费代币对应一笔兑换，最后再加一笔 Jito tip 交易。 |
+| `lastValidBlockHeight` | 必须在这个区块高度过去之前提交（≈ 60s） |
+| `meta` | 仓位元数据，包含构建交易时的原始手续费数量 |
+
+<Note>
+如果某个手续费代币本身就是 SOL，就不会为它生成兑换交易：领取交易会直接把它转到你的钱包。
+</Note>
+
+### 第 4 步：签名并上链
+
+签名每一笔交易，然后通过上链接口提交。上链接口会先发送领取 bundle，再发送兑换 bundle。
+
+```typescript
+const { lastValidBlockHeight, claimTxsWithJito, swapTxsWithJito } = claimRes.data;
+
+const signedClaimTxs = claimTxsWithJito.map(signTx);
+const signedSwapTxs = swapTxsWithJito.map(signTx);
+
+const landRes = await apiCall("POST", "/position/landing-claim-fee-tx", {
+  lastValidBlockHeight,
+  claimTxsWithJito: signedClaimTxs,
+  swapTxsWithJito: signedSwapTxs,
+});
+
+console.log(`Claim landed: https://solscan.io/tx/${landRes.data.signature}`);
+```
+
+<Tip>
+始终使用 `landing-claim-fee-tx`，不要自己通过 RPC 提交交易。LP Agent 的 Jito 集成上链成功率高得多：而且免费。
+</Tip>
+
+### 第 5 步：重新存入同一个池子
+
+领取交易上链后，你的钱包里会多出一些 SOL。读取新的 SOL 余额，留出一部分作为以后的手续费预留，然后把剩下的 zap 进同一个池子。
+
+```typescript
+// Wait briefly for balance to settle
+await new Promise(r => setTimeout(r, 3000));
+
+const balanceRes = await apiCall("GET", `/token/balance?owner=${OWNER}`);
+const sol = balanceRes.data?.find(
+  (t: any) => t.address === "So11111111111111111111111111111111111111112"
+);
+const availableSOL = sol ? parseFloat(sol.uiAmount) : 0;
+const depositSOL = Math.max(0, availableSOL - 0.05); // keep 0.05 SOL reserve
+
+if (depositSOL <= 0.001) {
+  console.log("Not enough SOL to compound, skipping zap-in");
+  return;
+}
+
+// Get the active bin for the new range
+const info = await apiCall("GET", `/pools/${pos.pool}/info`);
+const activeBin = info.data.liquidityViz?.activeBin;
+const fromBinId = activeBin.binId - 34;
+const toBinId = activeBin.binId + 34;
+
+const addTx = await apiCall("POST", `/pools/${pos.pool}/add-tx`, {
+  stratergy: "Spot",
+  inputSOL: depositSOL,
+  percentX: 0.5,
+  fromBinId,
+  toBinId,
+  owner: OWNER,
+  slippage_bps: 500,
+  mode: "zap-in",
+});
+
+const addLandRes = await apiCall("POST", "/pools/landing-add-tx", {
+  lastValidBlockHeight: addTx.data.lastValidBlockHeight,
+  swapTxsWithJito: addTx.data.swapTxsWithJito.map(signTx),
+  addLiquidityTxsWithJito: addTx.data.addLiquidityTxsWithJito.map(signTx),
+  meta: addTx.data.meta,
+});
+
+console.log(`Compounded! New deposit tx: https://solscan.io/tx/${addLandRes.data.signature}`);
+```
+
+<Note>
+这个示例会以当前价格为中心开一个新仓位，而不是往原来的仓位里追加。大多数策略都更喜欢这种做法：即使行情在变，你的区间也能一直紧贴当前价格。
+</Note>
+
+---
+
+## 参考
+
+### 如何选择 `MIN_FEE_USD`
+
+每次复投大约要花 **0.01–0.03 SOL** 的交易手续费（领取 + 兑换成 SOL + zap-in）。按 ~$150/SOL 算，也就是 $1.50–$4.50。设置 `MIN_FEE_USD` 时要保证收益能轻松覆盖成本：对大多数用户来说，`$5` 是一个稳妥的默认值。
+
+### 常见错误
+
+| 错误 | 原因 | 解决办法 |
+|-------|-------|-----|
+| `No claim fee transactions to build` | 仓位可领取的手续费为 0 | 等手续费累积起来 |
+| `Token X price unavailable` | 兑换所需的价格数据缺失 | 稍后重试，或跳过兑换（`swapToNative: false`） |
+| 交易过期 | `lastValidBlockHeight` 已经过了 | 在 ~60s 内重新生成并重新签名 |
+| `Fees claimed, but swap execution failed` | 兑换这一步在链上失败了 | 手续费已经领取到你的钱包里：你可以手动兑换或重试 |
+
+### 小贴士
+
+- **放慢检查节奏**：手续费是按小时累积的，不是按秒。每 5–15 分钟检查一次就够了，还能降低 API 用量。
+- **超出区间的仓位**：手续费仍然可以领取，但如果你重新存入同一个区间，就等于往不活跃的流动性里加钱。可以考虑改用[再平衡](/zh/tutorials/auto-rebalance-bot)，或者把新的 bin 区间设在当前 active bin 附近（示例机器人就是这么做的）。
+- **考虑税务影响**：在很多司法辖区，每次领取都算一次应税事件：请查阅当地规定。
+- **DAMM V2 支持**：同一套代码适用于 DLMM 和 DAMM V2：唯一的区别是请求 body 里的 `type` 字段。
+
+---
+
+## 用到的 API 接口
+
+| 接口 | 用途 |
+|----------|---------|
+| `GET /lp-positions/opening` | 获取当前仓位及其 `uncollectedFee` |
+| `POST /position/claim-fee-tx` | 生成领取手续费交易，以及可选的兑换成 SOL 交易 |
+| `POST /position/landing-claim-fee-tx` | 通过 Jito 让领取 + 兑换交易上链 |
+| `GET /token/balance` | 读取领取后的 SOL 余额 |
+| `GET /pools/{poolId}/info` | 获取 active bin，用于设定新的存入区间 |
+| `POST /pools/{poolId}/add-tx` | 生成重新存入用的 zap-in 交易 |
+| `POST /pools/landing-add-tx` | 通过 Jito 让 zap-in 上链 |
+
+---
+
+## 完整机器人脚本
+
+下面是完整的机器人代码，可以直接复制粘贴运行：
+
+<Accordion title="完整的自动复投机器人脚本">
+
+```typescript
+import { Keypair, Transaction, VersionedTransaction } from "@solana/web3.js";
+import bs58 from "bs58";
+
+// ===================== CONFIG =====================
+const CONFIG = {
+  API_BASE: "https://api.lpagent.io/open-api/v1",
+  API_KEY: "your-api-key-here",
+  PRIVATE_KEY: "your-base58-private-key",
+
+  CHECK_INTERVAL_MS: 5 * 60_000,  // 5 minutes
+  MIN_FEE_USD: 1,                  // only claim when >= $1 in fees
+  SLIPPAGE_BPS: 500,
+  RESERVE_SOL: 0.05,               // keep this much SOL in wallet
+  STRATEGY: "Spot" as const,
+  BIN_RANGE: 34,
+
+  POOL_FILTER: undefined as string | undefined, // or a specific pool address
+};
+
+const SOL_MINT = "So11111111111111111111111111111111111111112";
+const wallet = Keypair.fromSecretKey(bs58.decode(CONFIG.PRIVATE_KEY));
+const OWNER = wallet.publicKey.toBase58();
+
+// ===================== HELPERS =====================
+async function apiCall(method: string, path: string, body?: object) {
+  const res = await fetch(`${CONFIG.API_BASE}${path}`, {
+    method,
+    headers: { "Content-Type": "application/json", "x-api-key": CONFIG.API_KEY },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) throw new Error(`API ${method} ${path} failed: ${await res.text()}`);
+  return res.json();
+}
+
+function signTx(base64Tx: string): string {
+  const buffer = Buffer.from(base64Tx, "base64");
+  try {
+    const tx = VersionedTransaction.deserialize(buffer);
+    tx.sign([wallet]);
+    return Buffer.from(tx.serialize()).toString("base64");
+  } catch {
+    const tx = Transaction.from(buffer);
+    tx.partialSign(wallet);
+    return tx.serialize({ requireAllSignatures: false, verifySignatures: false }).toString("base64");
+  }
+}
+
+const log = (msg: string) => console.log(`[${new Date().toISOString()}] ${msg}`);
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+// ===================== CLAIM + SWAP =====================
+async function claimAndSwap(pos: any): Promise<void> {
+  log(`  Claim: requesting claim-fee-tx (swapToNative=true)...`);
+
+  const claimRes = await apiCall("POST", "/position/claim-fee-tx", {
+    position_id: pos.id,
+    owner: OWNER,
+    slippage_bps: CONFIG.SLIPPAGE_BPS,
+    swapToNative: true,
+    type: pos.protocol === "meteora_damm_v2" ? "meteora_damm_v2" : "meteora",
+  });
+
+  const { lastValidBlockHeight, claimTxsWithJito, swapTxsWithJito } = claimRes.data;
+  const signedClaim = claimTxsWithJito.map(signTx);
+  const signedSwap = swapTxsWithJito.map(signTx);
+
+  const landRes = await apiCall("POST", "/position/landing-claim-fee-tx", {
+    lastValidBlockHeight,
+    claimTxsWithJito: signedClaim,
+    swapTxsWithJito: signedSwap,
+  });
+
+  log(`  Claim landed: ${landRes.data?.signature || "success"}`);
+}
+
+// ===================== ZAP-IN (RE-DEPOSIT) =====================
+async function reDeposit(poolAddress: string, amountSOL: number): Promise<void> {
+  log(`  Re-deposit: zapping ${amountSOL.toFixed(4)} SOL back into pool...`);
+
+  const info = await apiCall("GET", `/pools/${poolAddress}/info`);
+  const activeBin = info.data.liquidityViz?.activeBin;
+  if (!activeBin) throw new Error("Could not get active bin");
+
+  const fromBinId = activeBin.binId - CONFIG.BIN_RANGE;
+  const toBinId = activeBin.binId + CONFIG.BIN_RANGE;
+
+  const addTx = await apiCall("POST", `/pools/${poolAddress}/add-tx`, {
+    stratergy: CONFIG.STRATEGY,
+    inputSOL: amountSOL,
+    percentX: 0.5,
+    fromBinId,
+    toBinId,
+    owner: OWNER,
+    slippage_bps: CONFIG.SLIPPAGE_BPS,
+    mode: "zap-in",
+  });
+
+  const result = await apiCall("POST", "/pools/landing-add-tx", {
+    lastValidBlockHeight: addTx.data.lastValidBlockHeight,
+    swapTxsWithJito: addTx.data.swapTxsWithJito.map(signTx),
+    addLiquidityTxsWithJito: addTx.data.addLiquidityTxsWithJito.map(signTx),
+    meta: addTx.data.meta,
+  });
+
+  log(`  Re-deposit done: https://solscan.io/tx/${result.data.signature}`);
+}
+
+// ===================== COMPOUND LOGIC =====================
+async function checkAndCompound() {
+  log("Checking positions for compoundable fees...");
+
+  const positionsRes = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}`);
+  const positions = positionsRes.data || [];
+
+  if (positions.length === 0) {
+    log("No open positions found");
+    return;
+  }
+
+  for (const pos of positions) {
+    if (CONFIG.POOL_FILTER && pos.pool !== CONFIG.POOL_FILTER) continue;
+
+    const pair = pos.pairName || `${pos.token0Info?.token_symbol}/${pos.token1Info?.token_symbol}`;
+    const uncollectedUsd = parseFloat(pos.uncollectedFee || "0");
+
+    log(`Position: ${pair} | Uncollected: $${uncollectedUsd.toFixed(2)} | In Range: ${pos.inRange}`);
+
+    if (uncollectedUsd < CONFIG.MIN_FEE_USD) {
+      log(`  Below threshold ($${CONFIG.MIN_FEE_USD}), skipping`);
+      continue;
+    }
+
+    log("  COMPOUNDING...");
+
+    try {
+      // Snapshot SOL balance before the claim
+      const before = await apiCall("GET", `/token/balance?owner=${OWNER}`);
+      const beforeSol = before.data?.find((t: any) => t.address === SOL_MINT);
+      const beforeAmount = beforeSol ? parseFloat(beforeSol.uiAmount) : 0;
+
+      // 1. Claim + swap to SOL in one round-trip
+      await claimAndSwap(pos);
+      await sleep(3000);
+
+      // 2. Read post-claim balance
+      const after = await apiCall("GET", `/token/balance?owner=${OWNER}`);
+      const afterSol = after.data?.find((t: any) => t.address === SOL_MINT);
+      const afterAmount = afterSol ? parseFloat(afterSol.uiAmount) : 0;
+
+      const gained = afterAmount - beforeAmount;
+      log(`  Gained ${gained.toFixed(4)} SOL from claim`);
+
+      const depositSOL = Math.max(0, afterAmount - CONFIG.RESERVE_SOL);
+      if (depositSOL <= 0.001) {
+        log("  Not enough SOL to re-deposit, skipping");
+        continue;
+      }
+
+      // 3. Re-deposit into the same pool
+      await reDeposit(pos.pool, depositSOL);
+      log("  Compound complete!");
+    } catch (error: any) {
+      log(`  ERROR: ${error.message}`);
+    }
+  }
+}
+
+// ===================== BOT LOOP =====================
+async function main() {
+  log("=== LP Agent Auto-Compound Bot ===");
+  log(`Owner: ${OWNER}`);
+  log(`Check interval: ${CONFIG.CHECK_INTERVAL_MS / 1000}s`);
+  log(`Min fee threshold: $${CONFIG.MIN_FEE_USD}`);
+  log(`Pool filter: ${CONFIG.POOL_FILTER || "all pools"}`);
+  log("");
+
+  while (true) {
+    try {
+      await checkAndCompound();
+    } catch (error: any) {
+      log(`ERROR: ${error.message}`);
+    }
+    log(`Next check in ${CONFIG.CHECK_INTERVAL_MS / 1000}s...\n`);
+    await sleep(CONFIG.CHECK_INTERVAL_MS);
+  }
+}
+
+main().catch(console.error);
+```
+
+</Accordion>
+
+## 下一步
+
+- [自动再平衡机器人](/zh/tutorials/auto-rebalance-bot)：复投和再平衡搭配使用效果更好
+- [Zap-In 与 Zap-Out 教程](/zh/tutorials/add-liquidity-api)：了解底层的 zap 流程
+- 查看完整的 [API 参考文档](/zh/api-reference/introduction)

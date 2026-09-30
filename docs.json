@@ -9,107 +9,290 @@
   },
   "favicon": "/favicon.svg",
   "navigation": {
-    "tabs": [
+    "languages": [
       {
-        "tab": "Documentation",
-        "groups": [
+        "language": "en",
+        "default": true,
+        "tabs": [
           {
-            "group": "Getting Started",
-            "pages": [
-              "introduction",
-              "quickstart",
-              "architecture",
-              "security",
-              "automation-model",
-              "fee",
-              "referral",
-              "data-methodology"
+            "tab": "Documentation",
+            "groups": [
+              {
+                "group": "Getting Started",
+                "pages": [
+                  "introduction",
+                  "quickstart",
+                  "account-and-wallet",
+                  "security",
+                  "fee",
+                  "referral",
+                  "data-methodology"
+                ]
+              },
+              {
+                "group": "Copy Trading",
+                "pages": [
+                  "features/smart-lp",
+                  "features/copy-lp",
+                  "features/copy-settings",
+                  "features/copy-management"
+                ]
+              },
+              {
+                "group": "Liquidity",
+                "pages": [
+                  "features/pools",
+                  "features/create-position",
+                  "features/portfolio",
+                  "features/manage-positions",
+                  "features/take-profit-stop-loss",
+                  "features/claim-sol"
+                ]
+              },
+              {
+                "group": "App",
+                "pages": [
+                  "features/settings",
+                  "features/notifications",
+                  "features/share"
+                ]
+              },
+              {
+                "group": "Integration",
+                "pages": [
+                  "integration/overview",
+                  "integration/meteora",
+                  "integration/robinhood",
+                  "integration/meteora-airdrop"
+                ]
+              },
+              {
+                "group": "Legal",
+                "pages": [
+                  "terms-of-service",
+                  "privacy-policy"
+                ]
+              }
             ]
           },
           {
-            "group": "Integration",
-            "pages": [
-              "integration/overview",
-              "integration/meteora",
-              "integration/robinhood",
-              "integration/meteora-airdrop"
+            "tab": "Tutorials",
+            "groups": [
+              {
+                "group": "Best Practices",
+                "pages": [
+                  "tutorials/copy-lp-best-practices",
+                  "tutorials/copy-robinhood-best-practices"
+                ]
+              },
+              {
+                "group": "API Tutorials",
+                "pages": [
+                  "tutorials/add-liquidity-api",
+                  "tutorials/auto-rebalance-bot",
+                  "tutorials/compound-lp-fees"
+                ]
+              }
             ]
           },
           {
-            "group": "Features",
-            "pages": [
-              "features/ai-suggestions",
-              "features/copy-lp",
-              "features/auto-compound",
-              "features/take-profit-stop-loss",
-              "features/dashboard"
+            "tab": "AI Getting Started",
+            "groups": [
+              {
+                "group": "AI",
+                "pages": [
+                  "ai",
+                  "llms-txt",
+                  "ai-api-guide",
+                  "cli"
+                ]
+              }
             ]
           },
           {
-            "group": "Legal",
-            "pages": [
-              "terms-of-service",
-              "privacy-policy"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Tutorials",
-        "groups": [
-          {
-            "group": "API Tutorials",
-            "pages": [
-              "tutorials/add-liquidity-api",
-              "tutorials/auto-rebalance-bot",
-              "tutorials/compound-lp-fees"
-            ]
+            "tab": "API Reference",
+            "groups": [
+              {
+                "group": "API",
+                "pages": [
+                  "api-reference/introduction"
+                ]
+              }
+            ],
+            "openapi": "api-reference/openapi.json"
           },
           {
-            "group": "Best Practices",
-            "pages": [
-              "tutorials/copy-lp-best-practices",
-              "tutorials/copy-robinhood-best-practices"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "AI Getting Started",
-        "groups": [
-          {
-            "group": "AI",
-            "pages": [
-              "ai",
-              "llms-txt",
-              "ai-api-guide",
-              "cli"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API Reference",
-        "groups": [
-          {
-            "group": "API",
-            "pages": [
-              "api-reference/introduction"
+            "tab": "API Pricing",
+            "groups": [
+              {
+                "group": "API Pricing",
+                "pages": [
+                  "api-key-dashboard/dashboard"
+                ]
+              }
             ]
           }
         ],
-        "openapi": "api-reference/openapi.json"
+        "navbar": {
+          "links": [
+            {
+              "label": "Support",
+              "href": "https://discord.gg/h8YDHtzmRU"
+            },
+            {
+              "label": "API Pricing",
+              "href": "/api-key-dashboard/dashboard"
+            }
+          ],
+          "primary": {
+            "type": "button",
+            "label": "Launch App",
+            "href": "https://app.lpagent.io/"
+          }
+        }
       },
       {
-        "tab": "API Pricing",
-        "groups": [
+        "language": "cn",
+        "tabs": [
           {
-            "group": "API Pricing",
-            "pages": [
-              "api-key-dashboard/dashboard"
+            "tab": "文档",
+            "groups": [
+              {
+                "group": "快速开始",
+                "pages": [
+                  "zh/introduction",
+                  "zh/quickstart",
+                  "zh/account-and-wallet",
+                  "zh/security",
+                  "zh/fee",
+                  "zh/referral",
+                  "zh/data-methodology"
+                ]
+              },
+              {
+                "group": "跟单",
+                "pages": [
+                  "zh/features/smart-lp",
+                  "zh/features/copy-lp",
+                  "zh/features/copy-settings",
+                  "zh/features/copy-management"
+                ]
+              },
+              {
+                "group": "流动性",
+                "pages": [
+                  "zh/features/pools",
+                  "zh/features/create-position",
+                  "zh/features/portfolio",
+                  "zh/features/manage-positions",
+                  "zh/features/take-profit-stop-loss",
+                  "zh/features/claim-sol"
+                ]
+              },
+              {
+                "group": "应用",
+                "pages": [
+                  "zh/features/settings",
+                  "zh/features/notifications",
+                  "zh/features/share"
+                ]
+              },
+              {
+                "group": "集成",
+                "pages": [
+                  "zh/integration/overview",
+                  "zh/integration/meteora",
+                  "zh/integration/robinhood",
+                  "zh/integration/meteora-airdrop"
+                ]
+              },
+              {
+                "group": "法律条款",
+                "pages": [
+                  "zh/terms-of-service",
+                  "zh/privacy-policy"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "教程",
+            "groups": [
+              {
+                "group": "最佳实践",
+                "pages": [
+                  "zh/tutorials/copy-lp-best-practices",
+                  "zh/tutorials/copy-robinhood-best-practices"
+                ]
+              },
+              {
+                "group": "API 教程",
+                "pages": [
+                  "zh/tutorials/add-liquidity-api",
+                  "zh/tutorials/auto-rebalance-bot",
+                  "zh/tutorials/compound-lp-fees"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "AI 入门",
+            "groups": [
+              {
+                "group": "AI",
+                "pages": [
+                  "zh/ai",
+                  "zh/llms-txt",
+                  "zh/ai-api-guide",
+                  "zh/cli"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "API 参考",
+            "groups": [
+              {
+                "group": "API",
+                "pages": [
+                  "zh/api-reference/introduction"
+                ]
+              }
+            ],
+            "openapi": {
+              "source": "api-reference/openapi.json",
+              "directory": "zh/api-reference"
+            }
+          },
+          {
+            "tab": "API 价格",
+            "groups": [
+              {
+                "group": "API 价格",
+                "pages": [
+                  "zh/api-key-dashboard/dashboard"
+                ]
+              }
             ]
           }
-        ]
+        ],
+        "navbar": {
+          "links": [
+            {
+              "label": "支持",
+              "href": "https://discord.gg/h8YDHtzmRU"
+            },
+            {
+              "label": "API 价格",
+              "href": "/zh/api-key-dashboard/dashboard"
+            }
+          ],
+          "primary": {
+            "type": "button",
+            "label": "打开应用",
+            "href": "https://app.lpagent.io/"
+          }
+        }
       }
     ]
   },
@@ -140,5 +323,35 @@
       "github": "https://github.com/lpagent",
       "discord": "https://discord.gg/h8YDHtzmRU"
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/features/ai-suggestions",
+      "destination": "/features/smart-lp"
+    },
+    {
+      "source": "/features/auto-compound",
+      "destination": "/features/manage-positions"
+    },
+    {
+      "source": "/features/dashboard",
+      "destination": "/features/portfolio"
+    },
+    {
+      "source": "/architecture",
+      "destination": "/security"
+    },
+    {
+      "source": "/automation-model",
+      "destination": "/security"
+    },
+    {
+      "source": "/prompts",
+      "destination": "/ai"
+    },
+    {
+      "source": "/integration/orca",
+      "destination": "/integration/overview"
+    }
+  ]
 }

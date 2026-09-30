@@ -1,0 +1,64 @@
+---
+title: "Settings"
+description: "Funding, auto TP/SL, slippage, token filters, notifications and your private key"
+---
+
+Open **Settings** from the account panel (click your address in the header). It has four tabs: **General**, **Swap**, **Security** and **Account**. Press **Save Changes** when you are done.
+
+## General
+
+<Frame>
+  ![Settings General tab](/images/app/settings-general.png)
+  <em>General on Robinhood Chain: Base Token, wallet balances, Keep ETH and Auto TP/SL</em>
+</Frame>
+
+| Setting | What it does |
+| --- | --- |
+| **Base Token** (Robinhood Chain) | Fund new positions, including copies, with **ETH** or **USDG**. Existing positions don't change. |
+| **Wallet balances** (Robinhood Chain) | Your capital (what funds positions) and your gas (ETH). |
+| **Keep ETH** (Robinhood Chain, when Base Token is USDG) | Keeps ETH topped up for gas. When ETH falls below **Refill below** (default 0.002 ETH), enough USDG is swapped to bring it back to **Refill up to** (default 0.008 ETH). |
+| **Auto TP/SL** | Off by default. When on, every new position gets the default take profit and stop loss below it (10% / 10%). Copies use their own exit rules instead. See [Take Profit & Stop Loss](/features/take-profit-stop-loss). |
+| **Manage Manual Position** | Lets LP Agent manage positions you open outside LP Agent, for example directly on Meteora, so you can use TP/SL on them. On by default for new accounts. |
+| **Realtime Portfolio** (Solana) | Stream open positions live instead of refreshing every 10 seconds. Saved on this device. |
+| **Realtime Numbers** | **Highlight** or **Animate**: how live values react when they change. Saved on this device. |
+
+<Frame>
+  ![More General settings](/images/app/settings-general-more.png)
+  <em>Manage Manual Position, Realtime Portfolio and Realtime Numbers</em>
+</Frame>
+
+## Swap
+
+| Setting | What it does |
+| --- | --- |
+| **Slippage** | The most the price may move against you on a swap, in %. Applies to every swap your agent makes: zap ins, copies, closes and swap backs. A warning shows above 7%. |
+| **Method** (Solana) | Which swap route to prefer: **OKX** (default) or **Jupiter Ultra**. |
+
+<Tip>
+  If copies fail with **Price moved**, the fix in Copy Logs opens this tab with a suggested slippage. Volatile tokens usually need more room.
+</Tip>
+
+## Security
+
+<Frame>
+  ![Settings Security tab](/images/app/settings-security.png)
+  <em>Token filters applied before a position is opened or copied</em>
+</Frame>
+
+These filters apply before any position is opened or copied. A token that fails any of them is skipped, and Copy Logs tells you which filter stopped it.
+
+| Filter | Default for new accounts |
+| --- | --- |
+| **Jupiter Organic Score** (Solana) | 50 (0 to 100). Real on-chain activity of the token, with bots and sybils left out. |
+| **Minimum Market Cap** | $500,000 |
+| **Minimum 24h Volume** | $100,000 |
+| **Minimum Holders** | 100. Set 0 for no floor. |
+| **Blacklist** | Tokens you never want to LP or copy. Press **Manage**, paste the token address and press **Add**. Each network has its own list. |
+
+## Account
+
+| Setting | What it does |
+| --- | --- |
+| **Export Private Key** | Export your agent wallet's key. See [Account & Wallet](/account-and-wallet#export-your-private-key). |
+| **Account Linking** | Only for accounts created before the wallet upgrade: link extra emails and wallets. |
+| **System Notifications** | Push notifications for take profit, stop loss and copy events, with a switch per event. See [Notifications](/features/notifications). |

@@ -1,0 +1,91 @@
+---
+title: "快速开始"
+description: "登录、给代理钱包充值，然后开出或跟单你的第一个仓位"
+---
+
+这篇指南带你从零开始开出第一个仓位。Solana 和 Robinhood Chain 的流程一样，有区别的地方会单独说明。
+
+## 1. 登录
+
+<Steps>
+  <Step title="打开应用">
+    打开 [app.lpagent.io](https://app.lpagent.io)，点击顶部栏的 **Connect Wallet**（连接钱包）。
+  </Step>
+  <Step title="选择登录方式">
+    - **钱包插件**，比如 Phantom、Solflare、MetaMask 或 Rabby。你只需批准一条登录签名消息：不发交易，不花 Gas。
+    - **WalletConnect**（电脑端）：用手机钱包扫二维码。
+    - **手机上**：从列表里选你的钱包（支持搜索），或者在钱包自带的浏览器里打开 LP Agent。
+    - **Continue with email**（使用邮箱继续）：你会通过邮件收到一个 6 位验证码。新的邮箱账户需要选一次 **Solana** 或 **Robinhood**。
+  </Step>
+  <Step title="系统为你创建代理钱包">
+    新账户会马上拿到一个**代理钱包**（agent wallet）。你的仓位和跟单都从这个钱包运行。具体原理见[账户与钱包](/zh/account-and-wallet)。
+  </Step>
+</Steps>
+
+<Note>
+  一个账户只属于一个网络。玩 Meteora 池子就用 Solana 钱包登录，玩 Robinhood Chain 池子就用 EVM 钱包登录。
+</Note>
+
+## 2. 给代理钱包充值
+
+点击顶部栏的 **Deposit**（充值）。
+
+<Frame>
+  ![Deposit 充值弹窗](/images/app/rh-deposit.png)
+  <em>从已连接的钱包充值，或者把资金转到 Receive 下显示的地址</em>
+</Frame>
+
+- **From**（你的钱包）：输入金额（或点 **Max**），然后在钱包里确认。
+- **Receive**（收款）：扫二维码或复制地址，从任意钱包或交易所转入。只能用页面上显示的网络转账。
+
+| 网络 | 充值什么 |
+| --- | --- |
+| Solana | SOL。留一些 SOL 备用，用来付交易手续费和仓位租金。 |
+| Robinhood Chain | ETH。ETH 也用来付 Gas。仓位可以用 ETH 或 USDG 注资（在 **Settings > General > Base Token** 里设置）。 |
+
+<Warning>
+  资金别太少。钱包太小的话很难赚回兑换（swap）和 Gas 成本，跟单时尤其如此。经验上，跟单时 Solana 至少用 **5 SOL**，Robinhood Chain 至少用 **0.08 ETH**，跑顺了再慢慢加仓。
+</Warning>
+
+## 3. 选择你的 LP 方式
+
+<Tabs>
+  <Tab title="跟单顶级 LP">
+    <Steps>
+      <Step title="找一个钱包">
+        打开 **Smart LP**，按历史总盈亏（PnL）、胜率或手续费排序。看一下这个钱包的平均持仓时间：频繁快进快出的钱包会让你花更多成本。
+      </Step>
+      <Step title="打开它的 Portfolio，点击 Copy LP">
+        跟单弹窗会根据你和带单钱包的净资产，给出一个建议的跟单比例。
+      </Step>
+      <Step title="设置规则，点击 Copy">
+        选好跟单规模、止盈和止损、要跟哪些池子类型以及你的保护设置。详见[跟单设置](/zh/features/copy-settings)。
+      </Step>
+    </Steps>
+    此后，这个钱包每开一个新仓位，都会跟单到你的代理钱包里。所有跟单都可以在 **Copy LP** 里查看。
+  </Tab>
+  <Tab title="自己开仓">
+    <Steps>
+      <Step title="找一个池子">
+        打开 **Pools**，按报价代币、协议和流动性筛选，再按 fee/TVL、交易量或手续费排序。
+      </Step>
+      <Step title="Zap In">
+        在池子页面输入金额，选一个价格区间（Meteora DLMM 还要选策略），然后点击 **Create Position**（Solana）或 **Zap In**（Robinhood Chain）。
+      </Step>
+      <Step title="设置保护">
+        给仓位设置止盈和止损，或者在 Settings 里打开 **Auto TP/SL**，让每个新仓位都自动带上。
+      </Step>
+    </Steps>
+    详见[创建仓位](/zh/features/create-position)。
+  </Tab>
+</Tabs>
+
+## 4. 查看和管理
+
+- **Portfolio**（投资组合）显示你的净资产、盈亏历史、当前仓位和已平仓的仓位。
+- 在仓位菜单里，你可以 **Increase**（加仓）、**Decrease**（减仓）、**Zap out**（一键出池）、领取手续费等等。详见[管理仓位](/zh/features/manage-positions)。
+- 打开推送通知，跟单开仓、平仓或失败时都会提醒你。详见[通知](/zh/features/notifications)。
+
+<Card title="需要帮助？" icon="discord" href="https://discord.gg/h8YDHtzmRU">
+  加入我们的 Discord 获取支持。
+</Card>

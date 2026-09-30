@@ -1,60 +1,71 @@
 ---
 title: Introduction
-description: "Welcome to LP Agent - Your AI-powered DeFi automation companion"
+description: "LP Agent helps you find, open, copy and manage liquidity positions on Solana and Robinhood Chain"
 ---
 
-<img src="/images/hero.png" alt="LP Agent Hero" />
+<Frame>
+  <img src="/images/app/rh-smart-lp-cards.jpg" alt="LP Agent Smart LP leaderboard" />
+</Frame>
 
 ## What is LP Agent?
 
-LP Agent is an AI-powered DeFi automation tool that revolutionizes liquidity management through one-click optimal position deployment. By analyzing on-chain data and market conditions, our AI provides personalized position suggestions tailored to your risk profile - no complex calculations needed. Built specifically for Meteora on Solana, it ensures smarter liquidity management with hands-free automation.
+LP Agent is a web app for liquidity providers. It finds pools and wallets worth following, opens positions in one click, copies the positions of top LPs for you, and closes them with take profit and stop loss while you are away.
 
-## Supported Protocols
+Everything runs from an **agent wallet**: a wallet created for your account that LP Agent can act from, within strict limits. You fund it, you can withdraw from it at any time, and you can export its private key.
+
+## Supported networks
 
 <CardGroup cols={2}>
-  <Card>
-    <img
-      src="/images/meteora.svg"
-      alt="Meteora Protocol"
-      className="h-8 dark:invert"
-    />
-    <div className="mt-4">
-      Innovative dynamic liquidity pools optimized for stable and volatile pairs
-    </div>
+  <Card title="Solana" icon="sun" href="/integration/meteora">
+    Meteora **DLMM** and **DAMM v2** pools. Positions are funded in SOL.
+  </Card>
+  <Card title="Robinhood Chain" icon="link" href="/integration/robinhood">
+    Uniswap **V3** and **V4** pools, including tokenized stocks. Positions are funded in ETH or USDG.
   </Card>
 </CardGroup>
 
-## The Problem
+Your account lives on one network. It is set by the wallet you sign in with: a Solana wallet gives you a Solana account, an EVM wallet gives you a Robinhood Chain account.
 
-Managing liquidity positions in DeFi can be challenging:
+## What you can do
 
-- Manual monitoring of positions is time-consuming
-- Missing optimal entry and exit points
-- Complex market dynamics are hard to track
-- High opportunity costs from suboptimal position management
-- Difficulty in calculating optimal position parameters
+<CardGroup cols={2}>
+  <Card title="Smart LP" icon="trophy" href="/features/smart-lp">
+    Leaderboard of wallets that earn from LP fees, with win rate, PnL and hold time. Wallets that profit from their own token launches are filtered out.
+  </Card>
+  <Card title="Copy LP" icon="copy" href="/features/copy-lp">
+    Copy a wallet's opens, adds, removes, closes and fee claims, scaled to your size, with your own TP/SL and safety filters.
+  </Card>
+  <Card title="Pools" icon="water" href="/features/pools">
+    Browse and filter pools by fees, volume and liquidity, then zap in from a single token.
+  </Card>
+  <Card title="Portfolio" icon="chart-line" href="/features/portfolio">
+    Track net worth, PnL, fees and every position, for your wallet or any wallet you look up.
+  </Card>
+  <Card title="Take Profit & Stop Loss" icon="shield-check" href="/features/take-profit-stop-loss">
+    Close a position automatically when it is up or down by the percentage you choose.
+  </Card>
+  <Card title="Referral cashback" icon="gift" href="/referral">
+    Add a partner code and get part of the fees you pay back every month.
+  </Card>
+</CardGroup>
 
-## Our Solution
-
-LP Agent addresses these challenges through:
-
-- One-click zap-in and zap-out via AI-optimized positions
-- Automated entry and exit strategies
-- Real-time market analysis
-- Risk-adjusted optimization
-- Personalized position suggestions based on your risk profile
+## Start here
 
 <CardGroup cols={2}>
   <Card title="Quick Start" icon="rocket" href="/quickstart">
-    Get started with LP Agent in minutes
+    Sign in, fund your agent wallet and open or copy your first position.
   </Card>
-  <Card title="Key Features" icon="stars" href="/features">
-    Explore LP Agent's powerful automation features
+  <Card title="Account & Wallet" icon="wallet" href="/account-and-wallet">
+    Sign-in options, deposits, withdrawals and exporting your key.
   </Card>
-  <Card title="How It Works" icon="gears" href="/how-it-works">
-    Learn about our AI-powered automation
+  <Card title="Fees" icon="receipt" href="/fee">
+    What LP Agent charges, and when.
   </Card>
-  <Card title="Integration " icon="plug" href="/integration">
-    Protocols we support
+  <Card title="Build with the API" icon="code" href="/api-reference/introduction">
+    Read LP data and build zap-in and zap-out transactions from your own code.
   </Card>
 </CardGroup>
+
+<Card title="Need help?" icon="discord" href="https://discord.gg/h8YDHtzmRU">
+  Ask the team and other LPs in our Discord.
+</Card>

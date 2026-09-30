@@ -1,41 +1,54 @@
 ---
 title: "Security"
-description: "Your Security is Our Priority and we use Privy"
+description: "How your agent wallet is protected and what automation can and cannot do"
 ---
 
-## Your Security is Our Priority
+## Who holds the keys
 
-### Protected by Privy
+Your agent wallet's keys are created and stored by [Turnkey](https://www.turnkey.com), a wallet infrastructure provider built on secure hardware. The keys never pass through LP Agent's servers.
 
-<div className="flex items-center gap-3 mb-4">
-  <img
-    src="/images/privy-logo-light.png"
-    alt="Privy"
-    className="h-8 block dark:hidden"
-  />
-  <img
-    src="/images/privy-logo-dark.png"
-    alt="Privy"
-    className="h-8 hidden dark:block"
-  />
-  <span className="text-sm text-gray-600 dark:text-gray-400">
-    Enterprise-grade wallet infrastructure
-  </span>
-</div>
+- **You own the wallet.** The wallet or email you sign in with is the owner of your key vault.
+- **You can take the key with you.** [Export the private key](/account-and-wallet#export-your-private-key) at any time. It is decrypted inside a secure Turnkey frame, so LP Agent never sees it.
+- **You can leave at any time.** Withdraw every token to any address. There are no lockups.
+
+## What automation can do
+
+Opening, copying and closing positions for you needs a key that can sign without asking you each time. LP Agent uses a **separate, restricted key** for this. It is not an owner of your wallet, and rules enforced by the wallet provider limit what it can sign.
 
 <CardGroup cols={2}>
-  <Card title="Non-Custodial" icon="lock">
-    Your funds stay under your control at all times. Only you have the keys.
+  <Card title="Solana" icon="sun">
+    - Meteora DLMM and DAMM v2 liquidity actions
+    - Swaps through approved swap routers
+    - SOL can only move between your agent wallet's own accounts, plus network tips and the LP Agent fee
+    - Direct token transfers out are blocked
+    - Token approvals and authority changes are blocked
   </Card>
-  <Card title="Enterprise Grade" icon="shield-check">
-    Bank-level security with SOC2 Type 2 certification
+  <Card title="Robinhood Chain" icon="link">
+    - Uniswap V3 and V4 position actions
+    - Swaps through approved swap routers
+    - Wrapping and unwrapping ETH
+    - Paying the LP Agent fee
   </Card>
 </CardGroup>
 
-## Complete Control
+**Withdrawals and key exports always need your own signature** (or an email code for email accounts).
+
+## Protections on your trades
+
+On top of the key rules, LP Agent adds guards you control:
+
+- **Token filters** in **Settings > Security**: minimum market cap, 24h volume and holder count, a Jupiter organic score floor on Solana, and a token blacklist. Tokens that fail are skipped. See [Settings](/features/settings#security).
+- **Meme Protection** on copies skips positions where the trusted side (SOL, USDC, USDT, ETH, WETH or USDG) is nearly empty.
+- **Uniswap V4 hooked pools** are not copied unless you allow them.
+- **Fund protection** (Solana) pauses copying when your copy losses hit the limit you set.
+- **Take profit and stop loss** close positions at the thresholds you choose.
+
+See [Copy Settings](/features/copy-settings) and [Managing Your Copies](/features/copy-management).
+
+## Stay safe
 
 <Warning>
-  You maintain full control of your assets: - Withdraw funds from your embedded
-  wallet at any time - Transfer to any external wallet whenever you want -
-  Revoke AI automation permissions instantly - No lockup periods or restrictions
+  - LP Agent will never ask for your private key, seed phrase or a sign-in code in Discord, X or by DM.
+  - Only use [app.lpagent.io](https://app.lpagent.io). Check the address before you connect your wallet.
+  - Liquidity providing is risky. Pools can lose value through price moves and impermanent loss, and some tokens can go to zero. Only use funds you can afford to lose.
 </Warning>

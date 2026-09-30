@@ -1,0 +1,81 @@
+---
+title: "Manage Positions"
+description: "Increase, decrease, zap out, claim fees and compound"
+---
+
+Open the menu (three dots) on a position in your [Portfolio](/features/portfolio). On a pool page, select one of your positions to get the same actions in the right-hand panel.
+
+| Action | Solana DLMM | Solana DAMM v2 | Robinhood Chain |
+| --- | --- | --- | --- |
+| Increase | Yes | From the pool page | Yes |
+| Decrease | By % and by price band | By % | By %, paid out in ETH, USDG or both |
+| Zap out (close) | Yes, with estimates | Yes | Yes, with estimates |
+| One-click zap out | Yes | - | - |
+| Claim fees | Yes | Yes | Yes |
+| Compound | Yes | - | - |
+| Take profit / stop loss | Yes | Yes | Yes |
+
+## Increase
+
+Add more liquidity to the same range.
+
+- **Solana**: opens the pool page with your range locked. Choose **Zap In** or **Both Tokens** and a strategy, then press **Increase Position**.
+- **Robinhood Chain**: pick ETH or USDG (it defaults to what the position was opened with). Your deposit is split to match the position's range. Press **Increase Position**.
+
+## Decrease
+
+Take part of your liquidity out.
+
+<Tabs>
+  <Tab title="Solana">
+    - Enter the percentage to remove, or use the slider (0%, 25%, 50%, 75%, 100%). It starts at 100%.
+    - On DLMM you can also pick a **price band** under the bin chart: "You will receive X% from price A to price B". Useful to take out only the part of your range the price has left.
+    - Choose how to receive your funds: both tokens, either token, or SOL.
+    - Press **Decrease**.
+  </Tab>
+  <Tab title="Robinhood Chain">
+    - Pick an amount with the slider or **25%**, **50%**, **75%**, **Max**. It starts at 50%.
+    - Choose **ETH**, **USDG** or **Both** (both tokens land in your wallet, nothing is sold). The default is the currency the position was opened with.
+    - Every decrease also collects all unclaimed fees.
+    - Press **Withdraw X%**.
+  </Tab>
+</Tabs>
+
+<Note>
+  On Robinhood Chain, if you cash out in a different currency than the one you opened with, LP Agent can't track the position's PnL in the original currency afterwards, so History shows an estimate.
+</Note>
+
+## Zap out (close)
+
+Close the whole position and receive one token.
+
+- Each payout option shows a live estimate of what you get after swap costs, refreshed every 10 seconds. Options with no swap route are disabled.
+- **Est. PnL after close** shows what your PnL will be, from a live swap quote. The final amount can move a little with price and slippage.
+- After closing, you see the result and can share it as a PnL card.
+
+On Solana DLMM there is also a **one-click zap out**: the lightning icon on a position row, or **Zap out to SOL** on the pool page. It closes 100% straight into SOL without a confirm step.
+
+On Robinhood Chain, the default payout is the currency the position was opened with (ETH or USDG). If some tokens could not be swapped because the price moved, LP Agent retries with more slippage shortly after.
+
+## Claim fees
+
+Collect your unclaimed LP fees without touching the position.
+
+- **Solana**: the dialog lists your unclaimed fees per token. Press **Claim Fees**. On DLMM, fees paid in the other token are swapped to SOL for you; DAMM v2 fees arrive as they are.
+- **Robinhood Chain**: **Receive as ETH** (or USDG) is on by default and swaps your fees into that currency. Turn it off to receive the tokens as they are. Press **Claim fees**.
+
+## Compound (Solana DLMM)
+
+**Compound** claims the unclaimed fees and adds them back into the same position, in one step. Press **Compound** in the position menu.
+
+## Take profit and stop loss
+
+Click the **Settings** badge on a position to set a take profit and a stop loss. See [Take Profit & Stop Loss](/features/take-profit-stop-loss).
+
+## Report a problem
+
+Every position and pool has a **Report** option. Describe what looks wrong and optionally leave a Telegram, Discord or email contact so we can follow up.
+
+## Low balance warning
+
+On Solana, if your SOL balance drops to 0.01 SOL or less, the action dialogs warn you that you may not be able to pay the transaction fee. Deposit a little SOL first.

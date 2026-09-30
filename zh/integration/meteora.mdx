@@ -1,0 +1,49 @@
+---
+title: "Meteora 集成"
+description: "LP Agent 里的 Solana Meteora DLMM 和 DAMM v2 池子"
+---
+
+## 概览
+
+在 Solana 上，LP Agent 支持 [Meteora](https://www.meteora.ag) 的两种主要池子类型。所有资金都从你的代理钱包（agent wallet）用 SOL 投入，平仓时也兑换回 SOL。
+
+<CardGroup cols={2}>
+  <Card title="DLMM" icon="chart-column">
+    流动性放在**价格 bin** 里。你选一个价格区间和一个**策略**，决定流动性在各个 bin 上怎么分布：**Spot**、**Curve** 或 **Bid-Ask**。手续费可能随波动率变化（动态手续费）。
+  </Card>
+  <Card title="DAMM v2" icon="chart-area">
+    流动性分布在**单一价格区间**上。没有 bin，也不用选策略：投入 SOL，它会按池子的比例拆分。
+  </Card>
+</CardGroup>
+
+## 你能做什么
+
+| | DLMM | DAMM v2 |
+| --- | --- | --- |
+| 用 SOL Zap In（单币入池） | 支持，带策略、价格区间和实时预览 | 支持 |
+| 存入两种代币 | 支持 | - |
+| 加仓 | 支持 | 从池子页面操作 |
+| 减仓 | 按百分比或按价格段 | 按百分比 |
+| Zap Out（一键出池）换成 SOL | 支持，带预估和一键 Zap Out | 支持 |
+| 领取手续费 | 支持（另一种代币的手续费会兑换成 SOL） | 支持 |
+| 复投（Compound） | 支持 | - |
+| 止盈 / 止损 | 支持 | 支持 |
+| Copy LP | 支持，可按策略筛选 | 支持 |
+
+详见[创建仓位](/zh/features/create-position)和[管理仓位](/zh/features/manage-positions)。
+
+## Solana 上要知道的费用
+
+- **仓位租金**：Solana 会为每个仓位押一小笔租金。仓位平仓时退回给你。
+- **新价格 bin 租金（DLMM）**：如果你是某个池子里某些价格 bin 的第一个 LP，Meteora 会收一次性租金来开这些 bin，这笔钱留在池子里。Create Position 面板会在你确认前显示它。把区间收窄就能避开。
+- **代币账户租金**：你碰过的每个代币都会留下一个小账户。用 [Claim SOL](/zh/features/claim-sol) 把这些 SOL 拿回来。
+- **交易手续费**：留一点 SOL 备用。余额在 0.01 SOL 或以下时，操作会提醒你。
+
+## Meteora 奖励
+
+- **Meteora 推荐奖励**：LP Agent 钱包绑定了 Meteora 的推荐计划，这个计划会以 USDC 支付你 DLMM 仓位上 Meteora 协议手续费的 2%。详见[推荐计划](/zh/referral)。
+- **MET 空投**：详见 [Meteora 空投](/zh/integration/meteora-airdrop)。
+
+<Warning>
+  DLMM 区间只有在价格处于区间内时才赚钱。价格离开你的区间后，你手里只剩两种代币中的一种，而且不再赚手续费，直到价格回来或者你移动仓位。
+</Warning>

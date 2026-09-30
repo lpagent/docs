@@ -1,0 +1,113 @@
+---
+title: "账户与钱包"
+description: "登录方式、代理钱包、充值、提现和私钥导出"
+---
+
+## 登录
+
+点击顶部栏的 **Connect Wallet**（连接钱包）。你可以用以下方式登录：
+
+| 方式 | 怎么用 |
+| --- | --- |
+| **钱包插件**（Phantom、Solflare、MetaMask、Rabby 等） | 选择你的钱包，批准一条登录签名消息。不发交易，不花 Gas。你上次用过的钱包排在最上面。 |
+| **WalletConnect**（电脑端） | 用手机钱包扫二维码，批准连接，再批准登录签名消息。 |
+| **手机** | 从列表里选你的钱包，或者搜索。有些钱包会在自己的浏览器里打开 LP Agent。如果列表里没有你的钱包，就在钱包自带的浏览器里打开 LP Agent，然后从那里连接。 |
+| **邮箱** | 输入邮箱，再填入收到的 6 位验证码。验证码由我们的钱包服务商 Turnkey 发送，几分钟后失效。 |
+
+在钱包弹出签名请求之前，会先跑一个快速的浏览器检查。一般会自动通过。
+
+### 一个账户对应一个网络
+
+你的账户绑定一个网络：
+
+- 用 **Solana** 钱包登录，玩 Meteora DLMM 和 DAMM v2 池子。
+- 用 **EVM** 钱包（0x 地址）登录，玩 Robinhood Chain 上的 Uniswap V3 和 V4 池子。
+- 新的**邮箱**账户会让你选一次 **Solana** 或 **Robinhood**。
+
+你仍然可以浏览另一个网络上的池子和钱包，但只能在你账户所属的网络上开仓或跟单。
+
+### 钱包升级前创建的账户
+
+LP Agent 在 2026 年 9 月迁移到了新的钱包基础设施。大多数老账户都已经迁移过来，并且**保留了原来的代理钱包地址**：照常连接你一直在用的那个钱包就行。
+
+如果你的账户还没迁移，应用会提示你，并帮你打开之前的登录方式。你也可以点击钱包选择列表底部的 **Already have an LP Agent account? Use your existing login**（已有 LP Agent 账户？使用原有登录方式）。
+
+### 登录会话
+
+使用应用期间你会一直保持登录，最长 7 天。点击账户面板里的 **Disconnect**（断开连接），就会在这台设备上退出登录。
+
+## 你的代理钱包
+
+每个账户都有一个**代理钱包**（agent wallet），在应用里显示为 **Embedded Wallet**（内嵌钱包）。LP Agent 用这个钱包开仓、跟单和平仓，所以你不用每笔交易都签名。
+
+- 它和你的登录钱包是分开的。
+- 钱由你充进去，你随时可以提现。
+- 你可以导出它的私钥，导入到任何钱包。
+- 自动化功能只能用它做 LP 操作和兑换（swap）。详见[安全](/zh/security)。
+
+点击顶部栏里你的地址，就能打开账户面板。
+
+<Frame>
+  ![账户面板](/images/app/rh-account-panel.png)
+  <em>账户面板：你的代理钱包、Deposit、Withdraw、Settings 和你的资产</em>
+</Frame>
+
+面板上显示：
+
+- **Signed in with**（登录方式）：你用来登录的钱包（或邮箱），仅在它和代理钱包不同时显示。
+- **Embedded Wallet**：你的代理钱包地址，带复制按钮。
+- **Deposit**（充值）、**Withdraw**（提现）和 **Settings**（设置）。
+- **Assets**（资产）：你的代币及其价值。低于 $1 的小额余额会折叠在 **Show all** 后面。点一下代币就能兑换它。
+- **Get API Key**、**Docs**、**Disconnect**，以及我们的 Discord 和 X 链接。
+
+<Note>
+  升级前创建、且从未授权过的账户，看到的是 **Grant full access**（授予完全访问权限），而不是 Deposit 和 Withdraw。授权后就会创建代理钱包。
+</Note>
+
+## 充值
+
+点击顶部栏或账户面板里的 **Deposit**。
+
+- **From**（你的钱包名）：输入金额或点 **Max**，然后点 **Deposit** 并在钱包里确认。Max 会留下一点点余额用来付网络手续费。
+- **Receive**（收款）：显示二维码和代理钱包地址。可以从任意钱包或交易所转入。只能用页面上显示的网络转账，否则资金可能丢失。
+
+| 网络 | 充值 | 说明 |
+| --- | --- | --- |
+| Solana | SOL | 最低 0.001 SOL。 |
+| Robinhood Chain | ETH | ETH 用来付 Gas。想用 USDG 开仓，就通过 **Receive** 充值 USDG，并在 Settings 里把 **Base Token** 设为 USDG。 |
+
+邮箱登录的账户只有 **Receive**。应用内不支持银行卡或银行买币：请在别处买好加密货币再转进来。
+
+## 提现
+
+点击账户面板里的 **Withdraw**（提现）。一共三步：
+
+1. **Select Token**（选择代币）：代理钱包里的任意代币。
+2. **Destination and Amount**（目标地址和金额）：粘贴地址，或者使用你的主钱包（登录钱包）。
+3. **Review and confirm**（检查并确认）：仔细核对地址。提现一旦发出就无法撤回。
+
+提现由你自己批准：用登录钱包签名，邮箱账户则用验证码确认。LP Agent 不收提现手续费，只需支付网络手续费。
+
+## 导出私钥
+
+进入 **Settings > Account > Export Private Key**，点击 **Export**。
+
+1. 你的登录钱包会让你签一次名来批准导出。邮箱账户可能需要输入验证码。
+2. 点击 **Reveal private key**（显示私钥）。私钥显示在我们钱包服务商提供的安全窗口里。LP Agent 永远看不到它。
+3. 把它存到安全的地方。关掉窗口后它就会消失。
+
+<Warning>
+  任何人拿到这个私钥，就能控制这个钱包和里面的所有资产。千万不要分享给别人，也不要粘贴到任何网站。
+</Warning>
+
+你可以把私钥导入 Phantom、Solflare、Backpack、MetaMask、Rabby 或同一网络的任何其他钱包。
+
+## 把 LP Agent 安装成应用
+
+LP Agent 可以作为 Web 应用安装：
+
+- **电脑端 Chrome 或 Edge**：打开浏览器菜单，选择 **Install app**（安装应用）。
+- **Android**：打开浏览器菜单，选择 **Add to Home Screen**（添加到主屏幕）或 **Install app**。
+- **iPhone**：在 Safari 里点 **Share**（分享），再点 **Add to Home Screen**。iPhone 上要收推送通知，必须先这样安装。
+
+想在仓位或跟单有变动时收到提醒，请看[通知](/zh/features/notifications)。
