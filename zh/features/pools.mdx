@@ -1,0 +1,106 @@
+---
+title: "池子"
+description: "浏览、筛选和搜索 Solana 与 Robinhood Chain 上的流动性池"
+---
+
+**Pools**（池子）页面列出 LP Agent 追踪的所有池子。用顶栏的链选择器切换网络。
+
+<Frame>
+  ![Solana 上的池子](/images/app/sol-pools.jpg)
+  <em>Solana 上的池子，按流动性排序</em>
+</Frame>
+
+## 视图和排序
+
+- 右上角可以切换 **Table**（表格，默认）或 **Card**（卡片）视图。
+- 顶栏显示有多少个池子符合条件，以及数据最后更新的时间。
+- 点列标题排序，再点一次反过来排。默认按 **Fee/TVL** 从高到低排序。
+- **Columns** 可以加更多列，比如这个代币所有池子的总流动性、波动率（24h 交易量 / 流动性），以及 Solana 上每个持有人对应的市值。
+
+| 列 | 含义 |
+| --- | --- |
+| **Pool** | 交易对、兑换手续费、协议（DLMM、DAMM V2、Uniswap V3、Uniswap V4）、DLMM 的 bin step、Solana 上的 organic score（有机评分）、地址和快捷链接 |
+| **Fee/TVL** | 时间窗口内赚到的手续费相对流动性的比值（Solana 上可选 24h、6h、1h 或 5m；Robinhood Chain 上是 24h） |
+| **Liquidity** | 池子的总锁仓价值。在 Robinhood Chain 上还会显示两种代币的占比和预估 **APR** |
+| **Volume** / **Fees** | 时间窗口内的交易量和手续费 |
+| **MCAP** | 主代币的市值 |
+| **Holders** | 持有人数（Solana） |
+| **Age** | 池子存在了多久 |
+| **Category** | 代币化股票标为 **Stock**（Robinhood Chain） |
+
+<Tip>
+  很小的池子 Fee/TVL 再高，也可能很快就没了。Zap In（单币入池）之前，把流动性、交易量和池龄放在一起看。
+</Tip>
+
+## 筛选
+
+| 筛选项 | Solana | Robinhood Chain |
+| --- | --- | --- |
+| **Quote Token** | SOL & USDC, SOL, USDC | WETH & USDG, WETH, USDG |
+| **Type** / **Protocol** | All, DLMM, DAMM V2 | All, Uniswap V3, Uniswap V4 |
+| **Category** | - | All, Stocks |
+| **Search** | 粘贴池子或代币地址 | 粘贴池子或代币地址 |
+| **Small pools** | - | **Show pools under $5k**（默认关闭） |
+| **Range filters** | 市值、池龄、流动性、24h 和 1h 交易量、24h 手续费、bin step、基础手续费、有机评分 | 市值、池龄、流动性、交易量、手续费、基础手续费 |
+
+- **Filter** 应用并保存你在当前网络的筛选条件。**Clear** 全部重置。
+- **Copy link** 复制一个带当前筛选条件的链接，方便你分享这个视图。
+- 在 Solana 上，新用户一开始就带有最低流动性、交易量和有机评分的门槛，免得列表被粉尘池刷屏。
+- 在 Robinhood Chain 上，低于 $5k 的池子默认隐藏，除非你打开 **Small pools**、搜索地址或者自己设最低流动性。显示 TVL 在 $50k 以上、但几乎没有交易量的池子，浏览时也会被排除。
+
+## 代币化股票（Robinhood Chain）
+
+<Frame>
+  ![Robinhood Chain 上的股票池](/images/app/rh-pools-stocks.jpg)
+  <em>Robinhood Chain 上的 Stocks 筛选</em>
+</Frame>
+
+在表格上方按 **Stocks**，查看持有 Robinhood 发行的代币化股票的池子。匹配靠的是合约地址（对照 Robinhood 的注册表），而不是 ticker（股票代码）。用了某只股票的 ticker、但合约不是同一个的代币，会被标成 **Fake ticker**（假 ticker）。
+
+## 什么都能搜
+
+顶栏的搜索框（快捷键 `/`）可以按地址找代币、池子和钱包：
+
+- **Token**（代币）：它的市值、交易量和流动性，以及包含这个代币的前 10 个池子，按 24h 交易量排序。
+- **Pool**（池子）：打开池子页面。
+- **Wallet**（钱包）：胜率、总盈亏（PnL）、手续费和 EV，并打开这个钱包的 Portfolio。
+
+最近 5 次搜索会保存在 **Recent Searches**（最近搜索）下面。
+
+## 池子页面
+
+点一个池子打开它。
+
+<Frame>
+  ![Solana 上的池子页面](/images/app/sol-pool-detail.jpg)
+  <em>一个 Meteora DLMM 池子：带你的价格区间和流动性深度的价格图、池子里的仓位，以及 Create Position 面板</em>
+</Frame>
+
+**顶部信息：** 交易对、协议、bin step 和基础手续费，以及实时数据：价格、市值、TVL、24h 交易量、24h 手续费、Fee/TVL 和预估手续费 APR。点交易对可以切换到同一个代币的其他池子。链接图标可以在 Meteora 或 Uniswap、GMGN、DexScreener 或区块浏览器上打开这个池子。
+
+**上方的标签页：**
+
+- **Price Chart**：K 线，周期从 1 分钟到 1 天。在 DLMM 池子上，流动性深度会画在价格旁边。拖动 **Min Price** 和 **Max Price** 线，就能直接目测设定价格区间。
+- **Pool Details**：池子地址、手续费、代币数量和各自占 TVL 的比例。在 Solana 上还有手续费历史和每个 bin 的流动性分布。
+- **Bubble**（Solana）：主代币的持有人气泡图。
+
+Solana 池子上的 **Live** 标记表示数据正在实时推送。
+
+**下方的标签页：**
+
+| 标签页 | 显示什么 |
+| --- | --- |
+| **Positions In Pool** | 所有当前仓位：持有人、价值、手续费、未实现盈亏（uPnL）、持仓时间和价格区间。鼠标悬停在持有人上可以看他的历史战绩。按 **Copy** 就能用同样的价格区间和策略自己开仓。 |
+| **Top LPer** | 在这个池子里赚得最多的钱包：总盈亏、手续费、仓位数、平均持仓时间和胜率。 |
+| **Activities** | 添加流动性、移除流动性和领取操作的实时动态（Solana）。 |
+| **Your Positions** / **History** | 你在这个池子里的当前仓位和已平仓的仓位。 |
+| **Your Assets** | 你钱包里的代币，Solana 上带兑换（swap）快捷入口。 |
+
+旗子图标可以举报池子。
+
+<Frame>
+  ![Robinhood Chain 池子里的仓位](/images/app/rh-pool-positions.jpg)
+  <em>Robinhood Chain 上的 Positions In Pool，每一行都有 Copy</em>
+</Frame>
+
+右边的面板就是用来开仓的。详见[创建仓位](/zh/features/create-position)。

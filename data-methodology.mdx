@@ -49,3 +49,15 @@ While using T0 and T3 might seem more comprehensive, we cannot reliably use thes
 2.  **Attribution**: Our system focuses on the performance of the liquidity provision itself. Price movements _before_ liquidity is added (T0 to T1) or _after_ it's removed (T2 to T3) are influenced by broader market dynamics and individual user trading decisions, rather than the LP strategy's direct performance.
 
 By focusing on T1 and T2, we provide a consistent measure of how the liquidity position performed during the period it was active. Users should be aware of the potential differences and consider their entry (T0) and exit (T3) points for their overall financial picture.
+
+## True PnL on closed copies
+
+When a copied position closes, LP Agent checks its result against the on-chain transactions, leg by leg, and shows it in Copy Logs with a **True PnL** shield. While the check runs, the PnL column reads **Tallying**. Push notifications for take profit, stop loss and leader exits carry this checked PnL.
+
+## Other wallets' PnL
+
+PnL on another wallet's portfolio is computed from indexed on-chain data and can miss swaps made outside the position, transfers, and positions opened in unusual ways. That is why other wallets' portfolios show a notice that PnL might not reflect their actual earnings. Treat it as a guide, not accounting.
+
+## Robinhood Chain
+
+Robinhood Chain PnL measures the liquidity leg only and does not yet include the swaps in and out of a position. See [Robinhood Chain Integration](/integration/robinhood#known-limitations) for the full list of limitations.

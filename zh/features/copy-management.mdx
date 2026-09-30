@@ -1,0 +1,128 @@
+---
+title: "管理你的跟单"
+description: "Copied Wallets、Analysis、Copy Logs，以及会暂停跟单的保护机制"
+---
+
+顶部菜单里的 **Copy LP** 页面有三个标签页：**Copied Wallets**（已跟单钱包）、**Analysis**（分析）和 **Copy Logs**（跟单日志）。
+
+## Copied Wallets
+
+<Frame>
+  ![Copied Wallets](/images/app/rh-copied-wallets.jpg)
+  <em>你跟单的钱包，分为 Active 和 Paused 两组。示例数据。</em>
+</Frame>
+
+每一行是你关注的一个钱包：
+
+| 列 | 显示内容 |
+| --- | --- |
+| **Wallet** | 你的标签和钱包地址。点击打开跟单设置。 |
+| **Copy size** | 例如 "10% of each position, up to 2 SOL"（每个仓位的 10%，最多 2 SOL），以及任何池子类型筛选。 |
+| **Auto exit** | 你的止盈和止损，或者 Off。 |
+| **Positions** | 从这个钱包跟单开了多少个仓位。 |
+| **PnL** | 你从这个钱包的跟单里赚到的盈亏（PnL）。 |
+| **Copy** | 开关，用来暂停或恢复跟单。 |
+
+行菜单里有 **Edit settings**、**View portfolio**、**Copy address** 和 **Stop copying**。**Find Smart LP** 会带你去排行榜。
+
+- **Pause**（关掉开关）：这个钱包的任何操作都不会被跟，**包括平仓**。你现有的跟单仓位保持开着，保留各自的止盈和止损。
+- **Stop copying**：把这个钱包从你的列表里移除。已经跟单的仓位会一直开着，直到你自己平仓。
+
+## Analysis
+
+<Frame>
+  ![Copy Analysis](/images/app/rh-copy-analysis.jpg)
+  <em>每个已跟单钱包的总盈亏、手续费收益和累计盈亏。示例数据。</em>
+</Frame>
+
+- 选择时间范围：**7D**、**1M**（默认）、**3M**、**1Y**、**YTD** 或 **ALL**。
+- 顶部卡片显示 **Total PnL**、**Fees earned** 和 **Copies opened**。
+- 图表显示每个已跟单钱包的累计盈亏。把鼠标悬停在图例里的名字上，可以高亮它的曲线。
+- 下方表格列出每个钱包的手续费、最近一期盈亏、总盈亏和已开跟单数。
+
+你的盈亏可能和你跟的钱包不一样：你自己的 TP/SL 可能更早平仓，而因为余额不足被跳过的跟单根本不会开。
+
+## Copy Logs
+
+Copy Logs 是每一次跟单的完整记录：开了的、平了的，还有没发生的那些以及原因。
+
+<Frame>
+  ![Copy Logs](/images/app/rh-copy-logs.jpg)
+  <em>顶部带资金警告的 Copy Logs，以及每个没开出来的跟单的原因</em>
+</Frame>
+
+### 筛选和列
+
+- 标签页：**All**、**Not opened**、**Failed**、**Open** 和 **Closed**，带数量。
+- 在 **Source** 列标题里按来源钱包筛选。
+- 列：**Position**、**Source**（带单钱包和它的仓位）、**Result**、**PnL**、**Why** 和 **Time**。
+
+结果标签：
+
+| 结果 | 含义 |
+| --- | --- |
+| **Open** | 你的跟单仓位开着。 |
+| **Closed** | 你的跟单仓位已平仓。 |
+| **Holding** | 已平仓，但 Smart Token Retention 正在把代币保留一小会儿。显示倒计时和 **Sell now**。 |
+| **Not opened** | 跟单没开出来，比如因为余额不足。 |
+| **Skipped** | 你的设置拒绝了这次跟单，比如代币筛选或 Meme Protection。 |
+| **Failed** | 尝试过跟单，但失败了。 |
+| **Pending** | 进行中。 |
+
+对于已平仓的跟单，**PnL** 显示对照链上交易核对过的最终结果（标记为 **True PnL**）。核对还在进行时显示 **Tallying**。
+
+原因相同的重复行会被折叠成一行（"3 more not opened, same reason"），并带 **Show all**。
+
+### 一键修复
+
+大多数原因都带一个按钮，直接带你去修：
+
+| 原因 | 按钮 |
+| --- | --- |
+| Price moved（价格变动） | **Raise slippage**（打开 Settings > Swap 并给出建议值） |
+| No ETH for gas / Not enough SOL or ETH（没有 ETH 付 Gas / SOL 或 ETH 不足） | **Top up SOL/ETH** |
+| Hooked pool not allowed（不允许带 Hook 的池子） | **Allow this pool** |
+| Tokens left in wallet（钱包里有剩余代币） | **Swap to SOL/ETH** |
+| Loss limit reached（达到亏损上限） | **Edit limit** |
+| Copy size is $0 / Too small for gas（跟单金额为 $0 / 金额太小，不够付 Gas） | **Edit copy size** |
+| Strategy not in your settings / Meme protection（策略不在你的设置里 / Meme 保护） | **Edit copy settings** |
+| Token blacklisted（代币在黑名单里） | **Edit blacklist** |
+| Token failed safety check / Token below quality floor（代币没通过安全检查 / 代币低于质量下限） | **Edit filters** |
+| Rug-risk leader / Leader's own token launch（有 Rug 风险的带单钱包 / 带单钱包自己发的币） | 无：为了保护你而跳过 |
+
+如果你的代理钱包资金不够，Copy Logs 顶部会有一个横幅，告诉你现在有多少、上一次跟单需要多少，以及有多少跟单没开出来。
+
+### 展开一行
+
+点击一行可以看到它的时间线（重试会被折叠，如果后面某次重试成功，会显示 "Fixed on retry"）、交易链接、资金数据和结果：投入金额、手续费收益、持仓多久，以及是什么平的仓（止盈、止损还是带单钱包退出）。在这里你可以 **Share**（分享）结果。
+
+### 报告一次跟单
+
+哪里看着不对？按 **Report this copy**，选择哪里不对（没跟上带单钱包、金额不对、盈亏看起来不对、代币卡住了、没跟着带单钱包平仓、其他），补充细节后按 **Send report**。这次跟单的日志会自动帮你附上。
+
+## 会暂停跟单的保护机制
+
+### 资金保护（Solana）
+
+<Frame>
+  ![资金保护横幅](/images/app/sol-fund-protection.png)
+  <em>资金保护：跟单亏损达到你的上限时暂停跟单</em>
+</Frame>
+
+当你跟单仓位的亏损达到上限时，资金保护会暂停新的跟单。
+
+- Solana 账户默认开启，上限为 **净资产的 20%**。
+- 按 **Edit** 修改 **Max loss from peak**（距峰值最大亏损）。保存时，这个百分比会按当天的净资产换算成一个固定的 SOL 数量，计数重新开始。
+- 亏损 **只计算已平仓的跟单仓位**，从设置上限以来的峰值开始算。
+- 达到上限时，横幅显示 **Stopped**：新的开仓、加仓、复投和再平衡都会被拦，但 **退出仍会跟随你的带单钱包**。Copy Logs 显示 **Loss limit reached**。
+- 按 **Resume** 用同样的上限和全新的计数重新开始。**Turn off** 会移除上限。
+
+### 钱包没钱时自动暂停
+
+如果因为代理钱包没资金或没 Gas，跟单一直失败，LP Agent 会暂停你那些钱包的跟单，免得失败的尝试越堆越多。如果代理钱包长时间一直没钱，也会同样被暂停。这些钱包会移到 **Paused**，如果你开了通知，还会收到一条推送通知。
+
+恢复方法：先给代理钱包充值，再把这些钱包的开关重新打开。
+
+## 接收通知
+
+打开推送通知，就能收到开仓、添加流动性、移除流动性、平仓、领取手续费，以及跟单失败或被跳过的提醒。见[通知](/zh/features/notifications)。

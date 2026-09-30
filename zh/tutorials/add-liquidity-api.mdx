@@ -1,0 +1,477 @@
+---
+title: "通过 API 进行 Zap-In 与 Zap-Out"
+description: "完整教程：使用 LP Agent Open API 添加流动性（Zap-In）和提取流动性（Zap-Out）"
+---
+
+## 你将构建什么
+
+学完本教程，你就能用代码实现：
+
+- **Zap-In**（单币入池）：找到一个池子，只用一种代币（SOL）添加流动性
+- **Zap-Out**（一键出池）：把流动性提取回你的钱包
+
+不需要任何智能合约知识：LP Agent 通过简单的 REST API 帮你搞定一切。
+
+<Tip>
+LP Agent 为 zap-in 和 zap-out 都内置了基于 Jito bundle 的交易上链服务。相比直接通过 RPC 提交交易，**上链成功率明显更高**：而且免费使用。
+</Tip>
+
+---
+
+## 工作原理
+
+### Zap-In 流程
+
+向 Meteora 池子添加流动性分为 4 步：
+
+```
+1. DISCOVER       Find a pool that matches your criteria
+   GET /pools/discover
+        ↓
+2. GET POOL INFO   Get the current active bin (price) to set your range
+   GET /pools/{poolId}/info
+        ↓
+3. GENERATE TXS   API creates unsigned transactions for you
+   POST /pools/{poolId}/add-tx
+        ↓
+4. SIGN & LAND     Sign with your wallet, submit via Jito
+   POST /pools/landing-add-tx
+```
+
+**什么是 "zap-in"？** 你只需要提供 SOL，API 会在添加流动性之前自动把它兑换（swap）成两种代币的正确比例。不需要先手动买币。
+
+### Zap-Out 流程
+
+提取流动性的流程也差不多：
+
+```
+1. GET POSITIONS   Find your open positions
+   GET /lp-positions/opening
+        ↓
+2. GET QUOTES      (Optional) Preview what you'll receive
+   POST /position/decrease-quotes
+        ↓
+3. GENERATE TXS   API creates unsigned withdrawal transactions
+   POST /position/decrease-tx
+        ↓
+4. SIGN & LAND     Sign with your wallet, submit via Jito
+   POST /position/landing-decrease-tx
+```
+
+### 理解关键概念
+
+开始写代码之前，先了解几个关键概念：
+
+| 概念 | 含义 |
+|---------|---------------|
+| **Bin** | Meteora DLMM 池子里的一个价格点。流动性分布在一段 bin 区间上。 |
+| **Active Bin**（活跃 bin） | 当前价格所在的 bin。价格在你的 bin 区间内时，你的仓位就会赚取手续费。 |
+| **Strategy**（策略） | 流动性在各个 bin 上的分布方式：`Spot`（均匀）、`Curve`（集中在中间）或 `BidAsk`（集中在两端）。 |
+| **BPS** | 基点（basis points）。10000 = 100%，5000 = 50%，500 = 5%。用于滑点和提取数量。 |
+| **Landing**（上链） | 把已签名的交易提交到链上。LP Agent 使用 Jito bundle 来提高成功率。 |
+
+---
+
+## 前置条件
+
+- 一个 LP Agent API key（在 [API Dashboard](https://app.lpagent.io/open-api) 获取）
+- 一个 Solana 钱包 keypair
+- Node.js >= 18
+
+```bash
+npm install @solana/web3.js bs58
+```
+
+---
+
+## 分步教程：Zap-In
+
+### 第 1 步：初始化
+
+先配置好 API 客户端和钱包：
+
+```typescript
+import { Keypair, Transaction, VersionedTransaction } from "@solana/web3.js";
+import bs58 from "bs58";
+
+const API_BASE = "https://api.lpagent.io/open-api/v1";
+const API_KEY = "your-api-key-here";
+
+const wallet = Keypair.fromSecretKey(bs58.decode("your-base58-private-key"));
+const OWNER = wallet.publicKey.toBase58();
+
+// Helper for API calls
+async function apiCall(method: string, path: string, body?: object) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(`API error: ${JSON.stringify(error)}`);
+  }
+
+  return res.json();
+}
+
+// Sign a base64-encoded transaction (handles both legacy and versioned)
+function signTransaction(base64Tx: string): string {
+  const buffer = Buffer.from(base64Tx, "base64");
+
+  try {
+    const tx = VersionedTransaction.deserialize(buffer);
+    tx.sign([wallet]);
+    return Buffer.from(tx.serialize()).toString("base64");
+  } catch {
+    const tx = Transaction.from(buffer);
+    tx.partialSign(wallet);
+    return tx
+      .serialize({ requireAllSignatures: false, verifySignatures: false })
+      .toString("base64");
+  }
+}
+```
+
+### 第 2 步：发现池子
+
+浏览可用的池子，按你的条件筛选。API 会按你选定的指标返回排好序的池子。
+
+```typescript
+const discoverRes = await apiCall("GET",
+  "/pools/discover?" + new URLSearchParams({
+    chain: "SOL",
+    sortBy: "vol_24h",        // sort by 24h volume
+    sortOrder: "desc",
+    pageSize: "5",
+    min_market_cap: "5",       // min $5M market cap
+    min_liquidity: "50",       // min $50K TVL
+  }).toString()
+);
+
+const pool = discoverRes.data[0];
+console.log(`Pool: ${pool.token0_symbol}/${pool.token1_symbol} (${pool.pool})`);
+console.log(`Protocol: ${pool.protocol}`); // "meteora" or "meteora_damm_v2"
+```
+
+**返回内容：** 一个池子列表，包含地址、交易对、TVL、交易量和协议类型。API 同时支持 Meteora DLMM 和 DAMM V2 池子：同一套代码两种都能用。
+
+### 第 3 步：获取池子信息并设定区间
+
+拉取池子的当前状态，找到 **active bin**（当前价格所在的位置）。你要围绕这个 bin 放置流动性。
+
+```typescript
+const poolInfoRes = await apiCall("GET", `/pools/${pool.pool}/info`);
+const activeBin = poolInfoRes.data.liquidityViz?.activeBin;
+
+// Place liquidity 34 bins on each side of the current price
+const RANGE = 34;
+const fromBinId = activeBin.binId - RANGE;
+const toBinId = activeBin.binId + RANGE;
+
+console.log(`Active bin: ${activeBin.binId}`);
+console.log(`Your range: bin ${fromBinId} to ${toBinId} (${RANGE * 2 + 1} bins)`);
+```
+
+**如何选择区间：** 越宽 = 越不容易超出区间，但手续费 APR 越低。越窄 = 手续费越高，但需要更频繁地再平衡。建议从每边 30-70 个 bin 开始。
+
+### 第 4 步：生成 Zap-In 交易
+
+告诉 API 你想存入多少 SOL。它会生成未签名的交易，把你的 SOL 兑换成正确的代币比例，然后添加流动性。
+
+```typescript
+const addTxRes = await apiCall("POST", `/pools/${pool.pool}/add-tx`, {
+  stratergy: "Spot",           // distribution strategy
+  inputSOL: 0.1,               // amount of SOL to deposit
+  percentX: 0.5,               // 50/50 split between tokens
+  fromBinId,
+  toBinId,
+  owner: OWNER,
+  slippage_bps: 500,           // 5% slippage tolerance
+  mode: "zap-in",              // auto-swap SOL to both tokens
+});
+
+console.log(`Position key: ${addTxRes.data.meta.positionPubKey}`);
+console.log(`Swap txs: ${addTxRes.data.swapTxsWithJito.length}`);
+console.log(`Add txs: ${addTxRes.data.addLiquidityTxsWithJito.length}`);
+```
+
+<Note>
+已经持有两种代币？改用 `mode: "normal"`，并用 `amountX` 和 `amountY` 代替 `inputSOL`，就能跳过兑换这一步。
+</Note>
+
+**返回内容：** Base64 编码的未签名交易，分成兑换交易（用来转换 SOL）和添加流动性交易两类，另外还有新仓位的元数据。
+
+### 第 5 步：签名并上链
+
+用你的钱包签名这些交易，然后通过 LP Agent 的 Jito 上链接口提交。
+
+```typescript
+const { lastValidBlockHeight, swapTxsWithJito, addLiquidityTxsWithJito, meta } = addTxRes.data;
+
+// Sign all transactions with your wallet
+const signedSwapTxs = swapTxsWithJito.map(signTransaction);
+const signedAddTxs = addLiquidityTxsWithJito.map(signTransaction);
+
+// Submit via LP Agent's Jito integration (better landing rate: free!)
+const landRes = await apiCall("POST", "/pools/landing-add-tx", {
+  lastValidBlockHeight,
+  swapTxsWithJito: signedSwapTxs,
+  addLiquidityTxsWithJito: signedAddTxs,
+  meta,
+});
+
+console.log(`Zap-In Success! Tx: https://solscan.io/tx/${landRes.data.signature}`);
+```
+
+**就这么简单！** 你的流动性已经生效，开始赚取手续费了。
+
+---
+
+## 分步教程：Zap-Out
+
+### 第 1 步：查找你的当前仓位
+
+查询你的钱包，列出所有当前 LP 仓位。
+
+```typescript
+const positionsRes = await apiCall("GET",
+  `/lp-positions/opening?owner=${OWNER}`
+);
+
+console.log(`Found ${positionsRes.count} open positions`);
+
+for (const pos of positionsRes.data) {
+  console.log(`- ${pos.pairName} | Value: $${pos.currentValue} | PnL: ${pos.pnl.percent.toFixed(2)}% | In Range: ${pos.inRange}`);
+}
+```
+
+**返回内容：** 每个仓位都包含加密 ID（提取时要用）、当前价值、盈亏（PnL）、是否在区间内，以及代币详情。
+
+### 第 2 步：获取报价（可选）
+
+提取之前，先预览你能收到多少。API 会给出不同输出选项的报价。
+
+```typescript
+const positionId = positionsRes.data[0].id; // encrypted position ID
+
+const quotesRes = await apiCall("POST", "/position/decrease-quotes", {
+  id: positionId,
+  bps: 10000,    // 10000 = 100% withdrawal, 5000 = 50%, etc.
+});
+
+const quotes = quotesRes.data;
+console.log(`Token prices: $${quotes.price.token0} / $${quotes.price.token1}`);
+```
+
+### 第 3 步：生成 Zap-Out 交易
+
+选择提取多少，以及想收到哪种代币。
+
+```typescript
+const decreaseTxRes = await apiCall("POST", "/position/decrease-tx", {
+  position_id: positionId,
+  bps: 10000,                  // 100% withdrawal
+  owner: OWNER,
+  slippage_bps: 500,
+  output: "allBaseToken",      // withdraw to SOL (see table below)
+  provider: "JUPITER_ULTRA",
+});
+
+console.log(`Generated ${decreaseTxRes.data.closeTxsWithJito.length} close txs`);
+```
+
+**输出选项：**
+
+| 输出 | 说明 |
+|--------|-------------|
+| `allBaseToken` | 全部兑换成 SOL（推荐，方便再次入池） |
+| `both` | 按原样收到两种代币（不兑换） |
+| `allToken0` | 全部兑换成代币 X |
+| `allToken1` | 全部兑换成代币 Y |
+
+### 第 4 步：签名并上链
+
+```typescript
+const { lastValidBlockHeight: blockHeight, closeTxsWithJito, swapTxsWithJito } = decreaseTxRes.data;
+
+// Sign all transactions
+const signedCloseTxs = closeTxsWithJito.map(signTransaction);
+const signedSwapTxs = swapTxsWithJito.map(signTransaction);
+
+// Submit via LP Agent's Jito integration
+const landRes = await apiCall("POST", "/position/landing-decrease-tx", {
+  lastValidBlockHeight: blockHeight,
+  closeTxs: [],
+  swapTxs: [],
+  closeTxsWithJito: signedCloseTxs,
+  swapTxsWithJito: signedSwapTxs,
+});
+
+console.log(`Zap-Out Success! Tx: https://solscan.io/tx/${landRes.data.signature}`);
+```
+
+<Tip>
+始终使用 `landing-decrease-tx` 接口，不要直接通过 RPC 提交交易。LP Agent 的 Jito 集成**上链成功率高得多**，而且完全**免费**。
+</Tip>
+
+---
+
+## 参考
+
+### 策略类型
+
+| 策略 | 说明 | 适用场景 |
+|----------|-------------|----------|
+| `Spot` | 在所有 bin 上均匀分布 | 稳定交易对（SOL/USDC） |
+| `Curve` | 钟形曲线，集中在 active bin 附近 | 区间震荡行情 |
+| `BidAsk` | 两端分配更多 | 会均值回归的高波动交易对 |
+
+### 常见错误
+
+| 错误 | 原因 | 解决办法 |
+|-------|-------|-----|
+| `Token X price unavailable` | 缺少价格数据 | 稍后重试，或换一个池子 |
+| `Insufficient balance` | 代币不够 | 减少 `inputSOL` 或 `amountX`/`amountY` |
+| `Missing amount to ZapIn` | zap-in 模式下没有提供 `inputSOL` | 在请求 body 里加上 `inputSOL` |
+| 交易过期 | `lastValidBlockHeight` 已经过了 | 重新生成并重新签名（不要等超过 ~60s） |
+
+### 小贴士
+
+- **交易上链**：始终使用 LP Agent 的上链接口，不要直接走 RPC。通过 Jito 成功率更高：而且免费。
+- **DAMM V2 池子**：zap-in 和 zap-out 都会自动识别池子类型。同一套代码适用于 DLMM 和 DAMM V2。
+- **部分 Zap-Out**：把 `bps` 设为小于 10000 的值，就只提取一部分（例如 `5000` = 50%）。
+
+---
+
+## 完整脚本
+
+下面把上面所有内容合成一个可以直接复制粘贴的脚本：
+
+<Accordion title="完整的 zap-in + zap-out 脚本">
+
+```typescript
+import { Keypair, Transaction, VersionedTransaction } from "@solana/web3.js";
+import bs58 from "bs58";
+
+const API_BASE = "https://api.lpagent.io/open-api/v1";
+const API_KEY = "your-api-key-here";
+const wallet = Keypair.fromSecretKey(bs58.decode("your-base58-private-key"));
+const OWNER = wallet.publicKey.toBase58();
+
+async function apiCall(method: string, path: string, body?: object) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: { "Content-Type": "application/json", "x-api-key": API_KEY },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) throw new Error(`API error: ${await res.text()}`);
+  return res.json();
+}
+
+function signTx(base64Tx: string): string {
+  const buffer = Buffer.from(base64Tx, "base64");
+  try {
+    const tx = VersionedTransaction.deserialize(buffer);
+    tx.sign([wallet]);
+    return Buffer.from(tx.serialize()).toString("base64");
+  } catch {
+    const tx = Transaction.from(buffer);
+    tx.partialSign(wallet);
+    return tx.serialize({ requireAllSignatures: false, verifySignatures: false }).toString("base64");
+  }
+}
+
+// ===================== ZAP-IN =====================
+async function zapIn(poolAddress: string, amountSOL: number) {
+  const info = await apiCall("GET", `/pools/${poolAddress}/info`);
+  const activeBin = info.data.liquidityViz?.activeBin;
+  const fromBinId = activeBin.binId - 34;
+  const toBinId = activeBin.binId + 34;
+
+  const addTx = await apiCall("POST", `/pools/${poolAddress}/add-tx`, {
+    stratergy: "Spot",
+    inputSOL: amountSOL,
+    percentX: 0.5,
+    fromBinId,
+    toBinId,
+    owner: OWNER,
+    slippage_bps: 500,
+    mode: "zap-in",
+  });
+
+  const signedSwapTxs = addTx.data.swapTxsWithJito.map(signTx);
+  const signedAddTxs = addTx.data.addLiquidityTxsWithJito.map(signTx);
+
+  const result = await apiCall("POST", "/pools/landing-add-tx", {
+    lastValidBlockHeight: addTx.data.lastValidBlockHeight,
+    swapTxsWithJito: signedSwapTxs,
+    addLiquidityTxsWithJito: signedAddTxs,
+    meta: addTx.data.meta,
+  });
+
+  console.log(`Zap-In done: https://solscan.io/tx/${result.data.signature}`);
+  return addTx.data.meta.positionPubKey;
+}
+
+// ===================== ZAP-OUT =====================
+async function zapOut(positionId: string, bps: number = 10000) {
+  const decreaseTx = await apiCall("POST", "/position/decrease-tx", {
+    position_id: positionId,
+    bps,
+    owner: OWNER,
+    slippage_bps: 500,
+    output: "allBaseToken",
+  });
+
+  const signedCloseTxs = decreaseTx.data.closeTxsWithJito.map(signTx);
+  const signedSwapTxs = decreaseTx.data.swapTxsWithJito.map(signTx);
+
+  const result = await apiCall("POST", "/position/landing-decrease-tx", {
+    lastValidBlockHeight: decreaseTx.data.lastValidBlockHeight,
+    closeTxs: [],
+    swapTxs: [],
+    closeTxsWithJito: signedCloseTxs,
+    swapTxsWithJito: signedSwapTxs,
+  });
+
+  console.log(`Zap-Out done: https://solscan.io/tx/${result.data.signature}`);
+}
+
+// ===================== MAIN =====================
+async function main() {
+  // Discover a pool
+  const discover = await apiCall("GET", "/pools/discover?" + new URLSearchParams({
+    chain: "SOL", sortBy: "vol_24h", sortOrder: "desc", pageSize: "1",
+  }));
+  const pool = discover.data[0];
+  console.log(`Pool: ${pool.token0_symbol}/${pool.token1_symbol}`);
+
+  // Zap-In: add 0.1 SOL of liquidity
+  const positionKey = await zapIn(pool.pool, 0.1);
+  console.log(`Position created: ${positionKey}`);
+
+  // Check position status
+  const positions = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}`);
+  const position = positions.data.find((p: any) => p.pool === pool.pool);
+  if (position) {
+    console.log(`Position value: $${position.currentValue}, PnL: ${position.pnl.percent}%`);
+
+    // Zap-Out: withdraw 100% to SOL
+    await zapOut(position.id, 10000);
+  }
+}
+
+main().catch(console.error);
+```
+
+</Accordion>
+
+## 下一步
+
+- [自动再平衡机器人](/zh/tutorials/auto-rebalance-bot)：构建一个自动监控并再平衡仓位的机器人
+- 查看完整的 [API 参考文档](/zh/api-reference/introduction)，了解所有可用接口

@@ -1,52 +1,59 @@
 ---
 title: "Fee Structure"
-description: "Simple and transparent fee structure for LP Agent services"
+description: "What LP Agent charges, and when"
 ---
 
-## Our Fee Structure
+## How fees work
 
-LP Agent charges one of two fees, depending on how your position is managed.
+What you pay depends on **who presses the button**: you, or LP Agent's automation acting for you.
 
 <CardGroup cols={2}>
-  <Card title="Automated" icon="robot">
+  <Card title="When automation acts" icon="robot">
     <div className="mt-2">
       <span className="text-2xl font-bold text-primary">8%</span>
       <div className="mt-2 text-sm">
-        Of claimed LP fees on positions run by automation: **Copy LP**, **Take Profit**, and **Stop Loss**.
+        Of the LP fees collected when LP Agent closes a position or collects fees for you: **Copy LP** following a leader, **Take Profit** and **Stop Loss**.
       </div>
     </div>
   </Card>
-  <Card title="Manual" icon="hand-pointer">
+  <Card title="When you act" icon="hand-pointer">
     <div className="mt-2">
       <span className="text-2xl font-bold text-primary">0.1%</span>
       <div className="mt-2 text-sm">
-        Of the amount when you manually add or remove liquidity from the **pool page**.
+        Of the amount when you add or remove liquidity yourself: zap in, increase, decrease or zap out.
       </div>
     </div>
   </Card>
 </CardGroup>
 
-| How the position is handled                 | Fee                      |
-| ------------------------------------------- | ------------------------ |
-| Copy LP                                     | 8% of claimed LP fees    |
-| Auto Take Profit                            | 8% of claimed LP fees    |
-| Auto Stop Loss                              | 8% of claimed LP fees    |
-| Manual add / remove liquidity via pool page | 0.1% of the amount       |
+| Action | Fee |
+| --- | --- |
+| Copy LP opens a position for you | 0% |
+| Copy LP closes, reduces or claims fees when the leader does | 8% of the LP fees collected |
+| Take Profit or Stop Loss closes a position | 8% of the LP fees collected |
+| You add liquidity (zap in, increase) | 0.1% of the amount you put in |
+| You remove liquidity (decrease, zap out, close) | 0.1% of the amount paid out |
+| Compound (Solana DLMM) | 0% |
+| Swaps | 0% |
+| [Claim SOL](/features/claim-sol) | 0% |
+| Deposits and withdrawals | 0% |
 
-**Example (automated):** A Copy LP position earns $100 in LP fees. When those fees are claimed, LP Agent takes $8. If the position earns nothing, you pay nothing
+The rule follows the action, not how the position was opened. A position you opened yourself and closed by your stop loss pays 8% of its LP fees. A copied position you close yourself pays 0.1%.
 
-**Example (manual):** You add $1,000 of liquidity from the pool page. LP Agent takes $1
+**Example (automation):** a copied position earned 1 SOL in LP fees. When the leader exits and your copy closes, LP Agent takes 0.08 SOL. If the position earned no fees, you pay nothing.
 
-## No Hidden Fees
+**Example (manual):** you zap in 10 SOL from the pool page. LP Agent takes 0.01 SOL.
 
-<Check>No monthly subscription fees</Check>
-<Check>No management fees</Check>
-<Check>No withdrawal lockups</Check>
+## No hidden fees
+
+<Check>No subscription</Check>
+<Check>No management fee on your capital</Check>
+<Check>No withdrawal fee or lockup</Check>
 
 <Warning>
-  Normal protocol costs, such as network gas fees and pool trading fees, still apply.
+  Network costs still apply: Solana transaction fees and position rent, Robinhood Chain gas, swap slippage, and the pool's own trading fees. Meteora also charges a one-time rent when you are the first LP in a price bin. The app shows it before you create the position.
 </Warning>
 
-<Card title="Ready to Start?" icon="rocket" href="/quickstart">
-  Start optimizing your liquidity positions with our transparent fee structure
-</Card>
+<Tip>
+  Referral cashback gives part of these fees back to you every month. See [Referral Program](/referral).
+</Tip>

@@ -1,0 +1,113 @@
+---
+title: "Account & Wallet"
+description: "Sign-in options, your agent wallet, deposits, withdrawals and private key export"
+---
+
+## Signing in
+
+Press **Connect Wallet** in the header. You can sign in with:
+
+| Method | How it works |
+| --- | --- |
+| **Wallet extension** (Phantom, Solflare, MetaMask, Rabby and others) | Pick your wallet and approve a sign-in message. No transaction, no gas. The wallet you used last is at the top. |
+| **WalletConnect** (desktop) | Scan the QR code with your phone's wallet, approve the connection, then approve the sign-in message. |
+| **Phone** | Pick your wallet from the list or search for it. Some wallets open LP Agent inside their own browser. If your wallet is not listed, open LP Agent in your wallet's built-in browser and connect from there. |
+| **Email** | Enter your email and type the 6-digit code you receive. The code comes from our wallet provider, Turnkey, and expires after a few minutes. |
+
+A quick browser check runs before your wallet is asked to sign. It normally passes on its own.
+
+### One network per account
+
+Your account is tied to one network:
+
+- Sign in with a **Solana** wallet for Meteora DLMM and DAMM v2 pools.
+- Sign in with an **EVM** wallet (0x address) for Uniswap V3 and V4 pools on Robinhood Chain.
+- A new **email** account asks you to pick **Solana** or **Robinhood** once.
+
+You can still browse pools and wallets on the other network, but you can only open or copy positions on your account's network.
+
+### Accounts created before the wallet upgrade
+
+LP Agent moved to a new wallet infrastructure in September 2026. Most existing accounts were moved over and **kept the same agent wallet address**: just connect the same wallet you always used.
+
+If your account was not moved yet, the app says so and opens your previous login for you. You can also use **Already have an LP Agent account? Use your existing login** at the bottom of the wallet picker.
+
+### Sessions
+
+You stay signed in while you use the app, for up to 7 days. **Disconnect** (in the account panel) signs you out on this device.
+
+## Your agent wallet
+
+Every account has an **agent wallet** (shown as **Embedded Wallet** in the app). It is the wallet LP Agent opens, copies and closes positions from, so you don't have to sign every transaction.
+
+- It is separate from the wallet you sign in with.
+- You fund it and you can withdraw from it at any time.
+- You can export its private key and import it into any wallet.
+- Automation can only do LP actions and swaps with it. See [Security](/security).
+
+Open the account panel by clicking your address in the header.
+
+<Frame>
+  ![Account panel](/images/app/rh-account-panel.png)
+  <em>The account panel: your agent wallet, Deposit, Withdraw, Settings and your assets</em>
+</Frame>
+
+The panel shows:
+
+- **Signed in with**: the wallet (or email) you signed in with, when it differs from the agent wallet.
+- **Embedded Wallet**: your agent wallet address, with a copy button.
+- **Deposit**, **Withdraw** and **Settings**.
+- **Assets**: your tokens with their value. Small balances under $1 are folded behind **Show all**. Tap a token to swap it.
+- **Get API Key**, **Docs**, **Disconnect**, and links to our Discord and X.
+
+<Note>
+  Accounts created before the upgrade that never granted access see **Grant full access** instead of Deposit and Withdraw. Granting access creates the agent wallet.
+</Note>
+
+## Deposit
+
+Press **Deposit** in the header or in the account panel.
+
+- **From (your wallet name)**: type an amount or press **Max**, then press **Deposit** and confirm in your wallet. Max keeps a tiny amount behind for the network fee.
+- **Receive**: a QR code and the agent wallet address. Send from any wallet or exchange. Only send on the network shown, or the funds may be lost.
+
+| Network | Deposit | Notes |
+| --- | --- | --- |
+| Solana | SOL | Minimum 0.001 SOL. |
+| Robinhood Chain | ETH | ETH pays gas. To fund positions in USDG, deposit USDG with **Receive** and set **Base Token** to USDG in Settings. |
+
+Email sign-ins only have **Receive**. There is no card or bank purchase in the app: buy crypto elsewhere and send it in.
+
+## Withdraw
+
+Press **Withdraw** in the account panel. It takes three steps:
+
+1. **Select Token**: any token in your agent wallet.
+2. **Destination and Amount**: paste the address, or use your primary (sign-in) wallet.
+3. **Review and confirm**: check the address carefully. A withdrawal cannot be undone.
+
+You approve the withdrawal yourself: your sign-in wallet signs it, or an email account confirms with a code. LP Agent takes no fee on withdrawals; only the network fee applies.
+
+## Export your private key
+
+Go to **Settings > Account > Export Private Key** and press **Export**.
+
+1. Your sign-in wallet asks you to sign once to approve the export. Email accounts may be asked for a code.
+2. Press **Reveal private key**. The key is shown inside a secure frame from our wallet provider. LP Agent never sees it.
+3. Store it somewhere safe. It disappears when you close the window.
+
+<Warning>
+  Anyone with this key controls the wallet and everything in it. Never share it or paste it into a website.
+</Warning>
+
+You can import the key into Phantom, Solflare, Backpack, MetaMask, Rabby or any other wallet for the same network.
+
+## Install LP Agent as an app
+
+LP Agent works as an installable web app:
+
+- **Desktop Chrome or Edge**: open the browser menu and choose **Install app**.
+- **Android**: open the browser menu and choose **Add to Home Screen** or **Install app**.
+- **iPhone**: in Safari, tap **Share**, then **Add to Home Screen**. You need this for push notifications on iPhone.
+
+See [Notifications](/features/notifications) to get a ping when your positions or copies move.

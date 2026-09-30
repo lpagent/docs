@@ -1,0 +1,147 @@
+---
+title: "CLI"
+description: "在终端或 AI Agent 工作流里使用 LP Agent"
+---
+
+## LP Agent CLI
+
+`lpagent` 是 LP Agent 的命令行工具。
+
+用户和 AI Agent 可以用它在终端脚本里发现池子、查看仓位，以及执行 zap-in/zap-out 交易流程。
+
+- 可以作为独立 CLI 使用
+- 在编程 Agent 环境里也很好用
+- JSON 输出方便自动化，表格输出方便人看
+
+<Card title="CLI 仓库" icon="github" href="https://github.com/lpagent/cli">
+  LP Agent CLI 的源代码、版本发布和 issue 跟踪。
+</Card>
+
+## 安装
+
+### 一键安装脚本
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/lpagent/cli/main/install.sh | bash
+```
+
+### 其他安装方式
+
+```bash
+# Go install
+go install github.com/lpagent/cli/cmd/lpagent@latest
+
+# Build from source
+git clone https://github.com/lpagent/cli.git && cd cli
+make build
+./bin/lpagent --help
+```
+
+## 初始设置
+
+```bash
+lpagent auth set-key
+lpagent auth set-default-owner <wallet-address>
+```
+
+然后验证能否正常访问：
+
+```bash
+lpagent positions open -o table --native
+```
+
+## 核心命令组
+
+### 仓位
+
+```bash
+lpagent positions open --owner <addr>
+lpagent positions historical --owner <addr> --from 2025-01-01
+lpagent positions overview -o table --native
+lpagent positions logs --position <id>
+lpagent positions get --position <id>
+lpagent positions revenue <addr>
+```
+
+### 池子
+
+```bash
+lpagent pools discover --chain SOL --sort-by tvl
+lpagent pools info <poolId>
+lpagent pools positions <poolId> --status Open
+lpagent pools onchain-stats <poolId>
+lpagent pools top-lpers <poolId>
+```
+
+### Zap-In / Zap-Out 交易流程
+
+```bash
+# Zap-In
+lpagent pools add-tx <poolId> --owner <addr> --strategy Spot --input-sol 1
+lpagent pools landing-add-tx --file signed-tx.json
+
+# Zap-Out
+lpagent tx decrease-quotes --id <id> --bps 10000
+lpagent tx decrease-tx --position-id <id> --bps 10000 --owner <addr> --slippage-bps 500
+lpagent tx landing-decrease-tx --file signed-tx.json
+```
+
+### 代币和原始 API 访问
+
+```bash
+lpagent token balance --owner <addr>
+
+lpagent api get /lp-positions/opening --query "owner=<addr>"
+lpagent api post /position/decrease-quotes --data '{"id":"...","bps":5000}'
+```
+
+## 输出模式
+
+所有命令都支持：
+
+- `json`（默认）
+- `table`
+- `quiet`
+
+用法：
+
+```bash
+lpagent positions open -o json
+lpagent positions open -o table --native
+```
+
+## 配置
+
+配置文件路径：
+
+- `~/.lpagent/config.json`
+
+覆盖来源：
+
+| 变量 | Flag | 说明 |
+| --- | --- | --- |
+| `LPAGENT_API_KEY` | `--api-key` | API key |
+| `LPAGENT_API_URL` | - | API 基础 URL |
+| `LPAGENT_DEFAULT_OWNER` | `--owner` | 默认钱包地址 |
+
+优先级顺序：
+
+1. CLI flag
+2. 环境变量
+3. 配置文件
+
+## AI Agent 使用模式
+
+把 `lpagent` 集成到 AI 工作流时：
+
+1. 优先用 `-o json`，方便机器解析
+2. 钱包签名要限制在可信的运行环境内
+3. 执行命令之前，先跑一步只读查询（`positions open`、`pools info`）
+4. 用“生成交易 + landing 命令”成对执行，更可靠
+
+## 相关文档
+
+- [AI API 指南](/zh/ai-api-guide)
+- [API 参考](/zh/api-reference/introduction)
+- [Zap-In 和 Zap-Out 教程](/zh/tutorials/add-liquidity-api)
+- [自动再平衡机器人教程](/zh/tutorials/auto-rebalance-bot)

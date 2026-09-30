@@ -1,0 +1,87 @@
+---
+title: "创建仓位"
+description: "用单一代币 Zap In 进池子，选好价格区间和策略"
+---
+
+从[池子](/zh/features/pools)页面打开一个池子。右边的面板就是用来添加流动性的。仓位从你的[代理钱包（agent wallet）](/zh/account-and-wallet)开出，所以不会弹出钱包确认窗口。
+
+<Tabs>
+  <Tab title="Solana（Meteora）">
+    <Frame>
+      ![Create Position 面板](/images/app/sol-create-position.png)
+      <em>DLMM 池子上的 Create Position：金额、代币分配、策略、预览和价格区间</em>
+    </Frame>
+
+    ### 1. 投入资金
+
+    - **Zap In**（单币入池，默认）：只用 SOL 付款。价格区间需要的代币，LP Agent 会帮你兑换。
+    - **Both Tokens**（双币）：两种代币都由你自己投入。每个代币旁边有一个 **Swap** 按钮，方便你换到另一边的代币。
+
+    输入 SOL 数量（或者用 **$** 开关改成 USD），用 **HALF** 或 **MAX**，或者点一个预设：**0.1 SOL**、**0.5 SOL**、**1 SOL**、**5 SOL**。超过你余额的预设会变灰。滑杆图标可以编辑你的预设（最多 6 个）。
+
+    **Token Distribution**（代币分配）决定你的 SOL 在两种代币之间怎么分，默认 50/50。如果你的价格区间完全在当前价格的一侧，它会被锁定：区间在价格下方就是 100% SOL（不用兑换），区间在价格上方就是 100% 代币。
+
+    ### 2. 策略（DLMM）
+
+    你的流动性在区间内各个价格 bin 上怎么分布：
+
+    | 策略 | 形状 | 适合 |
+    | --- | --- | --- |
+    | **Spot** | 均匀分布 | 价格稳定 |
+    | **Curve** | 集中在区间中间 | 窄幅横盘的行情，在价格附近赚更多手续费 |
+    | **Bid-Ask**（默认） | 两端更多 | 吃波动，跌的时候买、涨的时候卖 |
+
+    预览图会准确显示你的流动性在当前价格周围怎么摆。
+
+    ### 3. 价格区间
+
+    选一个预设，或者自己设：
+
+    - **±5%**（默认）、**±10%**：把当前价格包在中间。
+    - **-50%**、**-70%**：整个区间都在当前价格下方。这是单边、只用 SOL 的仓位，价格下跌时一路买入代币。
+    - 输入 **Min Price** 和 **Max Price**，按 1% 一档调整，或者在图上拖线。
+
+    面板会显示你的区间覆盖了多少个 bin。区间在你打开面板时就定下来了，不会跟着实时价格变。
+
+    ### 确认前要看的费用
+
+    汇总里会显示需要的 SOL、**position rent**（仓位租金，平仓时退回）以及可能产生的 **new price bin rent**（新价格 bin 租金）。如果你是这个池子某些价格 bin 里的第一个 LP，Meteora 会对每个新开的 bin 收一次性租金，平仓后这笔钱留在池子里。把区间收窄就能避开。
+
+    按 **Create Position**。交易上链后，仓位会在几秒后出现在你的 Portfolio 上，这段时间它正在从链上同步。
+
+    <Note>
+      DAMM v2 池子的表单更简单：输入 SOL 数量，按 **Create Position**。没有策略和区间要设；SOL 会按池子的比例拆分。
+    </Note>
+  </Tab>
+  <Tab title="Robinhood Chain（Uniswap）">
+    <Frame>
+      ![Zap In 面板](/images/app/rh-zap-in-panel.jpg)
+      <em>Uniswap V3 池子上的 Zap In</em>
+    </Frame>
+
+    ### 1. 投入资金
+
+    - **Zap In**（默认）：用 **ETH** 或 **USDG** 付款，LP Agent 帮你拆成交易对的两种代币。默认用你在 Settings 里设的 **Base Token**（基础代币）。你永远不需要 WETH，它会显示成 ETH。用 ETH 付款时，会留一点付 Gas。
+    - **Both Tokens**：两种代币原样存入，不做兑换。放不进你区间的部分会退回给你。
+
+    用 **HALF**、**MAX** 或 ETH 预设（**0.01**、**0.05**、**0.1**、**0.5 ETH**）。
+
+    ### 2. 价格区间
+
+    - **±5%**（默认）、**±10%**：把当前价格包在中间。区间越窄，价格待在区间里的时候你赚的手续费越多。
+    - **-50%**、**-70%**：单边，在当前价格下方。价格跌进区间后才开始赚钱。
+    - 自定义 **Min Price** 和 **Max Price**，单位是每个代币多少 USD，和图表用同一个刻度。也可以在图上拖线。
+
+    价格会自动对齐到池子的 tick spacing（tick 间距）。
+
+    ### 3. 确认
+
+    确认卡片会显示 **Swap slippage**（兑换滑点，齿轮图标打开 Settings）、**You deposit**、**Price range**、**Current price** 和 **Signed by: Your agent wallet**。按 **Zap In**。
+  </Tab>
+</Tabs>
+
+## 小贴士
+
+- 每个新仓位按你投入金额的 0.1% 收费。详见[费用](/zh/fee)。
+- 在 [Settings](/zh/features/settings) 里打开 **Auto TP/SL**，每个新仓位都会自动带上止盈和止损；也可以给每个仓位单独设置。详见[止盈与止损](/zh/features/take-profit-stop-loss)。
+- 想照着别人的设置来？在 **Positions In Pool** 里某一行按 **Copy**，就能把那个仓位的价格区间和策略载入面板。

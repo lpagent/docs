@@ -1,0 +1,60 @@
+---
+title: "Notifications"
+description: "Get a push when a position closes or a copy opens, closes or fails"
+---
+
+LP Agent can send push notifications to your phone or computer, even when the tab is closed.
+
+## Turn them on
+
+<Steps>
+  <Step title="Open Settings > Account">
+    From the account panel, press **Settings**, then the **Account** tab.
+  </Step>
+  <Step title="Switch on System Notifications">
+    Your browser asks for permission. Allow it.
+  </Step>
+  <Step title="Enable this device">
+    Each device subscribes separately. If you see "Notifications are on, but this device isn't receiving them yet", press **Enable on this device**.
+  </Step>
+  <Step title="Test it">
+    Press **Send test notification**.
+  </Step>
+</Steps>
+
+You can also press **Turn on** on the banner at the top of the **Copy LP** page.
+
+<Frame>
+  ![Notification settings](/images/app/settings-account.png)
+  <em>Settings > Account: System Notifications and per-event switches</em>
+</Frame>
+
+## What you can be notified about
+
+Every event is on by default once System Notifications is on. Switch off the ones you don't want.
+
+| Group | Event | When |
+| --- | --- | --- |
+| **Auto exits** | **Take profit hit** | Your take profit closed a position. Sent with the final PnL. |
+| | **Stop loss hit** | Your stop loss closed a position. Sent with the final PnL. |
+| **Copy trading activity** | **Position opened** | Your copy opened a position after your leader did. |
+| | **Position increased** | Liquidity was added to a copy. |
+| | **Position decreased** | Liquidity was removed from a copy. |
+| | **Position closed** | Your leader exited and your copy followed. Sent with the final PnL. |
+| | **Fees claimed** | Fees were claimed on a copy. |
+| | **Copy failed** | A copy could not go through, for example out of gas, slippage or low balance. |
+| | **Copy skipped** | Your filters turned a copy down, like the token quality floor or a blocked pool. |
+
+You also get a push if LP Agent pauses your copies because your agent wallet is out of funds.
+
+## iPhone and iPad
+
+iOS only sends push notifications to apps on your Home Screen:
+
+1. Open [app.lpagent.io](https://app.lpagent.io) in Safari.
+2. Tap **Share**, then **Add to Home Screen**.
+3. Open LP Agent from your Home Screen and turn notifications on there.
+
+## Stop notifications
+
+Switch off **System Notifications**, or switch off single events. Pressing **Disconnect** also removes this device's subscription.

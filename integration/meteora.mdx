@@ -1,37 +1,49 @@
 ---
 title: "Meteora Integration"
-description: "Optimize your Meteora liquidity positions with LP Agent"
+description: "Meteora DLMM and DAMM v2 pools on Solana in LP Agent"
 ---
 
 ## Overview
 
-LP Agent seamlessly integrates with Meteora's dynamic liquidity pools, providing AI-powered automation to help you maximize yields while minimizing risks on one of Solana's most innovative DeFi protocols.
+On Solana, LP Agent works with [Meteora](https://www.meteora.ag)'s two main pool types. Everything is funded in SOL from your agent wallet, and closes swap back to SOL.
 
-## Monitoring & Management
+<CardGroup cols={2}>
+  <Card title="DLMM" icon="chart-column">
+    Liquidity sits in **price bins**. You pick a range and a **strategy** that shapes how your liquidity spreads across the bins: **Spot**, **Curve** or **Bid-Ask**. Fees can change with volatility (dynamic fees).
+  </Card>
+  <Card title="DAMM v2" icon="chart-area">
+    Liquidity is spread over **one price range**. No bins and no strategy to pick: put in SOL and it is split by the pool's ratio.
+  </Card>
+</CardGroup>
 
-<AccordionGroup>
-  <Accordion title="Position Metrics">
-    - Real-time APR tracking
-    - Fee accumulation rate
-    - Price range status
-    - Impermanent loss calculator
-  </Accordion>
-  
-  <Accordion title="Automation Status">
-    - Last rebalance timestamp
-    - Compound history
-    - Strategy adjustments
-  </Accordion>
+## What you can do
 
-  <Accordion title="Risk Indicators (Soon)">
-    - Volatility metrics
-    - Range efficiency
-    - IL exposure
-    - Market direction indicators
-  </Accordion>
-</AccordionGroup>
+| | DLMM | DAMM v2 |
+| --- | --- | --- |
+| Zap in with SOL | Yes, with strategy, range and live preview | Yes |
+| Deposit both tokens | Yes | - |
+| Increase | Yes | From the pool page |
+| Decrease | By % or by price band | By % |
+| Zap out to SOL | Yes, with estimates and one-click zap out | Yes |
+| Claim fees | Yes (fees in the other token are swapped to SOL) | Yes |
+| Compound | Yes | - |
+| Take profit / stop loss | Yes | Yes |
+| Copy LP | Yes, filtered by strategy | Yes |
+
+See [Create a Position](/features/create-position) and [Manage Positions](/features/manage-positions).
+
+## Costs to know on Solana
+
+- **Position rent**: Solana holds a small rent deposit for each position. You get it back when the position closes.
+- **New price bin rent (DLMM)**: if you are the first LP in some price bins of a pool, Meteora charges a one-time rent to open them, and it stays with the pool. The Create Position panel shows it before you confirm. Narrow your range to avoid it.
+- **Token account rent**: every token you touch leaves a small account behind. Get that SOL back with [Claim SOL](/features/claim-sol).
+- **Transaction fees**: keep a little SOL spare. Actions warn you at 0.01 SOL or less.
+
+## Meteora rewards
+
+- **Meteora referral rewards**: LP Agent wallets are linked to Meteora's referral program, which pays 2% of Meteora's protocol fees on your DLMM positions, in USDC. See [Referral Program](/referral#meteora-referral-rewards-solana).
+- **MET airdrops**: see [Meteora Airdrop](/integration/meteora-airdrop).
 
 <Warning>
-  While Meteora stable pools are designed for minimal volatility, always monitor
-  your positions and maintain appropriate risk management settings.
+  DLMM ranges earn only while the price is inside them. When the price leaves your range, you hold only one of the two tokens and stop earning fees until it comes back or you move the position.
 </Warning>

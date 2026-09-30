@@ -7,13 +7,13 @@ description: "End-to-end guide: add liquidity (zap-in) and withdraw liquidity (z
 
 By the end of this tutorial, you'll know how to programmatically:
 
-- **Zap-In** — Find a pool and add liquidity with a single token (SOL)
-- **Zap-Out** — Withdraw your liquidity back to your wallet
+- **Zap-In**: Find a pool and add liquidity with a single token (SOL)
+- **Zap-Out**: Withdraw your liquidity back to your wallet
 
-No smart contract knowledge required — LP Agent handles everything through simple REST APIs.
+No smart contract knowledge required: LP Agent handles everything through simple REST APIs.
 
 <Tip>
-LP Agent provides built-in transaction landing via Jito bundles for both zap-in and zap-out. This gives you a **significantly better landing rate** than submitting transactions directly via RPC — and it's free to use.
+LP Agent provides built-in transaction landing via Jito bundles for both zap-in and zap-out. This gives you a **significantly better landing rate** than submitting transactions directly via RPC: and it's free to use.
 </Tip>
 
 ---
@@ -66,7 +66,7 @@ Before diving into code, here are the key concepts:
 |---------|---------------|
 | **Bin** | A price point in a Meteora DLMM pool. Liquidity is placed across a range of bins. |
 | **Active Bin** | The bin where the current price sits. Your position earns fees when the price is within your bin range. |
-| **Strategy** | How liquidity is distributed across bins — `Spot` (uniform), `Curve` (concentrated in middle), or `BidAsk` (concentrated at edges). |
+| **Strategy** | How liquidity is distributed across bins: `Spot` (uniform), `Curve` (concentrated in middle), or `BidAsk` (concentrated at edges). |
 | **BPS** | Basis points. 10000 = 100%, 5000 = 50%, 500 = 5%. Used for slippage and withdrawal amounts. |
 | **Landing** | Submitting signed transactions on-chain. LP Agent uses Jito bundles for better success rates. |
 
@@ -158,7 +158,7 @@ console.log(`Pool: ${pool.token0_symbol}/${pool.token1_symbol} (${pool.pool})`);
 console.log(`Protocol: ${pool.protocol}`); // "meteora" or "meteora_damm_v2"
 ```
 
-**What you get back:** A list of pools with their addresses, token pairs, TVL, volume, and protocol type. The API supports both Meteora DLMM and DAMM V2 pools — the same code works for both.
+**What you get back:** A list of pools with their addresses, token pairs, TVL, volume, and protocol type. The API supports both Meteora DLMM and DAMM V2 pools: the same code works for both.
 
 ### Step 3: Get Pool Info & Set Your Range
 
@@ -217,7 +217,7 @@ const { lastValidBlockHeight, swapTxsWithJito, addLiquidityTxsWithJito, meta } =
 const signedSwapTxs = swapTxsWithJito.map(signTransaction);
 const signedAddTxs = addLiquidityTxsWithJito.map(signTransaction);
 
-// Submit via LP Agent's Jito integration (better landing rate — free!)
+// Submit via LP Agent's Jito integration (better landing rate: free!)
 const landRes = await apiCall("POST", "/pools/landing-add-tx", {
   lastValidBlockHeight,
   swapTxsWithJito: signedSwapTxs,
@@ -342,7 +342,7 @@ Always use the `landing-decrease-tx` endpoint instead of submitting transactions
 
 ### Tips
 
-- **Transaction landing**: Always use LP Agent's landing endpoints instead of direct RPC. Better success rates via Jito — for free.
+- **Transaction landing**: Always use LP Agent's landing endpoints instead of direct RPC. Better success rates via Jito: for free.
 - **DAMM V2 pools**: Both zap-in and zap-out auto-detect pool types. The same code works for DLMM and DAMM V2.
 - **Partial zap-out**: Use `bps` less than 10000 to withdraw only a portion (e.g., `5000` = 50%).
 
@@ -473,5 +473,5 @@ main().catch(console.error);
 
 ## Next Steps
 
-- [Auto-Rebalancing Bot](/tutorials/auto-rebalance-bot) — Build a bot that monitors and rebalances positions automatically
+- [Auto-Rebalancing Bot](/tutorials/auto-rebalance-bot): Build a bot that monitors and rebalances positions automatically
 - Explore the full [API Reference](/api-reference/introduction) for all available endpoints

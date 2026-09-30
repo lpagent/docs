@@ -9,13 +9,13 @@ An auto-rebalancing bot that runs on a loop and:
 
 1. **Monitors** your open LP positions every 60 seconds
 2. **Detects** when a position goes out of range (stops earning fees)
-3. **Zap-Out** — withdraws liquidity back to SOL
-4. **Zap-In** — re-enters with a new position centered around the current price
+3. **Zap-Out**: withdraws liquidity back to SOL
+4. **Zap-In**: re-enters with a new position centered around the current price
 
-No smart contract knowledge needed — the bot uses LP Agent's Open API for everything.
+No smart contract knowledge needed: the bot uses LP Agent's Open API for everything.
 
 <Tip>
-All transactions are landed via LP Agent's built-in Jito integration, which provides a **significantly better landing rate** than submitting directly via RPC — and it's completely **free**.
+All transactions are landed via LP Agent's built-in Jito integration, which provides a **significantly better landing rate** than submitting directly via RPC: and it's completely **free**.
 </Tip>
 
 ---
@@ -109,7 +109,7 @@ These snippets show how to extend the bot. Each one plugs into the rebalance loo
 
 ### Add a Stop-Loss
 
-Exit positions that have lost too much value — don't throw good money after bad:
+Exit positions that have lost too much value: don't throw good money after bad:
 
 ```typescript
 const STOP_LOSS_PERCENT = -15; // exit at -15% PnL
@@ -214,7 +214,7 @@ const CONFIG = {
 - **Check interval**: 60s is a good default. Too fast = unnecessary API calls. Too slow = missed fees while out of range.
 - **Gas costs**: Each rebalance costs ~0.01-0.03 SOL. Factor this into profitability.
 - **Bin range**: Wider range = fewer rebalances but lower fee APR. Find the sweet spot for your pair.
-- **Transaction landing**: LP Agent's landing endpoints use Jito bundles — no need to set up your own Jito integration.
+- **Transaction landing**: LP Agent's landing endpoints use Jito bundles: no need to set up your own Jito integration.
 
 ---
 
@@ -375,7 +375,7 @@ async function checkAndRebalance() {
       continue;
     }
 
-    log("  OUT OF RANGE — rebalancing...");
+    log("  OUT OF RANGE: rebalancing...");
 
     try {
       // 1. Zap-Out to SOL
@@ -437,6 +437,6 @@ main().catch(console.error);
 
 ## Next Steps
 
-- [Zap-In & Zap-Out Tutorial](/tutorials/add-liquidity-api) — Understand the underlying API flows
-- [Copy LP Best Practices](/tutorials/copy-lp-best-practices) — Learn from top LPers
+- [Zap-In & Zap-Out Tutorial](/tutorials/add-liquidity-api): Understand the underlying API flows
+- [Copy LP Best Practices](/tutorials/copy-lp-best-practices): Learn from top LPers
 - Explore the full [API Reference](/api-reference/introduction)

@@ -1,65 +1,83 @@
 ---
 title: "Copy LP Best Practices"
-description: "Learn the essential tips and strategies to maximize your profits when copying liquidity providers"
+description: "How to pick, size and protect your copies on Solana"
 ---
 
 ## TL;DR
 
-- Learn the style of the original wallet (their token style, the entry/exit price,...)
-- Settings Minimum Market Cap: **5M**
-- Settings Minimum Jupiter Organic Score: **50**
-- Copy wallet that have avg position age **> 20 mins (0.3hrs)**
-- Set **Stop loss at 15%**
-- Start small, increase when you feel confidence
+- Copy with **at least 5 SOL of net worth** in your agent wallet
+- Use the **suggested Copy Percentage** (your net worth ÷ the leader's)
+- Skip leaders whose **average position age is under 18 minutes**
+- Keep the token filters on: **Minimum Market Cap**, **Minimum 24h Volume**, **Minimum Holders** and **Jupiter Organic Score** (50 or higher)
+- Leave **Meme Protection** on and set a **stop loss**
+- Start small, then scale once you trust the wallet
 
-## Key Success Factors
+This page covers Solana. For Robinhood Chain, read [Copy LP on Robinhood Chain](/tutorials/copy-robinhood-best-practices).
 
-### 1. Research Token Preferences
+## 1. Copy With at Least 5 SOL of Net Worth
 
-**Token selection has a huge impact on profitability.** Before copying any wallet, conduct quick research on their trading style:
+Every copied position pays a swap in, a swap back, and Solana fees and rent on both. That cost is roughly the same whether the position is 0.05 SOL or 5 SOL, while fee income grows with size. Below a certain size, a position can be a good trade for the leader and still lose you money.
 
-- **Small Cap vs Big Cap**: Analyze whether the original wallet typically invests in small-cap tokens (higher risk/reward) or big-cap tokens (more stable)
-- **Market Focus**: Determine if they focus on specific sectors or trade across various token categories
+The copy dialog shows this advice at the bottom of the step list. It is a recommendation: nothing is blocked. Lowering your copy size doesn't fix a small wallet, it just spreads the same fixed cost over less capital.
 
-### 2. Implement Risk Management
+## 2. Size From the Two Net Worths
 
-**There are always opportunities, so protect your capital first.** Setting proper safeguards is crucial:
+**Copy Percentage** scales every leader position. To make each copy the same share of your wallet as it is of theirs:
 
-#### Essential Safety Measures:
+```text
+Copy Percentage = your net worth ÷ the leader's net worth × 100
+```
 
-<Frame>
-  ![LP Agent Architecture](/images/setting-copy.png)
-  <em>Settings for rug check</em>
-</Frame>
+The dialog computes this for you and shows it as **Suggested**, with an **Apply** button. If the suggestion hits the 1% minimum, the leader is much bigger than you, and even their normal positions arrive oversized for your wallet. That's where **Max Increase Amount per Tx** helps: it caps each copied open and each copied add.
 
-- **Rug Check**: Always enable rug pull protection to avoid honeypot tokens
-- **Minimum Market Cap**: 3M minimum market cap
-- **Jupiter Organic Score**: 50 or higher
+<Warning>
+  A Max of **0** copies nothing. To copy without a cap, leave the field empty.
+</Warning>
 
-### 3. Analyze Trading Patterns
+See [Copy Settings](/features/copy-settings#step-1-sizing).
 
-**Position timing significantly affects Copy LP performance.** Study the original LP's behavior:
+## 3. Research the Leader
 
-- **Entry Speed**: Some traders "ape in" and exit very quickly, causing lag issues for copy trading
-- **Position Duration**: Look for traders who typically hold positions for **20+ minutes**
+On [Smart LP](/features/smart-lp) and on the leader's portfolio, check:
 
-### 4. Use Stop Loss Protection
+- **Avg age**: wallets that hold for minutes make you pay the round trip on every flip. The copy dialog shows a **High-frequency** warning under 18 minutes.
+- **Win rate and EV**: a high win rate with a negative EV means small wins and big losses.
+- **Fees vs profit**: Smart LP already hides wallets whose fees are under 10% of their profit. Look for leaders whose profit is mostly fees.
+- **Token style**: small caps (higher risk, higher reward) or big caps (steadier). Look at their open and closed positions.
+- **Strategies**: DLMM leaders use Spot, Curve or Bid-Ask. In **What to copy** you can untick the strategies you don't want to follow.
 
-**Stop Loss (SL) is an excellent way to protect your capital:** I usually set it as **15%**
+## 4. Filter the Tokens
 
-### 5. Start Small and Scale Gradually
+In **Settings > Security**, set floors that every copy must pass:
 
-**Begin with minimal capital and increase as you gain confidence:**
-Recommended Approach:
+| Filter | Suggested |
+| --- | --- |
+| Jupiter Organic Score | 50 or higher |
+| Minimum Market Cap | $500,000 or more. Raise it to a few million if you only want established tokens |
+| Minimum 24h Volume | $100,000 or more |
+| Minimum Holders | 100 or more |
 
-1. **Testing Phase**: Start with 1-5% of your intended investment
-2. **Learning Phase**: Copy for 1-2 weeks to understand the wallet's patterns
-3. **Optimization Phase**: Fine-tune settings based on performance data
+Add tokens you never want to touch to the **Blacklist**. Copies that fail a filter show in Copy Logs with the reason.
+
+Leave **Meme Protection** on in the copy dialog: it skips copies where the SOL, USDC or USDT side of the pool is nearly empty.
+
+## 5. Protect Your Capital
+
+- **Stop loss**: set one in **Exit rules**. Around 15% is a common starting point. Too tight and normal price moves close you out, and every close pays swap and network costs.
+- **Fund protection**: on the Copy LP page, set a loss limit for all your copies. It pauses new copies when your closed-copy losses hit the limit, while exits keep following your leaders. See [Managing Your Copies](/features/copy-management#fund-protection-solana).
+- **Smart Token Retention**: for leaders who pull and re-add the same token within a minute, this can save a sell and a buy. It also means holding the token for a short time, so only use it where the stats in the dialog show frequent re-adds.
+
+## 6. Start Small and Scale Gradually
+
+1. **Test**: start with a small copy percentage or a low max per transaction.
+2. **Learn**: copy for 1 to 2 weeks. Check **Analysis** and **Copy Logs** to see what was copied, skipped and why.
+3. **Scale**: raise the size on the wallets that work for you, and pause the ones that don't.
 
 ## Common Mistakes to Avoid
 
-1. **Copying without research**: Never blindly copy a wallet based on recent performance alone
-2. **Ignoring risk settings**: Always prioritize capital protection over potential gains
-3. **Starting too large**: Resist the urge to deploy significant capital immediately
-4. **Not monitoring performance**: Regularly review and adjust your Copy LP strategies
-5. **Chasing quick gains**: Focus on consistent, long-term profitability
+1. **Copying with a tiny agent wallet**, where swap and network costs eat the fees
+2. **Picking a copy percentage by feel** instead of using the suggestion
+3. **Leaving Max at 0**, which copies nothing
+4. **Copying a high-frequency wallet** and paying the round trip on every flip
+5. **Turning off the token filters** to get more copies
+6. **Not checking Copy Logs** when copies stop appearing. It is usually low balance or slippage, and the fix is one click away

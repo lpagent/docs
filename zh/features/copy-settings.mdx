@@ -1,0 +1,123 @@
+---
+title: "跟单设置"
+description: "跟单弹窗里的每个选项，一步一步讲清楚"
+---
+
+在钱包的投资组合页按 **Copy LP**，或者在 **Copy LP > Copied Wallets** 下点击一个钱包，就会打开跟单弹窗。它有五个步骤。左侧栏用一行字概括每一步，你可以直接跳到想改的那一步。
+
+- **Copying on / off**（右上角）：关掉后仍然关注这个钱包，但什么都不跟。它会移到你列表里的 **Paused**。
+- **Copy**（新跟单）或 **Update Copy**（已有跟单）会一次保存所有步骤。底部会显示你有几处未保存的修改。
+- 步骤下方的框显示我们建议的跟单净资产：Solana 上 **5 SOL**，Robinhood Chain 上 **0.08 ETH**。这只是建议，不会拦住任何操作。
+
+## 第 1 步：Sizing（仓位规模）
+
+<Frame>
+  ![Sizing 步骤](/images/app/sol-copy-settings-sizing.jpg)
+  <em>Sizing：跟单比例、建议值和每笔交易上限</em>
+</Frame>
+
+| 选项 | 作用 |
+| --- | --- |
+| **Copy Method** | **Limit Per Position**：每个带单仓位按你的比例缩放。 |
+| **Copy Percentage** | 1% 到 10000% 之间的整数。超过 100% 时你的仓位会比带单钱包的更大。 |
+| **Suggested** + **Apply** | 你的净资产除以带单钱包的净资产。按这个比例跟单，每个仓位在你钱包里的占比就和在它钱包里的占比一样。 |
+| **Max Increase Amount per Tx** | 每次跟单开仓和每次跟单加仓的可选上限，单位是你的 TP/SL 币种。留空表示不设上限。 |
+| **Funding currency**（Robinhood Chain） | 显示新跟单用 ETH 还是 USDG 出资，以及你用来付 Gas 的 ETH。在 Settings 里修改。 |
+
+Copy Percentage 和 Max 至少填一个，也可以两个都填。
+
+<Warning>
+  Max 设为 **0** 就什么都不会跟。想不设上限跟单，就把这一栏留空。
+</Warning>
+
+**快进快出的钱包：** 如果带单钱包平均持仓少于 18 分钟（Solana）或 1 小时（Robinhood Chain），弹窗会显示 **High-frequency**（高频）警告。每换一次仓，你都要付一次兑换进场、一次兑换回来和网络手续费，不管这笔交易赚没赚。
+
+## 第 2 步：Exit rules（退出规则）
+
+决定你的跟单在带单钱包之前什么时候自己平仓。
+
+| 选项 | 作用 |
+| --- | --- |
+| **TP/SL Currency** | 用 SOL/ETH 还是 USD 衡量盈亏。同时决定第 1 步里 Max 的单位。 |
+| **Take Profit** | 跟单涨了这么多百分比时平仓。 |
+| **Stop Loss** | 跟单跌了这么多百分比时平仓。 |
+
+取消勾选某一项就关掉那一边。新跟单一开始用的是你账户的默认 TP/SL（新账户为 10% / 10%）。
+
+TP/SL 会在每个跟单仓位开仓时保存到这个仓位上。之后就算你暂停或停止跟单，现有的跟单仓位仍保留它们的 TP/SL。Settings 里的 **Auto TP/SL** 开关对跟单不起作用；跟单始终使用这里的退出规则。
+
+## 第 3 步：What to copy（跟单范围）
+
+选择你要跟带单钱包的哪些池子类型。取消勾选就跳过这种类型。
+
+<Tabs>
+  <Tab title="Solana">
+    <Frame>
+      ![Solana 上的跟单范围](/images/app/sol-copy-settings-what-to-copy.png)
+      <em>DLMM 及其策略，以及 DAMM V2</em>
+    </Frame>
+
+    - **DLMM**：把流动性放在价格 bin 里的 Meteora 池子。选择要跟哪些 **Strategies**（策略）：**Spot**（均匀分布）、**Curve**（集中在当前价格附近）、**BidAsk**（集中在两端）和 **Custom**（其他任何形状）。如果带单仓位用的是你取消勾选的策略，就会被跳过。
+    - **DAMM V2**：把流动性分布在一个价格区间上的 Meteora 池子。所有 DAMM V2 仓位都会被跟。
+  </Tab>
+  <Tab title="Robinhood Chain">
+    <Frame>
+      ![Robinhood Chain 上的跟单范围](/images/app/rh-copy-settings-what-to-copy.jpg)
+      <em>Uniswap V3、Uniswap V4 和带 Hook 池子的规则</em>
+    </Frame>
+
+    - **Uniswap V3**：标准池子。所有 V3 仓位都会被跟。
+    - **Uniswap V4**：没有 Hook 的池子照常跟单。**Hooked pools**（带 Hook 的池子）按你选的规则处理：
+      - **None**（默认）：跳过带 Hook 池子的跟单。
+      - **All pools**：所有带 Hook 的池子都跟。有问题的 Hook 可能锁住你的流动性，或者在你撤出时抽成，所以只有在你信任带单钱包做 LP 的那些池子时才选这个。
+      - **Specific pools**：只跟你添加的池子。搜索代币或粘贴池子 ID（0x 加 64 个字符）。弹窗会列出这个带单钱包用过的带 Hook 池子。Hook 完全不碰流动性的池子会显示 **No LP hook, copies anyway**。最多 50 个池子。
+
+    Hook 规则只作用于开仓和添加流动性。退出永远不会被拦。
+  </Tab>
+</Tabs>
+
+## 第 4 步：Protection（保护）
+
+改变 LP Agent 如何处理这个钱包交易的保护机制。
+
+<Frame>
+  ![Solana 上的 Protection 步骤](/images/app/sol-copy-settings-protection.png)
+  <em>Meme Protection 和 Smart Token Retention（Solana）</em>
+</Frame>
+
+### Meme Protection
+
+**Meme Protection**（Meme 保护）在两个网络上都默认开启。当池子里可信的那一边（SOL、USDC、USDT，或 ETH、WETH、USDG）几乎为空，也就是你的跟单有超过 95% 会落在另一种代币上时，这次跟单会被跳过。Copy Logs（跟单日志）里显示为 **Meme protection**。
+
+### Smart Token Retention（Solana，DLMM）
+
+默认关闭。带单钱包经常撤出一个仓位，一分钟后又把同一个代币加回来。正常情况下，你的跟单会在退出时卖掉这个代币，再在加回时重新买入。开启 **Smart Token Retention**（智能代币保留）后，你的跟单会 **把代币保留一小段时间**，如果同一个带单钱包把它加回来，就直接复用。这样省掉一次卖出和一次买入。
+
+| 选项 | 可选值 |
+| --- | --- |
+| **Hold for**（保留时长） | 30s、**1 min**（默认）、2 min、5 min |
+| **Sells right away if**（出现以下情况立即卖出） | **Price drops more than**（价格跌幅超过）5%（0.5% 到 50%）、**This wallet sells the token**（该钱包卖出此代币），或 **Hold time runs out**（保留时间到期） |
+
+卡片会显示过去 7 天里，这个钱包在 1 分钟内和 5 分钟内把同一个代币加回来的频率。
+
+<Warning>
+  大多数退出之后并不会再加回来。代币卖出之前价格可能下跌，这部分亏损由你承担。关闭保留功能、暂停或停止跟单，都会卖掉所有被保留的代币。
+</Warning>
+
+被保留的代币在 Copy Logs 里显示为 **Holding**，带倒计时和 **Sell now** 按钮。
+
+## 第 5 步：Label（标签）
+
+这个钱包在你的列表和 Copy Logs 里显示的名字。
+
+## 同样作用于跟单的账户级设置
+
+这些在[设置](/zh/features/settings)里，不在跟单弹窗里：
+
+- **Settings > Security**：最低市值、最低 24h 交易量、最低持有人数、Jupiter organic score（Solana）以及你的代币 **Blacklist**（黑名单）。任何一项不通过的代币都会被跳过。
+- **Settings > Swap > Slippage**：用于代理（agent）替你做的每一次兑换，包括跟单和换回（swap back）。
+- **Settings > General > Base Token** 和 **Keep ETH**（Robinhood Chain）：用 ETH 或 USDG 为跟单出资，并让 ETH 保持充足用来付 Gas。
+
+<Note>
+  在 Robinhood Chain 上，如果开仓加平仓的 Gas 超过跟单金额的 3%，自动跟单会被跳过，显示为 **Too small for gas**。
+</Note>

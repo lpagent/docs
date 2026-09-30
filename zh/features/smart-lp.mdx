@@ -1,0 +1,92 @@
+---
+title: "Smart LP"
+description: "找到靠 LP 手续费赚钱的钱包，然后跟单"
+---
+
+**Smart LP** 是值得跟的流动性提供者（LP）排行榜。打开 LP Agent 看到的第一个页面就是它。
+
+<Frame>
+  ![Smart LP 表格](/images/app/sol-smart-lp-table.jpg)
+  <em>Solana 上的 Smart LP，表格视图</em>
+</Frame>
+
+## 排的是什么
+
+| 网络 | 排名依据 |
+| --- | --- |
+| Solana | Meteora DLMM 仓位 |
+| Robinhood Chain | Uniswap V3 和 V4 仓位 |
+
+用顶栏的链选择器切换网络。数值按 **$** 开关显示为 SOL、ETH 或 USD。
+
+### 只列出通过手续费检查的钱包
+
+有些钱包账面上很好看，但靠的是自己发币、给池子注入流动性再撤走，而不是赚 LP 手续费。Smart LP 会把它们藏起来。
+
+**Fee-checked**（通过手续费检查）的意思是：如果一个钱包的 LP 手续费收益 **不到它利润的 10%**，说明利润来自代币涨价（通常是它自己发的币），这个钱包就不会上榜。在页面上按 **How we check**（我们怎么检查）查看完整说明。
+
+### 按你的钱包规模筛选（Solana）
+
+在 Solana 上，Smart LP 只显示总利润不超过 **你净资产 5 倍** 的钱包（上限最低 20 SOL）。顶部的横幅会告诉你当前上限在哪。充值更多就能看到更大的钱包。Robinhood Chain 上的列表没有上限。
+
+## 看懂表格
+
+在右上角切换 **Card**（卡片）和 **Table**（表格）视图。
+
+| 列 | 含义 |
+| --- | --- |
+| **7D PnL** | 最近 7 天的利润，附每日柱状图 |
+| **Win rate** | 已平仓仓位中赚钱的占比。70% 及以上显示绿色，低于 50% 显示红色 |
+| **30D PnL** / **All-time PnL** | 30 天和历史累计利润 |
+| **Positions** | 仓位总数，加上最近 7 天开了多少个、分布在多少个池子 |
+| **Avg age** | 这个钱包通常持仓多久 |
+| **EV** | 每个仓位的期望值：(胜率 x 平均盈利) + (亏损率 x 平均亏损)，平均亏损按负数计算 |
+| **Avg invested** | 仓位平均规模 |
+| **Monthly PnL** | 平均每月利润 |
+| **Fees** | 累计赚到的 LP 手续费收益 |
+| **Last active** | 钱包最后一次交易的时间，以及从什么时候开始活跃 |
+
+点击列标题排序（再点一次反转顺序），或者在卡片视图里用排序按钮。默认按 **All-time PnL** 排序。
+
+<Tip>
+  跟单前先看 **Avg age**。每个跟单仓位都要付一次兑换（swap）进场、一次兑换回来，再加网络手续费。几分钟就换一次仓的钱包，会让你一遍又一遍地付这笔成本。如果一个钱包在 Solana 上平均持仓少于 18 分钟，或在 Robinhood Chain 上少于 1 小时，跟单弹窗会提醒你。
+</Tip>
+
+## 筛选
+
+| 筛选项 | 默认值 |
+| --- | --- |
+| **Active**（活跃时间：Last 24h、Last 7 days、Last 30 days、Any time） | Last 7 days |
+| **Min Win Rate (%)** | 80 |
+| **Min Positions** | 50 |
+| **Min Avg Age (hrs)** | 0.2 |
+| **More filters**：Min Profit、Min Monthly Profit、Min Expected Value、Min Fees Earned、First Activity Before | 空 |
+
+按 **Filter** 应用。筛选条件会保存在这个浏览器里。**Clear** 会把它们重置。
+
+## 跟单一个钱包
+
+<Steps>
+  <Step title="打开钱包">
+    点击一行或一张卡片，打开这个钱包的投资组合（portfolio）。看看它的当前仓位和已平仓仓位、盈亏（PnL）历史和手续费。
+  </Step>
+  <Step title="按 Copy LP">
+    按钮就在钱包地址旁边。它会打开[跟单设置](/zh/features/copy-settings)。
+  </Step>
+</Steps>
+
+你只能跟单和你账户同一个网络的钱包。如果你已经在跟某个钱包，它的投资组合页会改为显示一个标签，写着你的跟单规模和退出规则；点它就能编辑。
+
+<Frame>
+  ![带单钱包的投资组合和 Copy LP 按钮](/images/app/sol-portfolio.jpg)
+  <em>一个 Smart LP 钱包的投资组合。Copy LP 就在地址旁边。</em>
+</Frame>
+
+## 某个钱包被关闭跟单时（Robinhood Chain）
+
+在 Robinhood Chain 上，LP Agent 还会检查每个带单钱包的历史。如果一个钱包的利润不是来自 LP 手续费，或者它主要在自己发的币的池子里做 LP，它的投资组合页会显示 **Copy is off for this wallet**（此钱包已关闭跟单）并写明原因，跟单按钮会变成 **Copy off**。
+
+- 你不能对这个钱包发起新的跟单。
+- 如果你已经在跟它，**新的跟单会被跳过**，但你现有的跟单仓位仍会跟着它退出。这个钱包在你的 Copied Wallets 列表里会显示 **New copies off**。
+
+另外，如果带单钱包为一个还没有价格的代币新开了一个池子，并且自己持有几乎全部流动性，这一次跟单会被单独跳过。Copy Logs（跟单日志）里显示为 **Leader's own token launch**。

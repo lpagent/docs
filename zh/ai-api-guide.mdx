@@ -1,0 +1,172 @@
+---
+title: "AI API 指南"
+description: "面向 Agent 的 LP Agent API 指南：能力、接口和自动化流程"
+---
+
+## 用途
+
+本页写给 AI 系统和开发者：想在一个地方搞清楚 LP Agent API 能做什么，以及怎么跑完整个流程。
+
+如果你在构建 Agent，从这里开始，再顺着链接去看详细教程和 API 参考页面。
+
+<Note>
+最快的机器可读文档入口：[`https://docs.lpagent.io/llms.txt`](https://docs.lpagent.io/llms.txt)
+</Note>
+
+## Base URL 和认证
+
+- **Base URL**：`https://api.lpagent.io/open-api/v1`
+- **认证方式**：在请求 header 里带上 API key
+- **Header 名称**：`x-api-key`
+
+```bash
+curl -X GET "https://api.lpagent.io/open-api/v1/pools/discover?chain=SOL&pageSize=5" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+<Warning>
+永远不要把 API key 或私钥暴露在前端代码、共享的 prompt、截图或日志里。生产环境的 Agent 请使用安全的后端。
+</Warning>
+
+## 能力一览
+
+### 1) 发现池子和市场状态
+
+- `GET /pools/discover` → 按条件筛选/排序查找池子
+- `GET /pools/{poolId}/info` → 查看池子状态和 active bin 相关信息
+- `GET /pools/{poolId}/onchain-stats` → 链上池子指标
+- `GET /pools/{poolId}/top-lpers` → 头部流动性提供者（LP）
+
+### 2) 追踪仓位和投资组合分析
+
+- `GET /lp-positions/opening` → 某个 owner 的当前仓位
+- `GET /lp-positions/historical` → 历史/已平仓仓位
+- `GET /lp-positions/overview` → 汇总的投资组合指标
+- `GET /lp-positions/logs` → 仓位活动日志
+- `GET /lp-positions/revenue/{owner}` → 收益/盈亏时间序列数据
+
+### 3) 执行流动性操作（zap-in 单币入池 / zap-out 一键出池）
+
+- `POST /pools/{poolId}/add-tx` → 生成未签名的 zap-in 交易
+- `POST /pools/landing-add-tx` → 提交已签名的 zap-in 交易
+- `POST /position/decrease-quotes` → 预览 zap-out 的输出
+- `POST /position/decrease-tx` → 生成未签名的 zap-out 交易
+- `POST /position/landing-decrease-tx` → 提交已签名的 zap-out 交易
+
+### 4) 钱包工具
+
+- `GET /token/balance` → 钱包代币余额
+
+## 端到端流程
+
+## 流程 A：发现池子 -> Zap-In
+
+适用于你的 AI 想用 SOL 开一个新的 LP 仓位。
+
+<Steps>
+  <Step title="1) 发现候选池子">
+    带上链、流动性、市值和交易量筛选条件，调用 `GET /pools/discover`。
+  </Step>
+  <Step title="2) 读取选中池子的信息">
+    调用 `GET /pools/{poolId}/info`，用 active bin 数据确定 `fromBinId` / `toBinId`。
+  </Step>
+  <Step title="3) 生成添加流动性交易">
+    调用 `POST /pools/{poolId}/add-tx`，传入 `stratergy`、`owner`、区间、滑点和投入数量。
+  </Step>
+  <Step title="4) 本地签名">
+    在你的运行环境里，用用户钱包签名 base64 交易。
+  </Step>
+  <Step title="5) 提交上链">
+    把已签名的交易提交到 `POST /pools/landing-add-tx`。
+  </Step>
+</Steps>
+
+### 流程 B：列出仓位 -> 报价 -> Zap-Out
+
+适用于你的 AI 想关闭一个 LP 仓位的全部或一部分。
+
+<Steps>
+  <Step title="1) 获取当前仓位">
+    调用 `GET /lp-positions/opening?owner=<wallet>`，选定目标仓位的 `id`。
+  </Step>
+  <Step title="2) 预览移除流动性后的输出（可选）">
+    用 `id` 和 `bps` 调用 `POST /position/decrease-quotes`。
+  </Step>
+  <Step title="3) 生成移除流动性交易">
+    调用 `POST /position/decrease-tx`，传入 `position_id`、`bps`、`owner`、`slippage_bps` 和 `output` 模式。
+  </Step>
+  <Step title="4) 本地签名">
+    用 owner 钱包签名 base64 交易。
+  </Step>
+  <Step title="5) 提交上链">
+    把已签名的交易提交到 `POST /position/landing-decrease-tx`。
+  </Step>
+</Steps>
+
+### 流程 C：自动再平衡循环
+
+适用于你的 AI 需要持续让仓位保持在区间内。
+
+1. 轮询 `GET /lp-positions/opening?owner=...`
+2. 对每个 `inRange=false` 的仓位：
+   - zap-out 旧仓位（`decrease-tx` + `landing-decrease-tx`）
+   - 检查可用的 SOL（`GET /token/balance`）
+   - 获取池子的 active bin（`GET /pools/{poolId}/info`）
+   - zap-in 新仓位（`add-tx` + `landing-add-tx`）
+3. 每隔一段时间重复一次（例如每 60 秒）
+
+## 关键参数和限制
+
+- `bps`：`0..10000`（10000 = 100%）
+- `slippage_bps`：`0..10000`
+- `percentX`：`0..1`
+- 策略枚举：`Spot`、`Curve`、`BidAsk`
+- 添加模式枚举：`normal`、`zap-in`
+- zap-out 输出枚举：`allToken0`、`allToken1`、`both`、`allBaseToken`
+- provider 枚举（仅限支持的接口）：`OKX`、`JUPITER_ULTRA`
+
+<Note>
+在请求体里，添加流动性的字段名目前是 `stratergy`（拼写以 API 定义为准）。
+</Note>
+
+## 给 Agent 开发者的运维建议
+
+- 用 landing 接口，交易成功的处理会更好
+- 签名和密钥处理只放在可信的运行环境里
+- 交易过期了（超过区块高度窗口）就重新生成
+- 对临时性的 API/网络故障，加上带退避的重试
+- 始终记录请求 ID、接口和 owner（不要泄露密钥）
+
+## 最简 TypeScript API 封装
+
+```typescript
+const API_BASE = "https://api.lpagent.io/open-api/v1";
+
+async function apiCall(method: string, path: string, apiKey: string, body?: object) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  if (!res.ok) {
+    throw new Error(`API ${method} ${path} failed: ${res.status} ${await res.text()}`);
+  }
+
+  return res.json();
+}
+```
+
+## 推荐阅读顺序
+
+1. [API 参考简介](/zh/api-reference/introduction)
+2. [通过 API 进行 Zap-In 和 Zap-Out](/zh/tutorials/add-liquidity-api)
+3. [自动再平衡机器人](/zh/tutorials/auto-rebalance-bot)
+4. [AI 页面](/zh/ai)
+
+<Card title="需要完整的接口 schema？" icon="book" href="/zh/api-reference/introduction">
+  打开 **API Reference** 标签页，查看基于 OpenAPI 生成的完整接口详情。
+</Card>

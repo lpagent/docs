@@ -1,61 +1,53 @@
 ---
 title: "Integration Overview"
-description: "LP Agent with leading DeFi protocols"
+description: "The protocols and networks LP Agent supports"
 ---
 
-## Supported Protocols
+## Supported protocols
 
-LP Agent supports liquidity protocols across two networks — Meteora on Solana and
-Uniswap V3 on Robinhood Chain:
+LP Agent supports four pool types across two networks:
 
 <CardGroup cols={2}>
   <Card href="/integration/meteora">
     <div className="flex items-center gap-2">
       <img
         src="/images/meteora.svg"
-        alt="Meteora Protocol"
+        alt="Meteora"
         className="h-8 dark:invert"
       />
-      <h3 className="text-xl font-semibold">Meteora</h3>
+      <h3 className="text-xl font-semibold">Meteora on Solana</h3>
     </div>
     <div className="mt-3">
-      Advanced dynamic liquidity pools with innovative features for both stable
-      and volatile pairs. Optimized for consistent yields and reduced
-      impermanent loss.
+      **DLMM** (liquidity in price bins, with Spot, Curve and Bid-Ask strategies) and **DAMM v2** (one price range). Funded in SOL.
     </div>
   </Card>
 
   <Card href="/integration/robinhood">
     <div className="flex items-center gap-2">
-      <h3 className="text-xl font-semibold">Robinhood Chain</h3>
+      <h3 className="text-xl font-semibold">Uniswap on Robinhood Chain</h3>
     </div>
     <div className="mt-3">
-      Uniswap V3 concentrated liquidity on Robinhood Chain (EVM, chain ID 4663).
-      Position, pool, revenue, and balance data are available through the public
-      API with `chain=ROBINHOOD`.
+      **Uniswap V3** and **Uniswap V4** concentrated liquidity on Robinhood Chain (EVM, chain ID 4663), including tokenized stock pools. Funded in ETH or USDG.
     </div>
   </Card>
 </CardGroup>
 
-## Integration Benefits
+## What works where
 
-### Automated Management
+| Feature | Meteora DLMM | Meteora DAMM v2 | Uniswap V3 | Uniswap V4 |
+| --- | --- | --- | --- | --- |
+| [Smart LP](/features/smart-lp) leaderboard | Yes | - | Yes | Yes |
+| [Copy LP](/features/copy-lp) | Yes | Yes | Yes | Yes (hooked pools opt-in) |
+| [Zap in](/features/create-position) from one token | Yes | Yes | Yes | Yes |
+| Strategies (Spot, Curve, Bid-Ask) | Yes | - | - | - |
+| [Take profit / stop loss](/features/take-profit-stop-loss) | Yes | Yes | Yes | Yes |
+| Claim fees | Yes | Yes | Yes | Yes |
+| Compound | Yes | - | - | - |
+| One-click zap out | Yes | - | - | - |
+| [Fund protection](/features/copy-management#fund-protection-solana) | Yes | Yes | - | - |
+| [Claim SOL](/features/claim-sol) | Yes | Yes | - | - |
+| [Open API](/api-reference/introduction) | Read and transactions | Read and transactions | Read | Read |
 
-- Hands-free position management
-- Optimal range selection
-- Auto-rebalancing of positions
-- Fee collection and reinvestment
+## For developers
 
-### Risk Management
-
-- Real-time monitoring
-- Automatic position adjustments
-- Take profit (TP) settings
-- Stoploss settings
-
-### Performance Analytics
-
-- Position tracking
-- Yield analytics
-- Historical performance
-- ROI calculations
+The [LP Agent Open API](/api-reference/introduction) serves pool, position and wallet data for both networks. Pass `chain=ROBINHOOD` to read Robinhood Chain data; it defaults to `SOL`. Building zap-in, zap-out and claim transactions through the API is available on Solana. See [Robinhood Chain Integration](/integration/robinhood) for the Robinhood specifics.

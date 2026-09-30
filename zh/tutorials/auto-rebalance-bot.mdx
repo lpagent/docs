@@ -1,0 +1,442 @@
+---
+title: "自动再平衡机器人"
+description: "构建一个机器人，监控你的 LP 仓位，并在仓位超出区间时自动再平衡"
+---
+
+## 你将构建什么
+
+一个循环运行的自动再平衡机器人，它会：
+
+1. 每 60 秒**监控**一次你的当前 LP 仓位
+2. **检测**仓位什么时候超出区间（不再赚取手续费）
+3. **Zap-Out**（一键出池）：把流动性提取回 SOL
+4. **Zap-In**（单币入池）：以当前价格为中心开一个新仓位，重新入场
+
+不需要智能合约知识：机器人的所有操作都通过 LP Agent 的 Open API 完成。
+
+<Tip>
+所有交易都通过 LP Agent 内置的 Jito 集成上链，**上链成功率明显高于**直接通过 RPC 提交：而且完全**免费**。
+</Tip>
+
+---
+
+## 再平衡的原理
+
+当价格移出你仓位的 bin 区间时，仓位就会**停止赚取手续费**。再平衡的做法是：平掉旧仓位，再以当前价格为中心开一个新仓位。
+
+```
+Price moves out of range:
+  [-----old position-----]
+                              ^ current price (no fees!)
+
+After rebalance:
+                     [-----new position-----]
+                              ^ current price (earning fees again!)
+```
+
+### 机器人的决策循环
+
+每个检查周期，机器人都按下面的流程执行：
+
+```
+ ┌─────────────────────────────┐
+ │  Fetch all open positions   │
+ │  GET /lp-positions/opening  │
+ └──────────┬──────────────────┘
+            │
+            ▼
+ ┌─────────────────────────────┐
+ │  For each position:         │
+ │  Is it in range?            │
+ └──────┬────────────┬─────────┘
+        │ YES        │ NO
+        ▼            ▼
+    Skip it    ┌─────────────────────────────────┐
+               │ 1. ZAP-OUT old position to SOL  │
+               │    POST /position/decrease-tx    │
+               │    POST /position/landing-...    │
+               │                                  │
+               │ 2. Check SOL balance             │
+               │    GET /token/balance             │
+               │                                  │
+               │ 3. ZAP-IN new position           │
+               │    POST /pools/{id}/add-tx       │
+               │    POST /pools/landing-add-tx    │
+               └─────────────────────────────────┘
+```
+
+### 机器人要做的关键决策
+
+| 决策 | 处理方式 |
+|----------|-----------------|
+| **要不要再平衡？** | 要，只要该仓位的 `inRange` 为 `false` |
+| **再投入多少？** | Zap-Out 之后检查 SOL 余额，预留 0.05 SOL 用作手续费 |
+| **新区间放在哪？** | 以当前 active bin 为中心，区间大小可配置 |
+| **用什么策略？** | 可配置：`Spot`、`Curve` 或 `BidAsk` |
+
+---
+
+## 前置条件
+
+- 一个 LP Agent API key
+- 一个有 SOL 可以付交易手续费的 Solana 钱包
+- Node.js >= 18
+
+```bash
+npm install @solana/web3.js bs58
+```
+
+---
+
+## 配置
+
+看代码之前，先了解一下你可能要调整的设置：
+
+| 设置 | 默认值 | 说明 |
+|---------|---------|-------------|
+| `CHECK_INTERVAL_MS` | `60000` | 检查仓位的频率（毫秒）。60s 是个不错的起点。 |
+| `SLIPPAGE_BPS` | `500` | 滑点容忍度（500 = 5%） |
+| `BIN_RANGE` | `34` | active bin 每边的 bin 数量。越宽 = 再平衡越少，APR 越低。 |
+| `STRATEGY` | `Spot` | 分布方式：`Spot`（均匀）、`Curve`（集中）或 `BidAsk`（两端） |
+| `ZAP_OUT_OUTPUT` | `allBaseToken` | 提取成 SOL，方便再次 zap-in |
+| `POOL_FILTER` | `undefined` | 只再平衡某个指定的池子，设为 `undefined` 则处理所有池子 |
+
+---
+
+## 定制思路
+
+下面这些代码片段展示了怎么扩展这个机器人。每一段都可以直接插进再平衡循环里。
+
+### 添加止损
+
+亏得太多的仓位直接退出，别再继续往里砸钱：
+
+```typescript
+const STOP_LOSS_PERCENT = -15; // exit at -15% PnL
+
+if (pnlPercent < STOP_LOSS_PERCENT) {
+  log(`  PnL ${pnlPercent}% below stop-loss, closing without re-entry`);
+  await zapOut(pos.id);
+  continue; // skip zap-in
+}
+```
+
+### 添加 Discord 通知
+
+发生再平衡时收到提醒：
+
+```typescript
+async function notify(message: string) {
+  await fetch("https://discord.com/api/webhooks/YOUR_WEBHOOK", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content: message }),
+  });
+}
+
+// In the rebalance flow:
+await notify(`Rebalanced ${pair}: new position at bins ${fromBinId}-${toBinId}`);
+```
+
+### 动态 Bin 区间
+
+波动大的池子用更宽的区间，稳定的池子用更窄的区间：
+
+```typescript
+const binStep = pos.poolInfo?.tickSpacing || 1;
+const dynamicRange = binStep > 5 ? 20 : 50; // volatile → wider, stable → tighter
+```
+
+### 按池子类型筛选
+
+只再平衡 DLMM 仓位（跳过 DAMM V2）：
+
+```typescript
+if (pos.protocol !== "meteora") {
+  log("  Skipping non-DLMM position");
+  continue;
+}
+```
+
+---
+
+## 在生产环境运行
+
+### 使用 PM2
+
+```bash
+npm install -g pm2
+pm2 start bot.ts --name "lp-rebalance-bot" --interpreter ts-node
+pm2 logs lp-rebalance-bot    # view logs
+pm2 restart lp-rebalance-bot # restart
+pm2 stop lp-rebalance-bot    # stop
+```
+
+### 使用 Docker
+
+```dockerfile
+FROM node:22-slim
+WORKDIR /app
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+COPY . .
+CMD ["npx", "ts-node", "bot.ts"]
+```
+
+### 环境变量
+
+在生产环境中，**千万不要把密钥硬编码**：
+
+```typescript
+const CONFIG = {
+  API_KEY: process.env.LP_AGENT_API_KEY!,
+  PRIVATE_KEY: process.env.SOLANA_PRIVATE_KEY!,
+  // ...
+};
+```
+
+---
+
+## 用到的 API 接口
+
+| 接口 | 用途 |
+|----------|---------|
+| `GET /lp-positions/opening` | 获取当前仓位并检查 `inRange` |
+| `GET /token/balance` | 检查 SOL 余额，用于再投入 |
+| `GET /pools/{poolId}/info` | 获取 active bin，用于设定新仓位的区间 |
+| `POST /position/decrease-tx` | 生成 zap-out 交易 |
+| `POST /position/landing-decrease-tx` | 通过 Jito 让 zap-out 交易上链 |
+| `POST /pools/{poolId}/add-tx` | 生成 zap-in 交易 |
+| `POST /pools/landing-add-tx` | 通过 Jito 让 zap-in 交易上链 |
+
+## 小贴士
+
+- **检查间隔**：60s 是个不错的默认值。太快 = 多出不必要的 API 调用。太慢 = 超出区间期间错过手续费。
+- **Gas 成本**：每次再平衡要花 ~0.01-0.03 SOL。算收益时要把这部分算进去。
+- **Bin 区间**：区间越宽 = 再平衡次数越少，但手续费 APR 越低。给你的交易对找到最合适的平衡点。
+- **交易上链**：LP Agent 的上链接口使用 Jito bundle：不需要自己搭 Jito 集成。
+
+---
+
+## 完整机器人脚本
+
+下面是完整的机器人代码，可以直接复制粘贴运行：
+
+<Accordion title="完整的自动再平衡机器人脚本">
+
+```typescript
+import { Keypair, Transaction, VersionedTransaction } from "@solana/web3.js";
+import bs58 from "bs58";
+
+// ===================== CONFIG =====================
+const CONFIG = {
+  API_BASE: "https://api.lpagent.io/open-api/v1",
+  API_KEY: "your-api-key-here",
+  PRIVATE_KEY: "your-base58-private-key",
+
+  CHECK_INTERVAL_MS: 60_000,
+  SLIPPAGE_BPS: 500,
+  BIN_RANGE: 34,
+  STRATEGY: "Spot" as const,
+  ZAP_OUT_OUTPUT: "allBaseToken" as const, // withdraw to SOL for easy re-entry
+
+  POOL_FILTER: undefined as string | undefined,
+};
+
+const wallet = Keypair.fromSecretKey(bs58.decode(CONFIG.PRIVATE_KEY));
+const OWNER = wallet.publicKey.toBase58();
+
+// ===================== HELPERS =====================
+async function apiCall(method: string, path: string, body?: object) {
+  const res = await fetch(`${CONFIG.API_BASE}${path}`, {
+    method,
+    headers: { "Content-Type": "application/json", "x-api-key": CONFIG.API_KEY },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`API ${method} ${path} failed: ${text}`);
+  }
+  return res.json();
+}
+
+function signTx(base64Tx: string): string {
+  const buffer = Buffer.from(base64Tx, "base64");
+  try {
+    const tx = VersionedTransaction.deserialize(buffer);
+    tx.sign([wallet]);
+    return Buffer.from(tx.serialize()).toString("base64");
+  } catch {
+    const tx = Transaction.from(buffer);
+    tx.partialSign(wallet);
+    return tx.serialize({ requireAllSignatures: false, verifySignatures: false }).toString("base64");
+  }
+}
+
+function log(msg: string) {
+  console.log(`[${new Date().toISOString()}] ${msg}`);
+}
+
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// ===================== ZAP-OUT =====================
+async function zapOut(positionId: string, bps: number = 10000): Promise<void> {
+  log(`  Zap-Out: withdrawing ${bps / 100}% of position to SOL...`);
+
+  const decreaseTx = await apiCall("POST", "/position/decrease-tx", {
+    position_id: positionId,
+    bps,
+    owner: OWNER,
+    slippage_bps: CONFIG.SLIPPAGE_BPS,
+    output: CONFIG.ZAP_OUT_OUTPUT,
+  });
+
+  const signedCloseTxs = decreaseTx.data.closeTxsWithJito.map(signTx);
+  const signedSwapTxs = decreaseTx.data.swapTxsWithJito.map(signTx);
+
+  const result = await apiCall("POST", "/position/landing-decrease-tx", {
+    lastValidBlockHeight: decreaseTx.data.lastValidBlockHeight,
+    closeTxs: [],
+    swapTxs: [],
+    closeTxsWithJito: signedCloseTxs,
+    swapTxsWithJito: signedSwapTxs,
+  });
+
+  log(`  Zap-Out complete: ${result.data?.signature || "success"}`);
+}
+
+// ===================== ZAP-IN =====================
+async function zapIn(poolAddress: string, amountSOL: number): Promise<string> {
+  log(`  Zap-In: adding ${amountSOL} SOL to pool ${poolAddress}...`);
+
+  const info = await apiCall("GET", `/pools/${poolAddress}/info`);
+  const activeBin = info.data.liquidityViz?.activeBin;
+
+  if (!activeBin) {
+    throw new Error("Could not get active bin for pool");
+  }
+
+  const fromBinId = activeBin.binId - CONFIG.BIN_RANGE;
+  const toBinId = activeBin.binId + CONFIG.BIN_RANGE;
+  log(`  New range: bin ${fromBinId} to ${toBinId} (active: ${activeBin.binId})`);
+
+  const addTx = await apiCall("POST", `/pools/${poolAddress}/add-tx`, {
+    stratergy: CONFIG.STRATEGY,
+    inputSOL: amountSOL,
+    percentX: 0.5,
+    fromBinId,
+    toBinId,
+    owner: OWNER,
+    slippage_bps: CONFIG.SLIPPAGE_BPS,
+    mode: "zap-in",
+  });
+
+  const signedSwapTxs = addTx.data.swapTxsWithJito.map(signTx);
+  const signedAddTxs = addTx.data.addLiquidityTxsWithJito.map(signTx);
+
+  const result = await apiCall("POST", "/pools/landing-add-tx", {
+    lastValidBlockHeight: addTx.data.lastValidBlockHeight,
+    swapTxsWithJito: signedSwapTxs,
+    addLiquidityTxsWithJito: signedAddTxs,
+    meta: addTx.data.meta,
+  });
+
+  log(`  Zap-In complete: https://solscan.io/tx/${result.data.signature}`);
+  return addTx.data.meta.positionPubKey;
+}
+
+// ===================== REBALANCE LOGIC =====================
+async function checkAndRebalance() {
+  log("Checking positions...");
+
+  const positionsRes = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}`);
+  const positions = positionsRes.data;
+
+  if (!positions || positions.length === 0) {
+    log("No open positions found");
+    return;
+  }
+
+  log(`Found ${positions.length} open position(s)`);
+
+  for (const pos of positions) {
+    if (CONFIG.POOL_FILTER && pos.pool !== CONFIG.POOL_FILTER) continue;
+
+    const pair = pos.pairName || `${pos.token0Info?.token_symbol}/${pos.token1Info?.token_symbol}`;
+    const value = parseFloat(pos.currentValue) || 0;
+    const pnlPercent = pos.pnl?.percent || 0;
+
+    log(`Position: ${pair} | Value: $${value.toFixed(2)} | PnL: ${pnlPercent.toFixed(2)}% | In Range: ${pos.inRange}`);
+
+    if (pos.inRange) {
+      log("  In range, skipping");
+      continue;
+    }
+
+    log("  OUT OF RANGE: rebalancing...");
+
+    try {
+      // 1. Zap-Out to SOL
+      await zapOut(pos.id);
+      await sleep(2000);
+
+      // 2. Check available SOL
+      const balanceRes = await apiCall("GET", `/token/balance?owner=${OWNER}`);
+      const solBalance = balanceRes.data?.find(
+        (t: any) => t.address === "So11111111111111111111111111111111111111112"
+      );
+
+      const availableSOL = solBalance ? parseFloat(solBalance.uiAmount) : 0;
+      const reserveSOL = 0.05;
+      const reinvestSOL = Math.max(0, value / (solBalance?.price || 150) * 0.95);
+      const zapInAmount = Math.min(reinvestSOL, availableSOL - reserveSOL);
+
+      if (zapInAmount <= 0.001) {
+        log("  Not enough SOL to re-enter, skipping zap-in");
+        continue;
+      }
+
+      // 3. Zap-In with new range
+      log(`  Re-entering with ${zapInAmount.toFixed(4)} SOL...`);
+      const newPosition = await zapIn(pos.pool, zapInAmount);
+      log(`  Rebalance complete! New position: ${newPosition}`);
+    } catch (error: any) {
+      log(`  ERROR: ${error.message}`);
+    }
+  }
+}
+
+// ===================== BOT LOOP =====================
+async function main() {
+  log("=== LP Agent Auto-Rebalance Bot ===");
+  log(`Owner: ${OWNER}`);
+  log(`Check interval: ${CONFIG.CHECK_INTERVAL_MS / 1000}s`);
+  log(`Bin range: +/- ${CONFIG.BIN_RANGE} bins`);
+  log(`Strategy: ${CONFIG.STRATEGY}`);
+  log(`Pool filter: ${CONFIG.POOL_FILTER || "all pools"}`);
+  log("");
+
+  while (true) {
+    try {
+      await checkAndRebalance();
+    } catch (error: any) {
+      log(`ERROR: ${error.message}`);
+    }
+
+    log(`Next check in ${CONFIG.CHECK_INTERVAL_MS / 1000}s...\n`);
+    await sleep(CONFIG.CHECK_INTERVAL_MS);
+  }
+}
+
+main().catch(console.error);
+```
+
+</Accordion>
+
+## 下一步
+
+- [Zap-In 与 Zap-Out 教程](/zh/tutorials/add-liquidity-api)：了解底层的 API 流程
+- [Copy LP 最佳实践](/zh/tutorials/copy-lp-best-practices)：向顶尖 LP 学习
+- 查看完整的 [API 参考文档](/zh/api-reference/introduction)

@@ -1,0 +1,80 @@
+---
+title: "投资组合"
+description: "净资产、盈亏历史和所有仓位，你自己的钱包或任何钱包都能看"
+---
+
+**Portfolio**（投资组合）默认显示你的代理钱包（agent wallet）。你也可以查看任何钱包：在搜索框里粘贴地址，或者从 Smart LP 或池子页面打开一个钱包。别人的钱包只能看，不能操作。
+
+<Frame>
+  ![Robinhood Chain 上的 Portfolio](/images/app/rh-portfolio.jpg)
+  <em>Robinhood Chain 上的一个投资组合：指标、收益历史和当前仓位</em>
+</Frame>
+
+## 顶部信息
+
+- 钱包地址、所在网络，以及区块浏览器和资产追踪工具的链接（Solana 上是 Solscan 和 Jupiter；Robinhood Chain 上是 Etherscan 和 DeBank）。
+- **Refresh**（刷新）和数据最后更新的时间。
+- 在别人的钱包上：按 **Copy LP** 跟单这个钱包。详见 [Copy LP](/zh/features/copy-lp)。
+- 在 Solana 上，如果你能从没用的代币账户里领回 SOL，会显示一个横幅。详见 [Claim SOL](/zh/features/claim-sol)。
+
+<Note>
+  除了你自己的代理钱包，其他钱包的盈亏（PnL）可能和它实际赚到的对不上，因为测算方法有局限。详见[数据方法说明](/zh/data-methodology)。
+</Note>
+
+## 指标
+
+顶栏的 **$** 开关可以把所有数字在原生代币（SOL 或 ETH）和 USD 之间切换。
+
+| 指标 | 含义 |
+| --- | --- |
+| **Total Net Worth** | 持有的代币 + 当前仓位 + 未领取的手续费 + 可退回的租金（Solana）。在 Robinhood Chain 上，下方会列出 ETH、WETH 和 USDG 的持仓。 |
+| **Total Closed** | 已平仓的仓位数量 |
+| **Win Rate** | 已平仓仓位中赚钱的比例 |
+| **Avg Invested** | 平均仓位大小 |
+| **Fee Earned** | 赚到的 LP 手续费收益 |
+| **Total Profit** | 已平仓仓位的利润 |
+| **Avg Monthly Profit** | 平均每月利润 |
+| **Expected Value** | （胜率 x 平均盈利）+（亏损率 x 平均亏损），平均亏损按负数计算 |
+
+## 收益历史
+
+- 在 **PnL** 和 **Fee** 之间切换。
+- 按协议筛选：Solana 上是 DLMM 或 DAMM V2；Robinhood Chain 上是 V3 或 V4。
+- 按 **Daily**、**Weekly** 或 **Monthly** 分组，时间范围可选 **7D**、**MTD**、**1M**、**3M**、**1Y**、**YTD** 或 **ALL**。
+- 日历图标会打开月视图，每一天用绿色或红色标出。点某一天（或按 **Share**）可以把那天的结果做成卡片分享。
+
+## 当前仓位
+
+汇总行显示 **Total value**、**Total uPnL**、**Total claimed fee** 和 **Total unclaim fee**。可以按 **Type**（协议）筛选，也可以在 **Table** 和 **Card** 之间切换。
+
+| 列 | 含义 |
+| --- | --- |
+| **Position/Pool** | 交易对、协议、策略和仓位 ID（Robinhood Chain 上是 `#tokenId`）。图表图标会显示价格和你的区间。标签告诉你它是 **Manual**（手动：你自己开的，或者 LP Agent 在你钱包里发现的）还是 **Auto**（自动：从带单钱包跟单来的）。 |
+| **Age** | 开了多久 |
+| **Invested** / **Value** | 你投入了多少，现在值多少。鼠标悬停可以看代币数量。 |
+| **Total Fee** | 已领取加未领取的手续费，以及手续费占你投入的百分比 |
+| **uPnL** | 未实现盈亏（uPnL），显示金额和百分比 |
+| **DPR** | 日收益率（daily percentage rate） |
+| **Range** | 你的价格区间和当前价格。可以按价格显示，也可以按相对池子价格的百分比显示。**In range**（在区间内）/ **Out of range**（出了区间）。 |
+| **Settings** | 你的止盈和止损。点击修改。 |
+| **Action** | 仓位菜单。详见[管理仓位](/zh/features/manage-positions)。 |
+
+持有人很少的代币旁边会显示警告。
+
+## 历史仓位
+
+所有已平仓的仓位，最新的在最前面，显示投入、总手续费、盈亏、DPR 和平仓时间。打开 **Hide small PnL positions** 可以隐藏金额很小的仓位。黄色图标标出数字看起来不对的行，这些行不算进你的统计。
+
+## 仓位详情
+
+点一个仓位打开详情：
+
+- **Profit And Loss**、**Age**、**Liquidity**（当前价值，旁边是如果你一直拿着这些代币不动，现在值多少）和 **Fee**（已领取和未领取，按代币分开列）。
+- 在 Solana DLMM 上，有 **Price Bin** 图表，显示你在每个 bin 的流动性和当前价格。
+- **History**：这个仓位的每一笔交易，带链接。
+- **Logs**（只有你自己的仓位才有）：LP Agent 做了什么，比如 take profit queued（止盈已排队）或 close success（平仓成功）。
+- 跟单来的仓位会显示它是跟的哪个带单钱包的哪个仓位。
+
+## 实时更新
+
+当前仓位每 10 秒刷新一次，你切回这个标签页时也会刷新。在 Solana 上，你可以改用 **Settings > General > Realtime Portfolio** 实时推送。**Realtime Numbers** 决定数值变化时是闪一下还是滚动。

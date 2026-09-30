@@ -1,7 +1,35 @@
 ---
 title: "Robinhood Chain Integration"
-description: "Read Uniswap V3 and V4 liquidity data on Robinhood Chain through the LP Agent API"
+description: "Uniswap V3 and V4 on Robinhood Chain: in the app and through the LP Agent API"
 ---
+
+## In the app
+
+Sign in with an EVM wallet (MetaMask, Rabby and others) or pick **Robinhood** when you sign up with email, and your account runs on Robinhood Chain.
+
+<CardGroup cols={2}>
+  <Card title="Fund in ETH or USDG" icon="coins" href="/features/settings#general">
+    ETH pays gas. Choose **ETH** or **USDG** as your **Base Token** for new positions. With USDG, **Keep ETH** tops up your gas automatically.
+  </Card>
+  <Card title="Uniswap V3 and V4" icon="water" href="/features/create-position">
+    Zap in from ETH or USDG, pick a range, and close back into the currency you opened with.
+  </Card>
+  <Card title="Tokenized stocks" icon="building-columns" href="/features/pools#tokenized-stocks-robinhood-chain">
+    The **Stocks** filter shows pools holding Robinhood-issued stock tokens, matched by contract address.
+  </Card>
+  <Card title="Copy LP with guards" icon="shield-check" href="/features/copy-settings">
+    Hooked V4 pools are only copied if you allow them, fast flippers get a warning, and leaders whose profit doesn't come from fees are switched off.
+  </Card>
+</CardGroup>
+
+Things that differ from Solana:
+
+- Positions are identified by their Uniswap token ID, shown as `#1234567`.
+- Every copy keeps back a little ETH (at least 0.001 ETH) to pay for its own exit. WETH does not pay gas.
+- An automatic copy is skipped as **Too small for gas** when gas to open and close it would be more than 3% of its size. We suggest copying with at least **0.08 ETH** of net worth. See [Copy LP on Robinhood Chain](/tutorials/copy-robinhood-best-practices).
+- Claim SOL, Fund protection and compound are Solana only.
+
+The rest of this page is for developers using the API.
 
 ## Overview
 
@@ -18,7 +46,7 @@ Solana: you select the network with a `chain` query parameter.
 | API value | `chain=ROBINHOOD` |
 
 <Note>
-  `chain` defaults to `SOL`. Every existing integration keeps working untouched — you
+  `chain` defaults to `SOL`. Every existing integration keeps working untouched: you
   only pass `chain=ROBINHOOD` on the requests where you want Robinhood data.
 </Note>
 
@@ -30,7 +58,7 @@ curl -H "x-api-key: $LPAGENT_API_KEY" \
 ```
 
 An unrecognised `chain` value falls back to `SOL` rather than returning an error, so a
-typo produces Solana data — not a `400`. Check the value you send.
+typo produces Solana data, not a `400`. Check the value you send.
 
 ## Endpoint support
 
@@ -130,8 +158,8 @@ conventions. Handle these explicitly rather than assuming Solana shapes.
   <Accordion title="Transaction history is filtered differently">
     `GET /lp-positions/logs` returns economic events only. On Solana, `open` and `close`
     rows are metadata and are dropped. On Robinhood, `close` and `collectGross` are
-    dropped — `collectGross` is the raw Uniswap Collect payout, which the API splits into
-    separate decrease and fee rows — while `open` is kept because Uniswap V3 records the
+    dropped (`collectGross` is the raw Uniswap Collect payout, which the API splits into
+    separate decrease and fee rows), while `open` is kept because Uniswap V3 records the
     initial deposit there. Logs are capped at 200 rows per position.
   </Accordion>
 
@@ -151,7 +179,7 @@ conventions. Handle these explicitly rather than assuming Solana shapes.
 </Warning>
 
 - **Swap legs are outside the ledger.** Position PnL measures the liquidity leg only. The
-  swaps that enter and exit a position — up to four per cycle — are not booked into it,
+  swaps that enter and exit a position (up to four per cycle) are not booked into it,
   and their cost is material relative to typical LP gains.
 - **Open positions do not carry a live value.** The stored current value of an open
   position is not continuously refreshed, so any PnL derived from it is unreliable while

@@ -1,0 +1,104 @@
+---
+title: "概览"
+description: "把 AI Agent 接入 LP Agent 的文档和 API"
+---
+
+## LP Agent 的 AI 集成
+
+LP Agent 在设计上就对 AI 友好：文档清晰，API 参考基于 OpenAPI 生成，REST 接口简单，用 API key 认证。
+
+用这一页为你的 AI Agent 选对集成方式。
+
+## 选对工具
+
+怎么配置，取决于你的 Agent 跑在哪里、需要做什么。
+
+| 目标 | 本地编程 Agent（OpenCode、Claude Code、Cursor、Codex） | 托管型 Agent（ChatGPT、Claude 网页版、其他托管运行环境） |
+| --- | --- | --- |
+| **阅读文档、了解能力** | 先用 `https://docs.lpagent.io/llms.txt`，再看本文档站 + `docs.json` 导航 + API 参考页面 | 用 `https://docs.lpagent.io/llms.txt`、本文档站和 API 参考 |
+| **生成 API 集成代码** | 用 `api-reference/openapi.json` 和 `/api-reference/introduction` | 用 `/api-reference/introduction` 和基于 OpenAPI 生成的接口页面 |
+| **执行 LP 操作** | 用你的 `x-api-key` 调用 LP Agent REST API | 从你的服务器/后端用 `x-api-key` 调用 LP Agent REST API |
+
+<Note>
+本地编程 Agent 还可以直接读取仓库文件（`docs.json`、`.mdx` 和 `api-reference/openapi.json`），更快做出准确的集成。
+</Note>
+
+## 高效阅读文档
+
+适用于在写代码或执行操作之前，需要先了解 LP Agent 的 Agent。
+
+<Note>
+从 [`https://docs.lpagent.io/llms.txt`](https://docs.lpagent.io/llms.txt) 开始。如果 Agent 想先拿到一份精简的文档索引，再顺着链接深入阅读，这是最快的机器可读入口。
+</Note>
+
+<CardGroup cols={2}>
+  <Card title="快速开始" icon="rocket" href="/zh/quickstart">
+    产品概览、上手流程和核心概念。
+  </Card>
+
+  <Card title="API 参考" icon="code" href="/zh/api-reference/introduction">
+    认证方式，以及基于 OpenAPI 生成的完整接口参考。
+  </Card>
+</CardGroup>
+
+## 通过 API 执行操作
+
+适用于需要执行真实操作（发现池子、创建流动性交易、管理仓位）的 AI 系统。
+
+<Steps>
+  <Step title="1) 获取 API key">
+    在 [LP Agent Portal](https://portal.lpagent.io/) 创建 API key。
+  </Step>
+  <Step title="2) 认证请求">
+    每个 API 请求都在 `x-api-key` header 里带上你的 API key。
+  </Step>
+  <Step title="3) 按接口流程操作">
+    参考 API 教程里的端到端流程，再适配到你的 Agent 运行环境。
+  </Step>
+</Steps>
+
+<CardGroup cols={2}>
+  <Card title="Zap-In 和 Zap-Out 教程" icon="book" href="/zh/tutorials/add-liquidity-api">
+    用 Zap-In（单币入池）和 Zap-Out（一键出池）添加和移除流动性的端到端 API 流程。
+  </Card>
+
+  <Card title="自动再平衡教程" icon="arrows-rotate" href="/zh/tutorials/auto-rebalance-bot">
+    基于 LP Agent API 搭建自动化机器人流程。
+  </Card>
+</CardGroup>
+
+## 最简 API 请求示例
+
+```bash
+curl -X GET "https://api.lpagent.io/open-api/v1/pools/discover?chain=SOL&pageSize=5" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+```typescript
+const res = await fetch("https://api.lpagent.io/open-api/v1/pools/discover?chain=SOL&pageSize=5", {
+  headers: {
+    "x-api-key": process.env.LPAGENT_API_KEY!,
+  },
+});
+
+if (!res.ok) {
+  throw new Error(`Request failed: ${res.status}`);
+}
+
+const data = await res.json();
+```
+
+<Warning>
+不要把 API key 暴露在客户端应用、prompt、截图或共享日志里。生产环境的调用请走安全的后端。
+</Warning>
+
+## 推荐给 Agent 的学习路径
+
+1. 从 [简介](/zh/introduction) 和 [集成概览](/zh/integration/overview) 开始
+2. 阅读 [API 参考简介](/zh/api-reference/introduction)，了解认证方式
+3. 按 [Zap-In 和 Zap-Out 教程](/zh/tutorials/add-liquidity-api) 实现一个流程
+4. 用 [自动再平衡机器人](/zh/tutorials/auto-rebalance-bot) 扩展到自动化
+
+<Card title="需要帮助？" icon="headset" href="https://discord.gg/h8YDHtzmRU">
+  加入 LP Agent 社区 Discord 获取支持。
+</Card>

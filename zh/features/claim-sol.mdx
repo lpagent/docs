@@ -1,0 +1,44 @@
+---
+title: "领回 SOL"
+description: "取回锁在空代币账户里的 SOL（Solana）"
+---
+
+你持有过的每个代币都会在钱包里留下一个小账户，每个账户锁着大约 **0.0015 SOL** 的租金。LP 做多了，这笔钱会越积越多。**Claim SOL**（领回 SOL）会关掉你不再用的账户，把这些 SOL 还给你。
+
+<Frame>
+  ![Claim SOL 页面](/images/app/sol-claim-sol.jpg)
+  <em>Claim SOL：选钱包，检查要关闭的账户，然后领取</em>
+</Frame>
+
+## 怎么领
+
+<Steps>
+  <Step title="打开 Claim SOL">
+    在你 Portfolio 的横幅上按 **Claim Now**。至少有 0.01 SOL 可以领时才会显示这个横幅。点 X 可以隐藏 7 天。
+  </Step>
+  <Step title="选钱包">
+    **Agent wallet**（代理钱包），或者 **Your wallet**（你登录用的钱包，需要已连接）。每个都会显示能领多少。
+  </Step>
+  <Step title="检查列表">
+    **Accounts to close** 列出所有会被关闭的代币账户，以及每个账户能退回多少 SOL。
+  </Step>
+  <Step title="领取">
+    按 **Claim X SOL**。代理钱包会自动帮你领。你自己的钱包会要求你签名。
+  </Step>
+</Steps>
+
+## 清理粉尘代币
+
+**Also clean up dust** 默认开启。它会**销毁**单个价值低于 $0.10 的代币，同时关掉它们的账户，让你把这部分租金也拿回来。页面会显示涉及多少个代币，以及它们一共值多少。
+
+<Warning>
+  销毁的代币找不回来。想留着的话，取消勾选 **Also clean up dust**。价值高于粉尘标准的代币永远不会被动。
+</Warning>
+
+## 费用
+
+Claim SOL 是免费的。LP Agent 不收任何费用；你只需要付 Solana 网络手续费。
+
+## 分享
+
+领完之后，你可以把领回的金额做成卡片分享：发到 X 或 Telegram、复制图片、下载，或者复制链接。

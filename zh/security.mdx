@@ -1,0 +1,54 @@
+---
+title: "安全"
+description: "你的代理钱包如何受到保护，以及自动化能做什么、不能做什么"
+---
+
+## 谁掌握私钥
+
+你的代理钱包私钥由 [Turnkey](https://www.turnkey.com) 生成和保管。Turnkey 是一家基于安全硬件的钱包基础设施服务商。私钥从不经过 LP Agent 的服务器。
+
+- **钱包归你所有**。你用来登录的钱包或邮箱，就是你私钥保管库的所有者。
+- **私钥你可以随时带走**。你随时都可以[导出私钥](/zh/account-and-wallet)。私钥在 Turnkey 的安全窗口里解密，所以 LP Agent 永远看不到它。
+- **你随时可以离开**。把所有代币提现到任意地址。没有锁仓期。
+
+## 自动化能做什么
+
+要替你开仓、跟单和平仓，需要一把不用每次都问你就能签名的密钥。LP Agent 为此使用一把**独立的、受限的密钥**。它不是你钱包的所有者，而且由钱包服务商强制执行的规则限制了它能签什么。
+
+<CardGroup cols={2}>
+  <Card title="Solana" icon="sun">
+    - Meteora DLMM 和 DAMM v2 的流动性操作
+    - 通过已批准的兑换路由进行兑换（swap）
+    - SOL 只能在你代理钱包自己的账户之间转移，外加网络小费和 LP Agent 平台手续费
+    - 禁止直接把代币转出
+    - 禁止代币授权和权限变更
+  </Card>
+  <Card title="Robinhood Chain" icon="link">
+    - Uniswap V3 和 V4 的仓位操作
+    - 通过已批准的兑换路由进行兑换（swap）
+    - ETH 的包装和解包（wrap / unwrap）
+    - 支付 LP Agent 平台手续费
+  </Card>
+</CardGroup>
+
+**提现和导出私钥始终需要你本人签名**（邮箱账户则需要邮件验证码）。
+
+## 交易保护
+
+在密钥规则之外，LP Agent 还加了几道由你自己控制的防护：
+
+- **Token filters**（代币过滤），位于 **Settings > Security**：最低市值、24h 交易量和持币地址数，Solana 上还有 Jupiter organic score 下限，以及代币黑名单。不达标的代币会被跳过。详见[设置](/zh/features/settings)。
+- 跟单的 **Meme Protection**（Meme 保护）会跳过可信一侧代币（SOL、USDC、USDT、ETH、WETH 或 USDG）几乎为空的仓位。
+- **带 Hook 的 Uniswap V4 池子**默认不跟单，除非你允许。
+- **Fund protection**（资金保护，仅 Solana）会在你的跟单亏损达到你设定的上限时暂停跟单。
+- **止盈和止损**会在你设定的阈值处平仓。
+
+详见[跟单设置](/zh/features/copy-settings)和[管理你的跟单](/zh/features/copy-management)。
+
+## 注意安全
+
+<Warning>
+  - LP Agent 永远不会在 Discord、X 或私信里向你索要私钥、助记词或登录验证码。
+  - 只使用 [app.lpagent.io](https://app.lpagent.io)。连接钱包前先核对网址。
+  - 提供流动性有风险。池子可能因为价格波动和无常损失而贬值，有些代币可能归零。只投入你亏得起的资金。
+</Warning>

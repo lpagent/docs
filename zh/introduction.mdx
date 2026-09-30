@@ -1,0 +1,71 @@
+---
+title: 简介
+description: "LP Agent 帮你在 Solana 和 Robinhood Chain 上发现、开仓、跟单和管理流动性仓位"
+---
+
+<Frame>
+  <img src="/images/app/rh-smart-lp-cards.jpg" alt="LP Agent Smart LP 排行榜" />
+</Frame>
+
+## LP Agent 是什么？
+
+LP Agent 是一款专为流动性提供者（LP）打造的 Web 应用。它帮你找到值得关注的池子和钱包，一键开仓，自动帮你跟单顶级 LP 的仓位，在你不在线时按止盈和止损帮你平仓。
+
+所有操作都通过**代理钱包**（agent wallet）完成：这是为你的账户创建的一个钱包，LP Agent 可以在严格的限制范围内用它执行操作。钱由你充进去，你随时可以提现，也可以导出它的私钥。
+
+## 支持的网络
+
+<CardGroup cols={2}>
+  <Card title="Solana" icon="sun" href="/zh/integration/meteora">
+    Meteora **DLMM** 和 **DAMM v2** 池子。开仓资金为 SOL。
+  </Card>
+  <Card title="Robinhood Chain" icon="link" href="/zh/integration/robinhood">
+    Uniswap **V3** 和 **V4** 池子，包括代币化股票。开仓资金为 ETH 或 USDG。
+  </Card>
+</CardGroup>
+
+你的账户只属于一个网络，由你登录用的钱包决定：用 Solana 钱包登录就是 Solana 账户，用 EVM 钱包登录就是 Robinhood Chain 账户。
+
+## 你能做什么
+
+<CardGroup cols={2}>
+  <Card title="Smart LP" icon="trophy" href="/zh/features/smart-lp">
+    靠 LP 手续费收益赚钱的钱包排行榜，展示胜率、盈亏（PnL）和持仓时间。靠自己发币获利的钱包会被过滤掉。
+  </Card>
+  <Card title="Copy LP" icon="copy" href="/zh/features/copy-lp">
+    跟单一个钱包的开仓、添加流动性、移除流动性、平仓和领取手续费操作，按你的资金规模等比缩放，并使用你自己的 TP/SL 和安全过滤条件。
+  </Card>
+  <Card title="Pools（流动性池）" icon="water" href="/zh/features/pools">
+    按手续费、交易量和流动性浏览、筛选池子，然后用单一代币 Zap In（单币入池）。
+  </Card>
+  <Card title="Portfolio（投资组合）" icon="chart-line" href="/zh/features/portfolio">
+    追踪净资产、盈亏、手续费和每一个仓位，可以看你自己的钱包，也可以查任意钱包。
+  </Card>
+  <Card title="止盈与止损" icon="shield-check" href="/zh/features/take-profit-stop-loss">
+    仓位涨或跌到你设定的百分比时，自动平仓。
+  </Card>
+  <Card title="推荐返现" icon="gift" href="/zh/referral">
+    填写合作伙伴（KOL）邀请码，每月拿回你所付平台手续费的一部分。
+  </Card>
+</CardGroup>
+
+## 从这里开始
+
+<CardGroup cols={2}>
+  <Card title="快速开始" icon="rocket" href="/zh/quickstart">
+    登录、给代理钱包充值，然后开出或跟单你的第一个仓位。
+  </Card>
+  <Card title="账户与钱包" icon="wallet" href="/zh/account-and-wallet">
+    登录方式、充值、提现和导出私钥。
+  </Card>
+  <Card title="费用" icon="receipt" href="/zh/fee">
+    LP Agent 收哪些费用，什么时候收。
+  </Card>
+  <Card title="用 API 开发" icon="code" href="/zh/api-reference/introduction">
+    在你自己的代码里读取 LP 数据，构建 Zap In 和 Zap Out 交易。
+  </Card>
+</CardGroup>
+
+<Card title="需要帮助？" icon="discord" href="https://discord.gg/h8YDHtzmRU">
+  在我们的 Discord 里向团队和其他 LP 提问。
+</Card>

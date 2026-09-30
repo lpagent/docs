@@ -1,0 +1,111 @@
+---
+title: "Copy LP"
+description: "跟单顶级流动性提供者的仓位，按你的钱包规模缩放"
+---
+
+## 什么是 Copy LP？
+
+Copy LP 会跟随你选的一个钱包（**带单钱包**），在你的代理钱包（agent wallet）里按你的规模重复它的 LP 操作。带单钱包开仓，你就在同一个池子、同一个价格区间开仓。它添加流动性、移除流动性、领取手续费或平仓，你的跟单也照做。
+
+两个网络都支持：
+
+| 网络 | 可跟单的池子 |
+| --- | --- |
+| Solana | Meteora DLMM（Spot、Curve、Bid-Ask 和自定义形状）和 DAMM v2 |
+| Robinhood Chain | Uniswap V3 和 V4（带 Hook 的 V4 池子要你允许才会跟） |
+
+<div className="my-6">
+  <iframe
+    width="100%"
+    className="aspect-video"
+    src="https://www.youtube.com/embed/7z1bXwxur3k"
+    title="YouTube 视频播放器：Copy LP"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+  ></iframe>
+</div>
+
+## 如何开始跟单
+
+<Steps>
+  <Step title="给代理钱包充值">
+    跟单从你的[代理钱包](/zh/account-and-wallet)执行，没有单独的跟单钱包。充值 SOL（Solana）或 ETH（Robinhood Chain）。多留一些用来付手续费和 Gas。
+  </Step>
+  <Step title="在 Smart LP 上找钱包">
+    找胜率不错、手续费在利润里占实打实一部分、平均持仓时间不太短的钱包。见 [Smart LP](/zh/features/smart-lp)。
+  </Step>
+  <Step title="在它的投资组合页按 Copy LP">
+    跟单弹窗会打开，并给出一个建议规模。
+  </Step>
+  <Step title="设置规则并按 Copy">
+    五个简短步骤：**Sizing**（仓位规模）、**Exit rules**（退出规则）、**What to copy**（跟单范围）、**Protection**（保护）和 **Label**（标签）。见[跟单设置](/zh/features/copy-settings)。
+  </Step>
+  <Step title="在 Copy LP 页面追踪">
+    **Copy LP** 页面列出你跟单的钱包、你的收益，以及每一次跟单的日志。见[管理你的跟单](/zh/features/copy-management)。
+  </Step>
+</Steps>
+
+## 会跟哪些操作
+
+| 带单钱包的操作 | 你的跟单 | Solana | Robinhood Chain |
+| --- | --- | --- | --- |
+| 开仓 | 在同一个池子和价格区间按你的规模开仓 | 是 | 是 |
+| 添加流动性 | 添加带单钱包的数量 x 你的跟单比例（不超过你设的上限） | 是 | 是 |
+| 移除部分仓位 | 从你的仓位移除相同比例 | 是 | 是 |
+| 平仓 | 平掉你的跟单仓位 | 是 | 是 |
+| 领取手续费 | 领取你跟单仓位的手续费 | 是 | 是 |
+| 复投（Compound） | 复投你的跟单仓位 | 是 | 是 |
+| 再平衡 | 以同样方式移动你的跟单仓位 | 是 | 显示为一次平仓加一次新开仓 |
+
+- 只有你开始跟单 **之后** 带单钱包新开的仓位才会被跟。
+- 添加流动性、移除流动性和平仓只对你持有跟单仓位的那些仓位生效。
+- 你自己的 **止盈** 和 **止损** 可能在带单钱包之前就把跟单仓位平掉。谁先触发就按谁来。
+
+## 仓位规模怎么算
+
+你的规模由 **Sizing** 步骤里的两个数决定：
+
+- **Copy Percentage**（跟单比例）：你跟每个带单仓位的比例。弹窗会根据你的净资产和带单钱包的净资产给出建议值，让每个仓位在你钱包里的占比和在它钱包里的占比一样。
+- **Max Increase Amount per Tx**（每笔交易最大加仓额，可选）：每次跟单开仓和每次跟单加仓的上限。
+
+**例子：** Copy Percentage 80%，Max 8 SOL。
+
+1. 带单钱包用 1 SOL 开仓。你开 0.8 SOL。
+2. 带单钱包加仓 29 SOL。80% 是 23.2 SOL，所以你这次加仓被限制在 8 SOL。
+3. 你的跟单仓位现在有 8.8 SOL。
+
+上限是 **按每笔交易** 算的，不是按每个仓位。移除和平仓按比例执行，永远不受上限限制。
+
+## 钱包里要留多少
+
+| 网络 | 代理钱包里要留 |
+| --- | --- |
+| Solana | 跟单金额，加上仓位租金（平仓时退回），再加约 0.03 SOL 手续费。建议净资产至少 **5 SOL** 再跟单。 |
+| Robinhood Chain | 每次跟单都要 ETH 付 Gas。每个跟单会预留至少 0.001 ETH，用来支付它自己的退出。WETH 不能付 Gas。建议净资产至少 **0.08 ETH**。 |
+
+在 Robinhood Chain 上，你可以用 **ETH 或 USDG** 为跟单出资（**Settings > General > Base Token**）。跟单用什么币开仓，平仓时就换回什么币。在 Solana 上，平仓会兑换回 SOL。
+
+<Warning>
+  Copy LP 有真实风险。带单钱包过去的表现不代表你的结果：你的跟单比它晚一点成交，价格会略有不同，还要自己付兑换和网络成本。先用小仓位试，并设置止损。
+</Warning>
+
+## 常见问题
+
+<AccordionGroup>
+  <Accordion title="可以同时跟多个钱包吗？">
+    可以。每个跟单的钱包都有自己的设置。确保你的代理钱包有足够资金覆盖所有跟单。
+  </Accordion>
+  <Accordion title="暂停一个钱包会怎样？">
+    暂停期间，这个钱包的任何操作都不会被跟，**包括平仓**。你现有的跟单仓位保持开着，并保留各自的止盈和止损。想退出就自己平仓。
+  </Accordion>
+  <Accordion title="为什么某个跟单没开出来？">
+    打开 **Copy LP > Copy Logs**（跟单日志）。每个没开出来的跟单都会显示原因（余额不足、价格变动、代币筛选、Meme 保护等等），通常还带一个修复按钮。
+  </Accordion>
+  <Accordion title="Copy LP 要花多少钱？">
+    开跟单免费。当跟单因为带单钱包的操作而平仓或领取手续费时，LP Agent 收取所领取 LP 手续费收益的 8%。见[费用](/zh/fee)。
+  </Accordion>
+  <Accordion title="哪里能学怎么挑钱包、怎么定规模？">
+    阅读 [Copy LP 最佳实践](/zh/tutorials/copy-lp-best-practices)（Solana）和 [Robinhood Chain 上的 Copy LP](/zh/tutorials/copy-robinhood-best-practices)。
+  </Accordion>
+</AccordionGroup>

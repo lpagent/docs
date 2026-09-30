@@ -5,7 +5,7 @@ description: "How to size a copy on Robinhood Chain so fee income actually clear
 
 ## TL;DR
 
-- Copy from a wallet holding **at least 0.08 ETH of net worth**, because a smaller book cannot earn back the round trip
+- Copy with **at least 0.08 ETH of net worth** in your agent wallet, because a smaller book cannot earn back the round trip
 - Set **Copy Percentage to your net worth ÷ the leader's net worth**, not to a number that sounds right
 - Skip leaders whose **average position age is under 1 hour**, since you pay for every flip
 - Keep **spare ETH in the agent wallet for gas**, on top of the capital you intend to deploy
@@ -21,7 +21,7 @@ Copying one of the leader's positions is not a single transaction. LP Agent swap
 The important property is that **most of this cost is fixed per cycle, not proportional to your position**. A 0.01 ETH copy and a 0.5 ETH copy pay roughly the same gas and lose the same fraction to spread. Fee income, on the other hand, scales with position size. Below a certain size the two never cross, and a position can be a perfectly good trade for the leader while losing you money.
 
 <Note>
-  LP Agent charges **0% to open or close** and **8% of the fees you claim**. That is not what makes small copies unprofitable. Network gas and swap spread are. See the [Fee Structure](/fee).
+  LP Agent charges **nothing to open a copy** and **8% of the LP fees collected** when a copy closes or claims fees. That is not what makes small copies unprofitable. Network gas and swap spread are. See the [Fee Structure](/fee).
 </Note>
 
 ## 1. Copy With at Least 0.08 ETH of Net Worth
@@ -47,8 +47,8 @@ Copy Percentage = your net worth ÷ the leader's net worth × 100
 Matching that ratio is what makes the leader's 3% allocation land as your 3% allocation. Anything else silently changes the strategy. A leader who never risks more than a tenth of their book, copied at 100% by someone a twentieth of their size, is not a copy. It is a concentrated bet on one of their positions.
 
 <Frame>
-  ![LP Agent Copy LP Settings](/images/copy-lp.png)
-  <em>Copy settings</em>
+  ![Copy settings, Sizing step](/images/app/sol-copy-settings-sizing.jpg)
+  <em>The Sizing step shows the suggested percentage and the two net worths it came from</em>
 </Frame>
 
 The copy settings screen computes this for you. It reads both wallets' holdings and open positions, shows the suggested percentage next to the two net worths it came from, and offers a one-click **Apply**. Two edges are worth knowing about:
@@ -83,7 +83,7 @@ A wallet that opens and closes positions every few minutes generates a full copy
 **Skip leaders whose average position age is under 1 hour.** The settings screen shows a warning with the leader's actual average hold time when it falls below that.
 
 <Note>
-  The Solana guide draws this line at 20 minutes. Robinhood's is stricter for the same reason everything else on this page is: an EVM cycle costs more per flip, so the same churn hurts more.
+  The Solana guide draws this line at 18 minutes. Robinhood's is stricter for the same reason everything else on this page is: an EVM cycle costs more per flip, so the same churn hurts more.
 </Note>
 
 Average hold time is computed over the leader's whole history, so a wallet that has only recently started churning will not trip the warning. If you are copying a wallet whose behaviour changed, check their position log rather than the average.
@@ -102,7 +102,7 @@ Reconcile against on-chain data before drawing conclusions about a leader, or ab
 
 ## Common Mistakes to Avoid
 
-1. **Copying from a wallet holding less than 0.08 ETH**, where the round trip eats whatever the positions can earn
+1. **Copying with less than 0.08 ETH in your agent wallet**, where the round trip eats whatever the positions can earn
 2. **Leaving Max Increase Amount at `0`**, which disables copying without disabling the follow
 3. **Picking a copy percentage by feel** instead of from the ratio of net worths
 4. **Deploying the entire agent balance** and leaving nothing for gas
