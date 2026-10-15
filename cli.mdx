@@ -96,7 +96,7 @@ lpagent tx landing-decrease-tx --file signed-tx.json
 ```bash
 lpagent token balance --owner <addr>
 
-lpagent api get /lp-positions/opening --query "owner=<addr>"
+lpagent api get /lp-positions/open --query "owner=<addr>"
 lpagent api post /position/zap-out-estimates --data '{"position_id":"...","bps":5000}'
 ```
 

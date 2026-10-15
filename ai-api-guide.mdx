@@ -40,7 +40,7 @@ Never expose API keys or private keys in frontend code, shared prompts, screensh
 
 ### 2) Track positions and portfolio analytics
 
-- `GET /lp-positions/opening` → open positions for owner
+- `GET /lp-positions/open` → open positions for owner
 - `GET /lp-positions/historical` → historical/closed positions
 - `GET /lp-positions/overview` → aggregated portfolio metrics
 - `GET /lp-positions/logs` → position activity logs
@@ -73,7 +73,7 @@ transaction is Solana only.
 
 | Endpoint | Solana (`SOL`) | Robinhood Chain (`ROBINHOOD`) |
 | --- | --- | --- |
-| `GET /lp-positions/opening`, `/historical`, `/overview`, `/logs`, `/position` | Yes | Yes |
+| `GET /lp-positions/open`, `/historical`, `/overview`, `/logs`, `/position` | Yes | Yes |
 | `GET /lp-positions/revenue/{owner}` | Yes | Yes |
 | `GET /token/balance` | Yes | Yes |
 | `GET /pools/discover` | Yes | Yes |
@@ -118,7 +118,7 @@ Use this when your AI wants to close all or part of an LP position.
 
 <Steps>
   <Step title="1) Get open positions">
-    Call `GET /lp-positions/opening?owner=<wallet>` and choose a target position `id`.
+    Call `GET /lp-positions/open?owner=<wallet>` and choose a target position `id`.
   </Step>
   <Step title="2) Estimate the payout (optional)">
     Call `POST /position/zap-out-estimates` with `position_id` (the position's `id`) and `bps`. Each estimate shows what the wallet receives for one `output` option. Meteora DLMM positions only.
@@ -138,7 +138,7 @@ Use this when your AI wants to close all or part of an LP position.
 
 Use this when your AI should continuously keep positions in-range.
 
-1. Poll `GET /lp-positions/opening?owner=...`
+1. Poll `GET /lp-positions/open?owner=...`
 2. For each position with `inRange=false`:
    - zap-out old position (`decrease-tx` + `landing-decrease-tx`, with `type` set from the position's `protocol`)
    - check available SOL (`GET /token/balance`)

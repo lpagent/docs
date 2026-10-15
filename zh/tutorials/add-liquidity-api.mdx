@@ -46,7 +46,7 @@ LP Agent 为 zap-in 和 zap-out 都内置了基于 Jito bundle 的交易上链�
 
 ```
 1. GET POSITIONS   Find your open positions
-   GET /lp-positions/opening
+   GET /lp-positions/open
         ↓
 2. ESTIMATE        (Optional) See what each output option pays out
    POST /position/zap-out-estimates
@@ -247,7 +247,7 @@ console.log(`Zap-In Success! Tx: https://solscan.io/tx/${landRes.data.signature}
 
 ```typescript
 const positionsRes = await apiCall("GET",
-  `/lp-positions/opening?owner=${OWNER}`
+  `/lp-positions/open?owner=${OWNER}`
 );
 
 console.log(`Found ${positionsRes.count} open positions`);
@@ -476,7 +476,7 @@ async function main() {
   console.log(`Position created: ${positionKey}`);
 
   // Check position status
-  const positions = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}`);
+  const positions = await apiCall("GET", `/lp-positions/open?owner=${OWNER}`);
   const position = positions.data.find((p: any) => p.pool === pool.pool);
   if (position) {
     console.log(`Position value: $${position.currentValue}, PnL: ${position.pnl.percent}%`);

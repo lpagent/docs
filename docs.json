@@ -354,6 +354,14 @@
     {
       "source": "/integration/orca",
       "destination": "/integration/overview"
+    },
+    {
+      "source": "/api-reference/positions/get-opening-lp-positions-for-an-owner",
+      "destination": "/api-reference/positions/get-open-lp-positions-for-an-owner"
+    },
+    {
+      "source": "/zh/api-reference/positions/get-opening-lp-positions-for-an-owner",
+      "destination": "/zh/api-reference/positions/get-open-lp-positions-for-an-owner"
     }
   ]
 }

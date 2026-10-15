@@ -54,7 +54,7 @@ Solana: you select the network with a `chain` query parameter.
 
 ```bash
 curl -H "x-api-key: $LPAGENT_API_KEY" \
-  "https://api.lpagent.io/open-api/v1/lp-positions/opening?owner=0xYourWallet&chain=ROBINHOOD"
+  "https://api.lpagent.io/open-api/v1/lp-positions/open?owner=0xYourWallet&chain=ROBINHOOD"
 ```
 
 An unrecognised `chain` value falls back to `SOL` rather than returning an error, so a
@@ -66,7 +66,7 @@ typo produces Solana data, not a `400`. Check the value you send.
   <Accordion title="Available on both SOL and ROBINHOOD">
     | Method | Endpoint |
     | --- | --- |
-    | `GET` | `/lp-positions/opening` |
+    | `GET` | `/lp-positions/open` |
     | `GET` | `/lp-positions/historical` |
     | `GET` | `/lp-positions/overview` |
     | `GET` | `/lp-positions/logs` |

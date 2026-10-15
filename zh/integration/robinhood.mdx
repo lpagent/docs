@@ -50,7 +50,7 @@ LP Agent 为 **Robinhood Chain**（一个 EVM 网络）上的 Uniswap V3 和 Uni
 
 ```bash
 curl -H "x-api-key: $LPAGENT_API_KEY" \
-  "https://api.lpagent.io/open-api/v1/lp-positions/opening?owner=0xYourWallet&chain=ROBINHOOD"
+  "https://api.lpagent.io/open-api/v1/lp-positions/open?owner=0xYourWallet&chain=ROBINHOOD"
 ```
 
 无法识别的 `chain` 值会回退到 `SOL`，而不是返回错误，所以拼错了会拿到 Solana 的数据，而不是 `400`。请检查你传的值。
@@ -61,7 +61,7 @@ curl -H "x-api-key: $LPAGENT_API_KEY" \
   <Accordion title="SOL 和 ROBINHOOD 都支持">
     | Method | Endpoint |
     | --- | --- |
-    | `GET` | `/lp-positions/opening` |
+    | `GET` | `/lp-positions/open` |
     | `GET` | `/lp-positions/historical` |
     | `GET` | `/lp-positions/overview` |
     | `GET` | `/lp-positions/logs` |

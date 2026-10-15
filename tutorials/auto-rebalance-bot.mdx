@@ -41,7 +41,7 @@ Every check interval, the bot follows this flow:
 ```
  ┌─────────────────────────────┐
  │  Fetch all open positions   │
- │  GET /lp-positions/opening  │
+ │  GET /lp-positions/open     │
  └──────────┬──────────────────┘
             │
             ▼
@@ -73,7 +73,7 @@ Every check interval, the bot follows this flow:
 | **How much to reinvest?** | Checks SOL balance after zap-out, reserves 0.05 SOL for fees |
 | **Where to place the new range?** | Centers around the current active bin, with configurable range |
 | **What strategy to use?** | Configurable: `Spot`, `Curve`, or `BidAsk` |
-| **Which positions?** | Meteora DLMM only: the bot asks `/lp-positions/opening` for `platform=meteora`, because the re-entry places liquidity by bin |
+| **Which positions?** | Meteora DLMM only: the bot asks `/lp-positions/open` for `platform=meteora`, because the re-entry places liquidity by bin |
 
 ---
 
@@ -150,7 +150,7 @@ const dynamicRange = binStep > 5 ? 20 : 50; // volatile → wider, stable → ti
 
 ### Filter by Pool Type
 
-The complete bot already asks for DLMM positions only (`platform=meteora` on `/lp-positions/opening`). If you drop that filter, the endpoint also returns DAMM V2 positions. Skip them in the loop, since the re-entry places liquidity by bin, and send `type: "meteora_damm_v2"` to `decrease-tx` if you close one:
+The complete bot already asks for DLMM positions only (`platform=meteora` on `/lp-positions/open`). If you drop that filter, the endpoint also returns DAMM V2 positions. Skip them in the loop, since the re-entry places liquidity by bin, and send `type: "meteora_damm_v2"` to `decrease-tx` if you close one:
 
 ```typescript
 if (pos.protocol !== "meteora") {
@@ -202,7 +202,7 @@ const CONFIG = {
 
 | Endpoint | Purpose |
 |----------|---------|
-| `GET /lp-positions/opening` | Fetch open positions and check `inRange` |
+| `GET /lp-positions/open` | Fetch open positions and check `inRange` |
 | `GET /token/balance` | Check SOL balance for reinvestment |
 | `GET /pools/{poolId}/info` | Get active bin for new position range |
 | `POST /position/decrease-tx` | Generate zap-out transactions |
@@ -353,7 +353,7 @@ async function checkAndRebalance() {
   log("Checking positions...");
 
   // DLMM positions only: the re-entry below places liquidity by bin
-  const positionsRes = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}&platform=meteora`);
+  const positionsRes = await apiCall("GET", `/lp-positions/open?owner=${OWNER}&platform=meteora`);
   const positions = positionsRes.data;
 
   if (!positions || positions.length === 0) {
