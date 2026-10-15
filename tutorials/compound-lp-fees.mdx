@@ -41,7 +41,7 @@ Every check interval, the bot follows this flow:
 ```
  ┌──────────────────────────────┐
  │  Fetch all open positions    │
- │  GET /lp-positions/opening   │
+ │  GET /lp-positions/open      │
  └──────────┬───────────────────┘
             │
             ▼
@@ -148,7 +148,7 @@ function signTx(base64Tx: string): string {
 Query your open positions and pick the ones whose uncollected fees are worth claiming.
 
 ```typescript
-const positionsRes = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}`);
+const positionsRes = await apiCall("GET", `/lp-positions/open?owner=${OWNER}`);
 
 const compoundable = positionsRes.data.filter((pos: any) => {
   const uncollected = parseFloat(pos.uncollectedFee || "0");
@@ -289,7 +289,7 @@ Each compound cycle costs roughly **0.01–0.03 SOL** in transaction fees (claim
 - **Run on a slow cadence**: Fees accrue over hours, not seconds. Checking every 5–15 minutes is plenty and keeps API usage low.
 - **Out-of-range positions**: Fees are still claimable, but if you re-deposit into the same range you'll be adding to dead liquidity. Consider [rebalancing](/tutorials/auto-rebalance-bot) instead, or set the new bin range around the current active bin (which is what the example bot does).
 - **Consider tax implications**: Each claim is a taxable event in many jurisdictions: check with your local rules.
-- **DAMM V2 support**: Claiming works the same for DLMM and DAMM V2: the only difference is the `type` field in the request body. The re-deposit differs: a DAMM V2 pool has no bins, so skip the active-bin lookup and call `add-tx` without `fromBinId` / `toBinId` (the complete script below does this). `/lp-positions/opening` returns both kinds of position unless you pass `platform`.
+- **DAMM V2 support**: Claiming works the same for DLMM and DAMM V2: the only difference is the `type` field in the request body. The re-deposit differs: a DAMM V2 pool has no bins, so skip the active-bin lookup and call `add-tx` without `fromBinId` / `toBinId` (the complete script below does this). `/lp-positions/open` returns both kinds of position unless you pass `platform`.
 
 ---
 
@@ -297,7 +297,7 @@ Each compound cycle costs roughly **0.01–0.03 SOL** in transaction fees (claim
 
 | Endpoint | Purpose |
 |----------|---------|
-| `GET /lp-positions/opening` | Fetch open positions and their `uncollectedFee` |
+| `GET /lp-positions/open` | Fetch open positions and their `uncollectedFee` |
 | `POST /position/claim-fee-tx` | Generate claim-fee + optional swap-to-SOL transactions |
 | `POST /position/landing-claim-fee-tx` | Land claim + swap transactions via Jito |
 | `GET /token/balance` | Read post-claim SOL balance |
@@ -429,7 +429,7 @@ async function reDeposit(poolAddress: string, protocol: string, amountSOL: numbe
 async function checkAndCompound() {
   log("Checking positions for compoundable fees...");
 
-  const positionsRes = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}`);
+  const positionsRes = await apiCall("GET", `/lp-positions/open?owner=${OWNER}`);
   const positions = positionsRes.data || [];
 
   if (positions.length === 0) {
