@@ -77,7 +77,7 @@ Every check interval, the bot follows this flow:
 
 ## Prerequisites
 
-- An LP Agent API key (get one from the [API Dashboard](https://app.lpagent.io/open-api))
+- An LP Agent API key (get one from the [LP Agent Portal](https://portal.lpagent.io/))
 - A Solana wallet with SOL for transaction fees
 - Node.js >= 18
 
@@ -226,9 +226,9 @@ await new Promise(r => setTimeout(r, 3000));
 
 const balanceRes = await apiCall("GET", `/token/balance?owner=${OWNER}`);
 const sol = balanceRes.data?.find(
-  (t: any) => t.address === "So11111111111111111111111111111111111111112"
+  (t: any) => t.tokenAddress === "So11111111111111111111111111111111111111112"
 );
-const availableSOL = sol ? parseFloat(sol.uiAmount) : 0;
+const availableSOL = sol ? sol.balance : 0;
 const depositSOL = Math.max(0, availableSOL - 0.05); // keep 0.05 SOL reserve
 
 if (depositSOL <= 0.001) {
@@ -289,7 +289,7 @@ Each compound cycle costs roughly **0.01–0.03 SOL** in transaction fees (claim
 - **Run on a slow cadence**: Fees accrue over hours, not seconds. Checking every 5–15 minutes is plenty and keeps API usage low.
 - **Out-of-range positions**: Fees are still claimable, but if you re-deposit into the same range you'll be adding to dead liquidity. Consider [rebalancing](/tutorials/auto-rebalance-bot) instead, or set the new bin range around the current active bin (which is what the example bot does).
 - **Consider tax implications**: Each claim is a taxable event in many jurisdictions: check with your local rules.
-- **DAMM V2 support**: The same code works for DLMM and DAMM V2: the only difference is the `type` field in the request body.
+- **DAMM V2 support**: Claiming works the same for DLMM and DAMM V2: the only difference is the `type` field in the request body. The re-deposit differs: a DAMM V2 pool has no bins, so skip the active-bin lookup and call `add-tx` without `fromBinId` / `toBinId` (the complete script below does this). `/lp-positions/opening` returns both kinds of position unless you pass `platform`.
 
 ---
 
@@ -390,22 +390,26 @@ async function claimAndSwap(pos: any): Promise<void> {
 }
 
 // ===================== ZAP-IN (RE-DEPOSIT) =====================
-async function reDeposit(poolAddress: string, amountSOL: number): Promise<void> {
+async function reDeposit(poolAddress: string, protocol: string, amountSOL: number): Promise<void> {
   log(`  Re-deposit: zapping ${amountSOL.toFixed(4)} SOL back into pool...`);
 
-  const info = await apiCall("GET", `/pools/${poolAddress}/info`);
-  const activeBin = info.data.liquidityViz?.activeBin;
-  if (!activeBin) throw new Error("Could not get active bin");
-
-  const fromBinId = activeBin.binId - CONFIG.BIN_RANGE;
-  const toBinId = activeBin.binId + CONFIG.BIN_RANGE;
+  // DLMM needs a bin range. DAMM V2 pools have no bins: add-tx detects the pool type and needs no range.
+  let range = {};
+  if (protocol !== "meteora_damm_v2") {
+    const info = await apiCall("GET", `/pools/${poolAddress}/info`);
+    const activeBin = info.data.liquidityViz?.activeBin;
+    if (!activeBin) throw new Error("Could not get active bin");
+    range = {
+      fromBinId: activeBin.binId - CONFIG.BIN_RANGE,
+      toBinId: activeBin.binId + CONFIG.BIN_RANGE,
+    };
+  }
 
   const addTx = await apiCall("POST", `/pools/${poolAddress}/add-tx`, {
     stratergy: CONFIG.STRATEGY,
     inputSOL: amountSOL,
     percentX: 0.5,
-    fromBinId,
-    toBinId,
+    ...range,
     owner: OWNER,
     slippage_bps: CONFIG.SLIPPAGE_BPS,
     mode: "zap-in",
@@ -451,8 +455,8 @@ async function checkAndCompound() {
     try {
       // Snapshot SOL balance before the claim
       const before = await apiCall("GET", `/token/balance?owner=${OWNER}`);
-      const beforeSol = before.data?.find((t: any) => t.address === SOL_MINT);
-      const beforeAmount = beforeSol ? parseFloat(beforeSol.uiAmount) : 0;
+      const beforeSol = before.data?.find((t: any) => t.tokenAddress === SOL_MINT);
+      const beforeAmount = beforeSol ? beforeSol.balance : 0;
 
       // 1. Claim + swap to SOL in one round-trip
       await claimAndSwap(pos);
@@ -460,20 +464,21 @@ async function checkAndCompound() {
 
       // 2. Read post-claim balance
       const after = await apiCall("GET", `/token/balance?owner=${OWNER}`);
-      const afterSol = after.data?.find((t: any) => t.address === SOL_MINT);
-      const afterAmount = afterSol ? parseFloat(afterSol.uiAmount) : 0;
+      const afterSol = after.data?.find((t: any) => t.tokenAddress === SOL_MINT);
+      const afterAmount = afterSol ? afterSol.balance : 0;
 
       const gained = afterAmount - beforeAmount;
       log(`  Gained ${gained.toFixed(4)} SOL from claim`);
 
-      const depositSOL = Math.max(0, afterAmount - CONFIG.RESERVE_SOL);
+      // Re-deposit only what the claim brought in, and never dip into the reserve
+      const depositSOL = Math.max(0, Math.min(gained, afterAmount - CONFIG.RESERVE_SOL));
       if (depositSOL <= 0.001) {
         log("  Not enough SOL to re-deposit, skipping");
         continue;
       }
 
       // 3. Re-deposit into the same pool
-      await reDeposit(pos.pool, depositSOL);
+      await reDeposit(pos.pool, pos.protocol, depositSOL);
       log("  Compound complete!");
     } catch (error: any) {
       log(`  ERROR: ${error.message}`);

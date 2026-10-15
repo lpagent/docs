@@ -9,14 +9,14 @@ description: "How to size a copy on Robinhood Chain so fee income actually clear
 - Set **Copy Percentage to your net worth ÷ the leader's net worth**, not to a number that sounds right
 - Skip leaders whose **average position age is under 1 hour**, since you pay for every flip
 - Keep **spare ETH in the agent wallet for gas**, on top of the capital you intend to deploy
-- **Never leave Max Increase Amount at 0**: it saves cleanly and then copies nothing
+- **Never use a Max Increase Amount of 0**: it copies nothing. Leave the field empty for no cap
 - Read Robinhood PnL as indicative rather than settled. See [Known limitations](/integration/robinhood#known-limitations)
 
 This page is the Robinhood Chain companion to [Copy LP Best Practices](/tutorials/copy-lp-best-practices), which covers Solana. The research and risk-management advice there still applies. What changes here is sizing, because an EVM copy cycle costs more to execute.
 
 ## Why Sizing Matters More on Robinhood
 
-Copying one of the leader's positions is not a single transaction. LP Agent swaps your ETH into the pool's two tokens, adds liquidity, removes it when the leader exits, then swaps back to ETH. That is four gas-paying transactions per cycle, plus slippage on both swap legs: the aggregator is asked for up to 7% of tolerance so the route can fill, and the liquidity legs allow 1%.
+Copying one of the leader's positions is not a single transaction. LP Agent swaps your ETH into the pool's two tokens, adds liquidity, removes it when the leader exits, then swaps back to ETH. That is four gas-paying transactions per cycle, plus slippage on both swap legs: the swaps use your slippage setting (7% unless you changed it) so the route can fill, and the liquidity legs allow 1%.
 
 The important property is that **most of this cost is fixed per cycle, not proportional to your position**. A 0.01 ETH copy and a 0.5 ETH copy pay roughly the same gas and lose the same fraction to spread. Fee income, on the other hand, scales with position size. Below a certain size the two never cross, and a position can be a perfectly good trade for the leader while losing you money.
 
@@ -30,10 +30,10 @@ Before any field in the copy dialog matters, the wallet doing the copying needs 
 
 That figure is a floor on execution cost, not a promise of profit. It is the point where a normally behaved position has room to earn back the round trip. It is not a target either: everything above it behaves better, not worse.
 
-A wallet below the floor cannot settle this with settings. Lowering **Copy Percentage** or **Max Increase Amount** only redistributes capital that is not there, while the per-cycle bill stays where it was. The copy settings screen shows the recommendation at the top of the dialog, and it stays advice: nothing is blocked or refused.
+A wallet below the floor cannot settle this with settings. Lowering **Copy Percentage** or **Max Increase Amount** only redistributes capital that is not there, while the per-cycle bill stays where it was. The copy dialog shows the recommendation under its list of steps, and it stays advice: nothing is blocked or refused.
 
 <Warning>
-  **A Max Increase Amount of 0 is not "unlimited".** A zero cap scales every copy to nothing: the follow stays enabled, the leader keeps trading, and no position is ever opened for you. If you want no cap, leave the field empty rather than typing `0`.
+  **A Max Increase Amount of 0 is not "unlimited".** A zero cap scales every copy to nothing, so the dialog no longer saves it. An older copy still set to 0 shows a red note under the field: the follow stays enabled, the leader keeps trading, and no position is opened for you until you change it. If you want no cap, leave the field empty rather than typing `0`.
 </Warning>
 
 ## 2. Set the Copy Percentage From the Two Net Worths
@@ -98,12 +98,12 @@ Set a stop loss. Do not set it so tight that ordinary price movement triggers it
 
 Robinhood position PnL measures the **liquidity leg only**. The swaps that enter and exit a position are not booked into it, and on small positions their cost is material relative to the LP gain. Open positions do not carry a continuously refreshed value either.
 
-Reconcile against on-chain data before drawing conclusions about a leader, or about your own results. The full list is in [Robinhood Chain Integration](/integration/robinhood#known-limitations).
+Reconcile against on-chain data before drawing conclusions about a leader, or about your own results. For your own closed copies, Copy Logs does part of this for you: a result checked against the on-chain transactions is marked **True PnL**. The full list is in [Robinhood Chain Integration](/integration/robinhood#known-limitations).
 
 ## Common Mistakes to Avoid
 
 1. **Copying with less than 0.08 ETH in your agent wallet**, where the round trip eats whatever the positions can earn
-2. **Leaving Max Increase Amount at `0`**, which disables copying without disabling the follow
+2. **Keeping an old Max Increase Amount of `0`**, which disables copying without disabling the follow
 3. **Picking a copy percentage by feel** instead of from the ratio of net worths
 4. **Deploying the entire agent balance** and leaving nothing for gas
 5. **Copying a high-frequency wallet** and paying four transactions for each of their flips

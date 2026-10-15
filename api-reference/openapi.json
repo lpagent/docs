@@ -418,7 +418,8 @@
                           },
                           "id": {
                             "type": "string",
-                            "example": "1dfc9575a268b50f1848f732eb8bca84:ff76fef2591c25fbfb32279f17372a60ad69577aaf06163dd2c980b369736e89422c35ef5f6b5cdbe66861e4acfabbec"
+                            "description": "Position ID. On this API it is the same value as `tokenId`, not encrypted. Pass it as `position_id` to `decrease-tx`, `zap-out-estimates` and `claim-fee-tx`.",
+                            "example": "Ep22EwKegXis3bTC6P8JLgsHaT5J2beM2TncKe2Hmv24"
                           },
                           "logs": {
                             "type": "array",
@@ -1007,7 +1008,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Wallet address of the position owner",
+            "description": "Wallet address of the position owner. On `ROBINHOOD`, a `0x` address in any letter case works.",
             "example": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"
           },
           {
@@ -1736,6 +1737,18 @@
                             "nullable": true,
                             "description": "Logo URL for token1",
                             "example": "https://token-logo.lpagent.io/api/v1/logo?address=So11111111111111111111111111111111111111112&chain=SOL"
+                          },
+                          "token0": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Address of the token in slot 0. A swap row lists the token received first, so this is not always the pool's token0",
+                            "example": "31k88G5Mq7ptbRDf3AM13HAq6wRQHXHikR8hik7wPygk"
+                          },
+                          "token1": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Address of the token in slot 1",
+                            "example": "So11111111111111111111111111111111111111112"
                           }
                         }
                       }
@@ -2525,7 +2538,7 @@
               ],
               "default": "mcap"
             },
-            "description": "Field to sort pools by. Any other value falls back to `mcap`. On `SOL`, `fee_24h` and `fee_tvl_ratio` are derived from the pool fee rate and 24h volume; on `ROBINHOOD` they use the stored 24h fee figures, which are empty for dynamic-fee pools and sort last."
+            "description": "Field to sort pools by. Any other value falls back to `mcap`. On `SOL`, `fee_24h` and `fee_tvl_ratio` are derived from the pool fee rate and volume: `fee_24h` from 24h volume, `fee_tvl_ratio` from the volume of the `feeTVLInterval` window. On `ROBINHOOD` they use the stored 24h fee figures, which are empty for dynamic-fee pools and sort last."
           },
           {
             "in": "query",
@@ -2575,7 +2588,7 @@
               ],
               "default": "24h"
             },
-            "description": "Time interval for fee/TVL ratio calculation"
+            "description": "Volume window behind the Fee/TVL sort on `SOL`. With `sortBy=fee_tvl_ratio`, pools are ranked by the pool fee rate applied to this window's volume, over TVL, so `1h` ranks by the last hour's trading. Ignored on `ROBINHOOD`, which has one stored ratio."
           },
           {
             "in": "query",
@@ -2844,6 +2857,24 @@
                             "type": "number",
                             "description": "Volume in last 24 hours",
                             "example": 800000
+                          },
+                          "fee_5m": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Fees the pool earned in the last 5 minutes, in USD, as a decimal string. Null when no recent figure is available.",
+                            "example": "3.27"
+                          },
+                          "fee_1h": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Fees the pool earned in the last 1 hour, in USD, as a decimal string. Null when no recent figure is available.",
+                            "example": "41.9"
+                          },
+                          "fee_6h": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Fees the pool earned in the last 6 hours, in USD, as a decimal string. Null when no recent figure is available.",
+                            "example": "262.15"
                           },
                           "base_price": {
                             "type": "number",
@@ -3941,7 +3972,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Wallet address of the position owner",
+            "description": "Wallet address of the position owner. On `ROBINHOOD`, a `0x` address in any letter case works.",
             "example": "7q4VBmi56ws3LHNHstESrHHCK8CD3jfA2JVBhe29yvUM"
           },
           {
@@ -4312,10 +4343,10 @@
         }
       }
     },
-    "/position/decrease-quotes": {
+    "/position/zap-out-estimates": {
       "post": {
-        "summary": "Zap-Out - Get quotes for withdrawing liquidity",
-        "description": "Returns quotes for converting position tokens to different output combinations (token0 to token1, token1 to token0, to base token, etc.) before executing a zap-out **Solana only** - this endpoint has no Robinhood Chain (EVM) equivalent.",
+        "summary": "Zap-Out - Estimate what a withdrawal pays out",
+        "description": "For each output option of `decrease-tx`, returns what the wallet ends up with after the swap and fees, priced on the route the transaction is built on: net amounts, their value in SOL and USD, and the same withdrawal's value at the pool price before any swap. Call it before `decrease-tx` to show the user the real payout.\n\nMeteora DLMM positions only. **Solana only** - this endpoint has no Robinhood Chain (EVM) equivalent.\n\nReplaces `POST /position/decrease-quotes`, which has been removed.\n",
         "tags": [
           "Position"
         ],
@@ -4326,19 +4357,41 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "id",
                   "bps"
                 ],
                 "properties": {
+                  "position_id": {
+                    "type": "string",
+                    "description": "The position address, as passed to `decrease-tx`. This is the `id` (same value as `tokenId`) that `/lp-positions/opening` returns. Either this or `id` is required.",
+                    "example": "Ep22EwKegXis3bTC6P8JLgsHaT5J2beM2TncKe2Hmv24"
+                  },
                   "id": {
                     "type": "string",
-                    "description": "The encrypted position ID"
+                    "description": "An encrypted position ID, still accepted in place of `position_id`. The `id` that `/lp-positions/opening` returns on this API is already the plain position address: send that one as `position_id`."
                   },
                   "bps": {
                     "type": "integer",
-                    "description": "The percentage of position to close in basis points (0-10000)",
-                    "minimum": 0,
-                    "maximum": 10000
+                    "description": "Basis points of the position to withdraw (1-10000). 10000 closes it and claims its fees.",
+                    "minimum": 1,
+                    "maximum": 10000,
+                    "example": 10000
+                  },
+                  "outputs": {
+                    "type": "array",
+                    "description": "Price only these output options (default all four)",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "allToken0",
+                        "allToken1",
+                        "both",
+                        "allBaseToken"
+                      ]
+                    },
+                    "example": [
+                      "allBaseToken",
+                      "both"
+                    ]
                   }
                 }
               }
@@ -4347,7 +4400,7 @@
         },
         "responses": {
           "200": {
-            "description": "Quotes for different token combinations",
+            "description": "One estimate per requested output. An estimate with ok=false carries the reason (e.g. no swap route).",
             "content": {
               "application/json": {
                 "schema": {
@@ -4355,13 +4408,116 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "success",
-                        "error"
-                      ]
+                      "example": "success"
                     },
                     "data": {
-                      "type": "object"
+                      "type": "object",
+                      "properties": {
+                        "lane": {
+                          "type": "string",
+                          "enum": [
+                            "wallet"
+                          ],
+                          "description": "Always `wallet`: `decrease-tx` is signed by the owner"
+                        },
+                        "bps": {
+                          "type": "integer",
+                          "description": "The `bps` that was priced"
+                        },
+                        "isClose": {
+                          "type": "boolean",
+                          "description": "True when `bps` is 10000: the position is closed and its fees are claimed"
+                        },
+                        "nativePriceUsd": {
+                          "type": "number",
+                          "description": "SOL price in USD used for the estimate"
+                        },
+                        "target": {
+                          "type": "object",
+                          "description": "Token that `allBaseToken` pays out in (SOL)",
+                          "properties": {
+                            "address": {
+                              "type": "string"
+                            },
+                            "symbol": {
+                              "type": "string",
+                              "nullable": true
+                            },
+                            "decimals": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        "estimates": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "output": {
+                                "type": "string",
+                                "enum": [
+                                  "allToken0",
+                                  "allToken1",
+                                  "both",
+                                  "allBaseToken"
+                                ],
+                                "description": "The `decrease-tx` output option this estimate is for"
+                              },
+                              "ok": {
+                                "type": "boolean",
+                                "description": "False when this option could not be priced, for example when there is no swap route"
+                              },
+                              "error": {
+                                "type": "string",
+                                "description": "Why the option could not be priced. Present when `ok` is false"
+                              },
+                              "receive": {
+                                "type": "array",
+                                "description": "What the wallet ends up holding, swap and fees already taken",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "address": {
+                                      "type": "string"
+                                    },
+                                    "decimals": {
+                                      "type": "integer"
+                                    },
+                                    "amount": {
+                                      "type": "string",
+                                      "description": "Raw base units"
+                                    },
+                                    "uiAmount": {
+                                      "type": "number"
+                                    }
+                                  }
+                                }
+                              },
+                              "valueNative": {
+                                "type": "number",
+                                "description": "`receive` priced in SOL"
+                              },
+                              "valueUsd": {
+                                "type": "number",
+                                "description": "`receive` priced in USD"
+                              },
+                              "marketValueNative": {
+                                "type": "number",
+                                "description": "The same withdrawal priced at the pool, before any swap or fee, in SOL"
+                              },
+                              "marketValueUsd": {
+                                "type": "number",
+                                "description": "The same withdrawal priced at the pool, before any swap or fee, in USD"
+                              },
+                              "priceImpactPct": {
+                                "type": "number",
+                                "nullable": true,
+                                "description": "Price impact of the worst swap leg, in percent. Negative when the swap moves the price against you. Null when the payout needs no swap or the route reports no impact."
+                              }
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 }
@@ -4369,10 +4525,7 @@
             }
           },
           "400": {
-            "description": "Invalid parameters"
-          },
-          "500": {
-            "description": "Internal server error"
+            "description": "Invalid parameters or the position could not be read"
           }
         }
       }

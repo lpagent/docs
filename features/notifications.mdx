@@ -1,6 +1,6 @@
 ---
 title: "Notifications"
-description: "Get a push when a position closes or a copy opens, closes or fails"
+description: "Get a push when a position closes or a copy opens, closes or fails, and hear a chime when a position opens or closes"
 ---
 
 LP Agent can send push notifications to your phone or computer, even when the tab is closed.
@@ -58,3 +58,16 @@ iOS only sends push notifications to apps on your Home Screen:
 ## Stop notifications
 
 Switch off **System Notifications**, or switch off single events. Pressing **Disconnect** also removes this device's subscription.
+
+## Position sounds
+
+Separate from push notifications, the open app plays a short two-note chime: rising when a position opens, falling when it closes. It plays when the transaction lands, on Solana and Robinhood Chain:
+
+- **Open**: creating a position. On Robinhood Chain that includes a zap in or a two-token deposit.
+- **Close**: closing a position in full, with a zap out (one-click or from the **Close** form) or, on Robinhood Chain, a 100% withdraw.
+
+Adding to a position or withdrawing part of it stays silent.
+
+While a pool page is open, you also hear the close chime when one of your positions is closed for you, for example by take profit, stop loss or a copy exit. Your browser may only allow that sound after you have clicked something on the page.
+
+The chime is on by default. Turn it off with **Settings > General > Position Sounds**. The choice is saved on this device, and switching it back on plays the chime once so you can hear it.

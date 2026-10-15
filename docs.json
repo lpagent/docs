@@ -30,23 +30,24 @@
                 ]
               },
               {
-                "group": "Copy Trading",
-                "pages": [
-                  "features/smart-lp",
-                  "features/copy-lp",
-                  "features/copy-settings",
-                  "features/copy-management"
-                ]
-              },
-              {
                 "group": "Liquidity",
                 "pages": [
+                  "features/discover",
                   "features/pools",
                   "features/create-position",
                   "features/portfolio",
                   "features/manage-positions",
                   "features/take-profit-stop-loss",
                   "features/claim-sol"
+                ]
+              },
+              {
+                "group": "Copy Trading",
+                "pages": [
+                  "features/smart-lp",
+                  "features/copy-lp",
+                  "features/copy-settings",
+                  "features/copy-management"
                 ]
               },
               {
@@ -137,7 +138,7 @@
           "links": [
             {
               "label": "Support",
-              "href": "https://discord.gg/h8YDHtzmRU"
+              "href": "https://discord.gg/lpagent"
             },
             {
               "label": "API Pricing",
@@ -170,23 +171,24 @@
                 ]
               },
               {
-                "group": "跟单",
-                "pages": [
-                  "zh/features/smart-lp",
-                  "zh/features/copy-lp",
-                  "zh/features/copy-settings",
-                  "zh/features/copy-management"
-                ]
-              },
-              {
                 "group": "流动性",
                 "pages": [
+                  "zh/features/discover",
                   "zh/features/pools",
                   "zh/features/create-position",
                   "zh/features/portfolio",
                   "zh/features/manage-positions",
                   "zh/features/take-profit-stop-loss",
                   "zh/features/claim-sol"
+                ]
+              },
+              {
+                "group": "跟单",
+                "pages": [
+                  "zh/features/smart-lp",
+                  "zh/features/copy-lp",
+                  "zh/features/copy-settings",
+                  "zh/features/copy-management"
                 ]
               },
               {
@@ -280,7 +282,7 @@
           "links": [
             {
               "label": "支持",
-              "href": "https://discord.gg/h8YDHtzmRU"
+              "href": "https://discord.gg/lpagent"
             },
             {
               "label": "API 价格",
@@ -304,7 +306,7 @@
     "links": [
       {
         "label": "Support",
-        "href": "https://discord.gg/h8YDHtzmRU"
+        "href": "https://discord.gg/lpagent"
       },
       {
         "label": "API Pricing",
@@ -321,7 +323,7 @@
     "socials": {
       "twitter": "https://x.com/lpagent_io",
       "github": "https://github.com/lpagent",
-      "discord": "https://discord.gg/h8YDHtzmRU"
+      "discord": "https://discord.gg/lpagent"
     }
   },
   "redirects": [

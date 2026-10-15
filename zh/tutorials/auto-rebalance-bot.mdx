@@ -73,6 +73,7 @@ After rebalance:
 | **再投入多少？** | Zap-Out 之后检查 SOL 余额，预留 0.05 SOL 用作手续费 |
 | **新区间放在哪？** | 以当前 active bin 为中心，区间大小可配置 |
 | **用什么策略？** | 可配置：`Spot`、`Curve` 或 `BidAsk` |
+| **处理哪些仓位？** | 只处理 Meteora DLMM：机器人调用 `/lp-positions/opening` 时带上 `platform=meteora`，因为重新入场是按 bin 放流动性的 |
 
 ---
 
@@ -149,7 +150,7 @@ const dynamicRange = binStep > 5 ? 20 : 50; // volatile → wider, stable → ti
 
 ### 按池子类型筛选
 
-只再平衡 DLMM 仓位（跳过 DAMM V2）：
+完整脚本已经只查 DLMM 仓位（在 `/lp-positions/opening` 上带 `platform=meteora`）。如果去掉这个筛选，接口也会返回 DAMM V2 仓位。在循环里跳过它们，因为重新入场是按 bin 放流动性的；如果要关闭 DAMM V2 仓位，调用 `decrease-tx` 时传 `type: "meteora_damm_v2"`：
 
 ```typescript
 if (pos.protocol !== "meteora") {
@@ -351,7 +352,8 @@ async function zapIn(poolAddress: string, amountSOL: number): Promise<string> {
 async function checkAndRebalance() {
   log("Checking positions...");
 
-  const positionsRes = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}`);
+  // DLMM positions only: the re-entry below places liquidity by bin
+  const positionsRes = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}&platform=meteora`);
   const positions = positionsRes.data;
 
   if (!positions || positions.length === 0) {
@@ -385,10 +387,10 @@ async function checkAndRebalance() {
       // 2. Check available SOL
       const balanceRes = await apiCall("GET", `/token/balance?owner=${OWNER}`);
       const solBalance = balanceRes.data?.find(
-        (t: any) => t.address === "So11111111111111111111111111111111111111112"
+        (t: any) => t.tokenAddress === "So11111111111111111111111111111111111111112"
       );
 
-      const availableSOL = solBalance ? parseFloat(solBalance.uiAmount) : 0;
+      const availableSOL = solBalance ? solBalance.balance : 0;
       const reserveSOL = 0.05;
       const reinvestSOL = Math.max(0, value / (solBalance?.price || 150) * 0.95);
       const zapInAmount = Math.min(reinvestSOL, availableSOL - reserveSOL);

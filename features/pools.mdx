@@ -1,32 +1,41 @@
 ---
 title: "Pools"
-description: "Browse, filter and search liquidity pools on Solana and Robinhood Chain"
+description: "Browse, filter and search liquidity pools on Solana and Robinhood Chain, and create a new one"
 ---
 
-The **Pools** page lists every pool LP Agent tracks. Switch network with the chain picker in the header.
+The **Pools** page lists every pool LP Agent tracks. Switch network with the chain picker in the header. To start from a token instead of a pool, use [Discover](/features/discover).
 
 <Frame>
   ![Pools on Solana](/images/app/sol-pools.jpg)
   <em>Pools on Solana, sorted by liquidity</em>
 </Frame>
 
-## Views and sorting
+## The list
 
-- **Table** (default) or **Card** view, top right.
-- The top bar shows how many pools match and when the data was last updated.
+- One table, 20 pools a page. On a phone it becomes a list, with sort chips above it.
+- The bar above the table shows how many pools match on this chain and, while the data is fresh, when it was last updated.
+- The list refreshes on its own: every minute on Solana, every 10 seconds on Robinhood Chain. A pool a refresh brings onto the page flashes in, and a pool that changed rank slides to its new place.
 - Click a column header to sort, click again to flip the order. The default sort is **Fee/TVL**, highest first.
-- **Columns** adds extra columns, such as total liquidity across the token's pools, volatility (24h volume / liquidity) and market cap per holder on Solana.
+- On Solana, the **Fee/TVL** header has a window picker: **24h**, **6h**, **1h** or **5m**. The **Volume** and **Fees** columns follow the same window. The app remembers the window you picked, per chain, for your next visit.
+- **Columns** switches columns on and off. Every column the chain can show is listed and on by default. Your choice is kept per chain; **Show all columns** brings them all back.
+- On Solana, the chart icon at the end of a row opens a price chart under it. Click anywhere else on the row to open the pool.
 
 | Column | Meaning |
 | --- | --- |
 | **Pool** | Pair, swap fee, protocol (DLMM, DAMM V2, Uniswap V3, Uniswap V4), bin step on DLMM, organic score on Solana, address and quick links |
+| **Category** | **Stock** for tokenized stocks (Robinhood Chain) |
 | **Fee/TVL** | Fees earned relative to liquidity over the window (24h, 6h, 1h or 5m on Solana; 24h on Robinhood Chain) |
 | **Liquidity** | Total value locked in the pool. On Robinhood Chain it also shows the token split and an estimated **APR** |
 | **Volume** / **Fees** | Trading volume and fees over the window |
 | **MCAP** | Market cap of the main token |
 | **Holders** | Holder count (Solana) |
-| **Age** | How long the pool has existed |
-| **Category** | **Stock** for tokenized stocks (Robinhood Chain) |
+| **Age** | How long the pool has existed, such as **5h**, **9d** or **2.3y** |
+| **T Liq** | Liquidity across all of the token's pools |
+| **T Quote Liq** | The quote side (SOL, USDC and so on) of that liquidity (Solana) |
+| **Volatility** | 24h volume over liquidity, across the token's pools (Solana) |
+| **MC/Holder** | Market cap per holder (Solana) |
+| **Fee/TVL 24h**, **6h**, **1h**, **5m** | Fee/TVL in each window, with its hourly rate (Solana) |
+| **T Vol 24h**, **6h**, **1h** | Volume across all of the token's pools, with its hourly rate (Solana) |
 
 <Tip>
   A high Fee/TVL on a tiny pool can disappear fast. Check liquidity, volume and age together before you zap in.
@@ -34,17 +43,20 @@ The **Pools** page lists every pool LP Agent tracks. Switch network with the cha
 
 ## Filters
 
+Press **Filters** to open the whole form. The button shows how many filters are set (ranges, search and **Small pools**).
+
 | Filter | Solana | Robinhood Chain |
 | --- | --- | --- |
+| **Pool or token** | Paste a pool or token address | Paste a pool or token address |
 | **Quote Token** | SOL & USDC, SOL, USDC | WETH & USDG, WETH, USDG |
 | **Type** / **Protocol** | All, DLMM, DAMM V2 | All, Uniswap V3, Uniswap V4 |
 | **Category** | - | All, Stocks |
-| **Search** | Paste a pool or token address | Paste a pool or token address |
 | **Small pools** | - | **Show pools under $5k** (off by default) |
-| **Range filters** | Market cap, age, liquidity, 24h and 1h volume, 24h fees, bin step, base fee, organic score | Market cap, age, liquidity, volume, fees, base fee |
+| **Ranges** (min and max) | Market cap, liquidity, 24h volume, 1h volume, 24h fees, age (hours), base fee (%), bin step, organic score | Market cap, liquidity, 24h volume, 1h volume, 24h fees, age (hours), base fee (%) |
 
-- **Filter** applies and saves your filters for this network. **Clear** resets them.
-- **Copy link** copies a link with your current filters, so you can share a view.
+- Amounts are in USD. You can type `500k`, `1.5m` or `2b`.
+- **Apply** applies your filters, saves them for this network and closes the form. **Clear all** resets them.
+- **Copy link** copies a link with the filters in the form, so you can share a view.
 - On Solana, new users start with a minimum liquidity, volume and organic score so the list is not flooded with dust pools.
 - On Robinhood Chain, pools under $5k are hidden unless you turn on **Small pools**, search an address or set your own minimum liquidity. Pools showing $50k or more TVL with almost no volume are also left out of browsing.
 
@@ -67,6 +79,58 @@ The search box in the header (shortcut `/`) finds tokens, pools and wallets by a
 
 Your last 5 searches are kept under **Recent Searches**.
 
+## Create a pool
+
+When a token has no pool you want, you can create one from inside the app, with your [agent wallet](/account-and-wallet#your-agent-wallet). You start it from [Discover](/features/discover), not from the Pools page:
+
+- **Create pool** on a token with no pool.
+- **New pool** above a token's unfolded pools, for another fee or quote token.
+
+The **Create a pool for** dialog opens. Nothing is sent until you press its button.
+
+| Field | Solana | Robinhood Chain |
+| --- | --- | --- |
+| **Protocol** | **DLMM** or **DAMM v2** (Meteora) | **Uniswap v3** or **Uniswap v4** |
+| **Quote token** | SOL or USDC | ETH or USDG |
+| Fee | DLMM: **Bin step**, shown with its size such as **100 (1% per bin)**, then **Fee**. It starts on a 100 bin step with a 1% fee, or the nearest offered. DAMM v2: **Fee** only, a flat fee collected in the quote token. | **Fee**: a standard Uniswap fee tier, such as 0.05%, 0.3% or 1% |
+| First deposit | DLMM: none. You add the first liquidity on the pool page right after. DAMM v2: part of creating the pool. | Part of creating the pool |
+
+### Starting price
+
+**Starting price** is how much of the quote token 1 token is worth. It starts at the market price; **Use market** puts it back after you edit it.
+
+- More than 5% away from the market price, the dialog warns you.
+- More than 20% away, it refuses: **Price too far from the market**.
+- When no market price is known for the token, the dialog says so. Check the price yourself.
+- A DLMM pool opens at the nearest bin at or under your price, and the dialog shows that price.
+
+<Warning>
+  A pool opened away from the market price is arbitraged as soon as it holds liquidity, and the first liquidity in it pays for that. Keep the starting price at the market unless you have a reason not to.
+</Warning>
+
+### First deposit (DAMM v2 and Robinhood Chain)
+
+Type the quote side in **First deposit in** (SOL, USDC, ETH or USDG). The token side is whatever that is worth at your starting price. Both sides come from your agent wallet, so it must already hold the token. The note under the box shows the token amount it pairs with and what your agent wallet holds. If it holds too little, the dialog says how much is missing and does not create the pool. On Robinhood Chain you also need ETH for gas.
+
+The pool opens at the ratio of the two sides, and your first deposit becomes a full-range position.
+
+### Before you press Create pool
+
+The summary shows:
+
+- **Pool address**: where the new pool will live.
+- **Cost to create**: about how much SOL of network rent (Solana) or ETH of gas (Robinhood Chain) it takes, on top of any deposit.
+- **First deposit**: the two amounts, or **On the pool page, right after** for DLMM.
+- **Signed by**: **Agent wallet**.
+
+If a pool with the same pair and fee already exists, the button reads **Open existing pool** and takes you there instead. The button also tells you what is missing, for example **Enter a starting price** or **No agent wallet on this chain**.
+
+### After it is created
+
+- **DLMM**: the new pool's page opens. Add your first liquidity in the **Create Position** panel. As the first LP in the pool, you pay the one-time **New price bin rent** for the bins your range covers, shown before you confirm. See [Create a Position](/features/create-position).
+- **DAMM v2**: the new pool's page opens, with your first deposit in it.
+- **Robinhood Chain**: the dialog confirms the pool and links the transaction. The pool's page and your position show up once LP Agent has picked up the pool, usually within a few minutes. **Open portfolio** and **Open pool page** take you onward.
+
 ## The pool page
 
 Click a pool to open it.
@@ -76,15 +140,18 @@ Click a pool to open it.
   <em>A Meteora DLMM pool: price chart with your range and liquidity depth, positions in the pool, and the Create Position panel</em>
 </Frame>
 
-**Header:** pair, protocol, bin step and base fee, and live stats: price, market cap, TVL, 24h volume, 24h fees, Fee/TVL and estimated fee APR. Click the pair to switch to another pool of the same token. The link icon opens the pool on Meteora or Uniswap, GMGN, DexScreener or the block explorer.
+**Header:** pair, protocol, bin step and base fee, and live stats: price, market cap, TVL, 24h volume, 24h fees, Fee/TVL and estimated fee APR. Click the pair to switch to another pool of the same token. The link icon opens the pool on Meteora or Uniswap, either token on GMGN, the pool on DexScreener or the block explorer, and on Solana the main token's holder map on Bubblemaps.
 
 **Tabs at the top:**
 
-- **Price Chart**: candles from 1 minute to 1 day. On DLMM pools the liquidity depth is drawn next to the price. Drag the **Min Price** and **Max Price** lines to set your range by eye.
+- **Price Chart**: candles from 1 minute to 1 day.
+  - **Pool** / **Token** above the chart: **Pool** plots this pool's own trades. **Token** plots the token's price across every market it trades on, with candles down to 1 second. Both chains have it.
+  - **Price** / **MCap** in the chart's toolbar switches between price and market cap. On Robinhood Chain it is on the Token chart only. On Solana, while the chart shows market cap, your range lines read **Min MCap** and **Max MCap**, and the panel's range follows.
+  - On DLMM pools the liquidity depth is drawn next to the price and follows the pool's live liquidity.
+  - Drag the **Min Price** and **Max Price** lines to set your range by eye.
 - **Pool Details**: pool address, fees, token amounts and share of TVL. On Solana, fee history and the liquidity distribution per bin.
-- **Bubble** (Solana): a holder bubble map of the main token.
 
-A **Live** badge on Solana pools shows the data is streaming.
+A **Live** badge on Solana pools shows the data is streaming. When you select one of your positions, its live uPnL shows in the browser tab's title, so you can watch it from another tab.
 
 **Tabs at the bottom:**
 
@@ -96,6 +163,11 @@ A **Live** badge on Solana pools shows the data is streaming.
 | **Your Positions** / **History** | Your open and closed positions in this pool. |
 | **Your Assets** | Tokens in your wallet, with a swap shortcut on Solana. |
 
+On **Your Positions** and **History**:
+
+- The source select narrows the rows: **All positions**, **Auto only** (positions badged Auto) or **Manual only** (positions badged Manual). Copied positions show under **All positions**. Your choice is remembered in this browser. On **History** the select appears when you are looking at your own agent wallet.
+- A position you just opened shows in **Your Positions** as soon as the transaction lands, with what you put in and its range. Value, fees and uPnL fill in a few seconds later, once it has synced. Until then the row has no actions.
+
 The flag icon lets you report a pool.
 
 <Frame>
@@ -103,4 +175,4 @@ The flag icon lets you report a pool.
   <em>Positions In Pool on Robinhood Chain, with Copy on each row</em>
 </Frame>
 
-The panel on the right is where you open a position. See [Create a Position](/features/create-position).
+The panel on the right is where you open a position. See [Create a Position](/features/create-position). Select one of your positions to manage it there. See [Manage Positions](/features/manage-positions).

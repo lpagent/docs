@@ -51,7 +51,7 @@ It works on both networks:
 | Leader does | Your copy does | Solana | Robinhood Chain |
 | --- | --- | --- | --- |
 | Opens a position | Opens the same pool and range at your size | Yes | Yes |
-| Adds liquidity | Adds the leader's amount x your copy % (capped by your max) | Yes | Yes |
+| Adds liquidity | Adds the leader's amount x your copy % (capped by your max). See [How sizing works](#how-sizing-works) | Yes | Yes |
 | Removes part of a position | Removes the same share of your position | Yes | Yes |
 | Closes a position | Closes your copy | Yes | Yes |
 | Claims fees | Claims fees on your copy | Yes | Yes |
@@ -61,6 +61,8 @@ It works on both networks:
 - Only positions the leader opens **after** you start copying are copied.
 - Adds, removes and closes only apply to positions you hold a copy of.
 - Your own **take profit** and **stop loss** can close a copy before the leader does. Whichever comes first wins.
+- On Solana, some rebalances can't be mirrored: for example the leader moves only part of a position, or takes profit or tops up in the same move. Those are skipped. Your copy stays where it is, and Copy Logs says why.
+- On Solana, some leaders open an empty position and fund it a few seconds later. Your copy opens the empty position too (it pays the position rent), then copies the funding add. If your agent wallet can't cover that add, the copy is still empty, so it is closed about a minute later and the position rent comes back to your wallet.
 
 ## How sizing works
 
@@ -76,6 +78,19 @@ Your size is set by two numbers in the **Sizing** step:
 3. Your copy now holds 8.8 SOL.
 
 The cap applies **per transaction**, not per position. Removes and closes are percentage based and are never capped.
+
+With no Copy Percentage, each copy matches the leader's amount, up to your Max.
+
+### When the max cuts the open short
+
+If the Max cuts the open itself, your copy holds a smaller share of the leader's position than your Copy Percentage. The leader's later adds to that position are copied at that smaller share, so your copy keeps the same shape as the leader's instead of piling into one side.
+
+**Example:** Copy Percentage 50%, Max 7 SOL.
+
+1. The leader opens with 100 SOL. 50% would be 50 SOL, so you open 7 SOL: 7% of the leader's position.
+2. Later the leader adds 10 SOL. You add 0.7 SOL (7%), not 5 SOL (50%).
+
+Each add still stays under your Max, and never goes above your current Copy Percentage. This holds for 30 days after the open; after that, adds go back to your Copy Percentage.
 
 ## What you need in your wallet
 

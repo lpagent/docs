@@ -67,6 +67,7 @@ lpagent positions revenue <addr>
 
 ```bash
 lpagent pools discover --chain SOL --sort-by tvl
+lpagent pools discover --chain SOL --sort-by fee_tvl_ratio --fee-tvl-interval 1h
 lpagent pools info <poolId>
 lpagent pools positions <poolId> --status Open
 lpagent pools onchain-stats <poolId>
@@ -81,10 +82,14 @@ lpagent pools add-tx <poolId> --owner <addr> --strategy Spot --input-sol 1
 lpagent pools landing-add-tx --file signed-tx.json
 
 # Zap-Out
-lpagent tx decrease-quotes --id <id> --bps 10000
+lpagent tx zap-out-estimates --position-id <id> --bps 10000
 lpagent tx decrease-tx --position-id <id> --bps 10000 --owner <addr> --slippage-bps 500
 lpagent tx landing-decrease-tx --file signed-tx.json
 ```
+
+<Note>
+`tx zap-out-estimates` shows what each output option (`allToken0`, `allToken1`, `both`, `allBaseToken`) pays out before you run `decrease-tx`. It needs CLI v0.4.0 or later, where `tx decrease-quotes` is kept as an alias for it. Older versions call the removed `/position/decrease-quotes` endpoint and fail, so run `lpagent upgrade`.
+</Note>
 
 ### Token and raw API access
 
@@ -92,7 +97,7 @@ lpagent tx landing-decrease-tx --file signed-tx.json
 lpagent token balance --owner <addr>
 
 lpagent api get /lp-positions/opening --query "owner=<addr>"
-lpagent api post /position/decrease-quotes --data '{"id":"...","bps":5000}'
+lpagent api post /position/zap-out-estimates --data '{"position_id":"...","bps":5000}'
 ```
 
 ## Output modes

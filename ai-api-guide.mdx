@@ -32,10 +32,11 @@ Never expose API keys or private keys in frontend code, shared prompts, screensh
 
 ### 1) Discover pools and market state
 
-- `GET /pools/discover` → find pools with filters/sorting
+- `GET /pools/discover` → find pools with filters/sorting (Fee/TVL sort over a `5m`, `1h`, `6h` or `24h` window on Solana)
 - `GET /pools/{poolId}/info` → inspect pool state and active bin context
+- `GET /pools/{poolId}/positions` → positions opened in a pool
 - `GET /pools/{poolId}/onchain-stats` → on-chain pool metrics
-- `GET /pools/{poolId}/top-lpers` → top liquidity providers
+- `GET /pools/{poolId}/top-lpers` → top liquidity providers (Premium)
 
 ### 2) Track positions and portfolio analytics
 
@@ -43,19 +44,49 @@ Never expose API keys or private keys in frontend code, shared prompts, screensh
 - `GET /lp-positions/historical` → historical/closed positions
 - `GET /lp-positions/overview` → aggregated portfolio metrics
 - `GET /lp-positions/logs` → position activity logs
+- `GET /lp-positions/position` → one position in detail
 - `GET /lp-positions/revenue/{owner}` → revenue/pnl time data
 
 ### 3) Execute liquidity operations (zap-in / zap-out)
 
 - `POST /pools/{poolId}/add-tx` → generate unsigned zap-in txs
 - `POST /pools/landing-add-tx` → submit signed zap-in txs
-- `POST /position/decrease-quotes` → preview zap-out outputs
+- `POST /position/zap-out-estimates` → estimate what each zap-out output pays out
 - `POST /position/decrease-tx` → generate unsigned zap-out txs
 - `POST /position/landing-decrease-tx` → submit signed zap-out txs
 
-### 4) Wallet utility
+### 4) Claim fees
+
+- `POST /position/claim-fee-tx` → generate unsigned claim-fee txs, optionally with swap-to-SOL txs
+- `POST /position/landing-claim-fee-tx` → submit signed claim-fee txs
+
+### 5) Wallet and network utility
 
 - `GET /token/balance` → wallet token balances
+- `POST /rpc`, `POST /rpc/historical` → Solana JSON-RPC (Premium)
+- `POST /jito` → send a Jito bundle (Premium)
+
+## Chain Support
+
+Read endpoints take `chain=SOL` (default) or `chain=ROBINHOOD`. Everything that builds or sends a
+transaction is Solana only.
+
+| Endpoint | Solana (`SOL`) | Robinhood Chain (`ROBINHOOD`) |
+| --- | --- | --- |
+| `GET /lp-positions/opening`, `/historical`, `/overview`, `/logs`, `/position` | Yes | Yes |
+| `GET /lp-positions/revenue/{owner}` | Yes | Yes |
+| `GET /token/balance` | Yes | Yes |
+| `GET /pools/discover` | Yes | Yes |
+| `GET /pools/{poolId}/positions`, `/onchain-stats`, `/top-lpers` | Yes | Yes |
+| `GET /pools/{poolId}/info` | Yes | No |
+| `POST /pools/{poolId}/add-tx`, `/pools/landing-add-tx` | Yes | No |
+| `POST /position/zap-out-estimates` | Yes (Meteora DLMM only) | No |
+| `POST /position/decrease-tx`, `/position/landing-decrease-tx` | Yes | No |
+| `POST /position/claim-fee-tx`, `/position/landing-claim-fee-tx` | Yes | No |
+| `POST /rpc`, `/rpc/historical`, `/jito` | Yes | No |
+
+See [API Reference Introduction](/api-reference/introduction#supported-chains) for how `chain` and
+`platform` behave on each endpoint.
 
 ## End-to-End Flows
 
@@ -81,7 +112,7 @@ Use this when your AI wants to open a new LP position from SOL input.
   </Step>
 </Steps>
 
-### Flow B: List positions -> Quote -> Zap-Out
+### Flow B: List positions -> Estimate -> Zap-Out
 
 Use this when your AI wants to close all or part of an LP position.
 
@@ -89,11 +120,11 @@ Use this when your AI wants to close all or part of an LP position.
   <Step title="1) Get open positions">
     Call `GET /lp-positions/opening?owner=<wallet>` and choose a target position `id`.
   </Step>
-  <Step title="2) Preview withdrawal outputs (optional)">
-    Call `POST /position/decrease-quotes` with `id` and `bps`.
+  <Step title="2) Estimate the payout (optional)">
+    Call `POST /position/zap-out-estimates` with `position_id` (the position's `id`) and `bps`. Each estimate shows what the wallet receives for one `output` option. Meteora DLMM positions only.
   </Step>
   <Step title="3) Generate withdraw transactions">
-    Call `POST /position/decrease-tx` with `position_id`, `bps`, `owner`, `slippage_bps`, and `output` mode.
+    Call `POST /position/decrease-tx` with `position_id`, `bps`, `owner`, `slippage_bps`, and `output` mode. For a DAMM V2 position, also send `type: "meteora_damm_v2"` (the position's `protocol`).
   </Step>
   <Step title="4) Sign locally">
     Sign base64 transactions with the owner wallet.
@@ -109,7 +140,7 @@ Use this when your AI should continuously keep positions in-range.
 
 1. Poll `GET /lp-positions/opening?owner=...`
 2. For each position with `inRange=false`:
-   - zap-out old position (`decrease-tx` + `landing-decrease-tx`)
+   - zap-out old position (`decrease-tx` + `landing-decrease-tx`, with `type` set from the position's `protocol`)
    - check available SOL (`GET /token/balance`)
    - get pool active bin (`GET /pools/{poolId}/info`)
    - zap-in new position (`add-tx` + `landing-add-tx`)
@@ -117,8 +148,10 @@ Use this when your AI should continuously keep positions in-range.
 
 ## Critical Parameters and Constraints
 
-- `bps`: `0..10000` (10000 = 100%)
+- `bps`: `0..10000` on `decrease-tx`, `1..10000` on `zap-out-estimates` (10000 = 100%)
 - `slippage_bps`: `0..10000`
+- position type enum on `decrease-tx` and `claim-fee-tx`: `meteora` (DLMM, default), `meteora_damm_v2`
+- `feeTVLInterval` on `pools/discover`: `5m`, `1h`, `6h`, `24h`
 - `percentX`: `0..1`
 - strategy enum: `Spot`, `Curve`, `BidAsk`
 - add mode enum: `normal`, `zap-in`
@@ -135,6 +168,8 @@ In request bodies, the add-liquidity field name is currently `stratergy` (spelli
 - Keep signing and secret handling in trusted runtime only
 - Re-generate transactions if they expire (block height window passed)
 - Add retries with backoff for transient API/network failures
+- Stay under your plan's requests per minute (Basic 5, Premium 10, Enterprise 20); a `429` means wait and retry
+- A `401` with `Unauthorized` means the key is missing, unknown, or out of access (for example a paid plan that ended); see [When a paid plan ends](/api-reference/introduction#when-a-paid-plan-ends)
 - Always log request IDs, endpoint, and owner (without leaking keys)
 
 ## Minimal TypeScript API wrapper
@@ -165,7 +200,8 @@ async function apiCall(method: string, path: string, apiKey: string, body?: obje
 1. [API Reference Introduction](/api-reference/introduction)
 2. [Zap-In & Zap-Out via API](/tutorials/add-liquidity-api)
 3. [Auto-Rebalancing Bot](/tutorials/auto-rebalance-bot)
-4. [AI page](/ai)
+4. [Compound LP Fees](/tutorials/compound-lp-fees)
+5. [AI page](/ai)
 
 <Card title="Need complete endpoint schemas?" icon="book" href="/api-reference/introduction">
   Open the API Reference tab for full OpenAPI-generated endpoint details.

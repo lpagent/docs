@@ -45,7 +45,9 @@ description: "净资产、盈亏历史和所有仓位，你自己的钱包或任
 
 ## 当前仓位
 
-汇总行显示 **Total value**、**Total uPnL**、**Total claimed fee** 和 **Total unclaim fee**。可以按 **Type**（协议）筛选，也可以在 **Table** 和 **Card** 之间切换。
+汇总行显示 **Total value**、**Total uPnL**、**Total claimed fee** 和 **Total unclaim fee**。可以按 **Type**（协议）筛选，也可以在 **Table**（默认）和 **Card** 之间切换。
+
+在手机上，**Table** 保留所有列，可以左右滑动查看。**Card** 则显示一个紧凑的列表，顶部有排序菜单。
 
 | 列 | 含义 |
 | --- | --- |
@@ -63,7 +65,20 @@ description: "净资产、盈亏历史和所有仓位，你自己的钱包或任
 
 ## 历史仓位
 
-所有已平仓的仓位，最新的在最前面，显示投入、总手续费、盈亏、DPR 和平仓时间。打开 **Hide small PnL positions** 可以隐藏金额很小的仓位。黄色图标标出数字看起来不对的行，这些行不算进你的统计。
+所有已平仓的仓位，最新的在最前面，显示投入、总手续费、盈亏、DPR 和平仓时间。和当前仓位一样，可以在 **Table** 和 **Card** 之间切换。
+
+按 **Filter**（筛选）缩小列表范围。按钮上的数字表示开了几个筛选。
+
+| 筛选 | 作用 |
+| --- | --- |
+| **Type** | 协议：Solana 上是 DLMM 或 DAMM V2；Robinhood Chain 上是 Uniswap V3 或 Uniswap V4。 |
+| **Source** | **All positions**、**Auto only** 或 **Manual only**（全部、只看自动、只看手动）。只在你自己的代理钱包上有。 |
+| **Pool** | 这个钱包平过仓的某一个池子。可以按交易对搜索，也可以粘贴池子地址。 |
+| **PnL** | 盈亏的最小值和最大值，单位是页面当前显示的币种（USD、SOL 或 ETH）。两端的值都包含在内。 |
+
+按 **Apply** 应用筛选，或按 **Reset** 全部清除。筛选条件会保存在页面链接里，所以收藏这个链接，下次打开还是同样的筛选结果。
+
+打开 **Hide Small PnL** 可以隐藏金额很小的仓位。黄色图标标出数字看起来不对的行，这些行不算进你的统计。
 
 ## 仓位详情
 
@@ -71,10 +86,10 @@ description: "净资产、盈亏历史和所有仓位，你自己的钱包或任
 
 - **Profit And Loss**、**Age**、**Liquidity**（当前价值，旁边是如果你一直拿着这些代币不动，现在值多少）和 **Fee**（已领取和未领取，按代币分开列）。
 - 在 Solana DLMM 上，有 **Price Bin** 图表，显示你在每个 bin 的流动性和当前价格。
-- **History**：这个仓位的每一笔交易，带链接。
+- **History**：这个仓位的每一笔交易，带链接。按 **Export CSV** 可以下载成表格文件：时间（UTC）、交易哈希、操作、状态、每个代币的数量、价格和 USD 价值，以及按 USD 和按 SOL 或 ETH 计的总额。数字完整写出，不做缩写（不会写成 "1.2k"）。
 - **Logs**（只有你自己的仓位才有）：LP Agent 做了什么，比如 take profit queued（止盈已排队）或 close success（平仓成功）。
 - 跟单来的仓位会显示它是跟的哪个带单钱包的哪个仓位。
 
 ## 实时更新
 
-当前仓位每 10 秒刷新一次，你切回这个标签页时也会刷新。在 Solana 上，你可以改用 **Settings > General > Realtime Portfolio** 实时推送。**Realtime Numbers** 决定数值变化时是闪一下还是滚动。
+当前仓位每 10 秒刷新一次，你切回这个标签页时也会刷新。在 Solana 上，你可以改用 **Settings > General > Realtime Portfolio** 实时推送。**Realtime Numbers** 决定数值变化时是闪一下还是滚动。在手机上，数值只会直接更新，不闪也不滚动。

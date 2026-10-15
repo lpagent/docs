@@ -24,13 +24,13 @@ description: "跟单弹窗里的每个选项，一步一步讲清楚"
 | **Max Increase Amount per Tx** | 每次跟单开仓和每次跟单加仓的可选上限，单位是你的 TP/SL 币种。留空表示不设上限。 |
 | **Funding currency**（Robinhood Chain） | 显示新跟单用 ETH 还是 USDG 出资，以及你用来付 Gas 的 ETH。在 Settings 里修改。 |
 
-Copy Percentage 和 Max 至少填一个，也可以两个都填。
+Copy Percentage 和 Max 至少填一个，也可以两个都填。只填 Max 时，每次跟单都和带单钱包的金额一样，但不超过 Max。如果开仓就被 Max 截短，带单钱包之后往这个仓位加仓时，会按开仓实际拿到的那个更小的比例跟。见[仓位规模怎么算](/zh/features/copy-lp)。
 
 <Warning>
-  Max 设为 **0** 就什么都不会跟。想不设上限跟单，就把这一栏留空。
+  Max 设为 **0** 会什么都跟不到，所以现在保存不了。想不设上限跟单，就把这一栏留空。以前保存为 0 的跟单，会在这一栏下面显示一行红字提示。
 </Warning>
 
-**快进快出的钱包：** 如果带单钱包平均持仓少于 18 分钟（Solana）或 1 小时（Robinhood Chain），弹窗会显示 **High-frequency**（高频）警告。每换一次仓，你都要付一次兑换进场、一次兑换回来和网络手续费，不管这笔交易赚没赚。
+**快进快出的钱包：** 如果带单钱包平均持仓少于 18 分钟（Solana）或 1 小时（Robinhood Chain），弹窗会显示 **High-frequency**（高频）警告。每换一次仓，你都要付一次兑换进场、一次兑换回来和网络手续费，不管这笔交易赚没赚。在 Solana 上，如果这个钱包还经常在退出后一分钟内把同一个代币加回来，警告里会写出有多频繁，并提供 **Turn on Smart Token Retention**（开启智能代币保留）按钮。
 
 ## 第 2 步：Exit rules（退出规则）
 
@@ -87,24 +87,31 @@ TP/SL 会在每个跟单仓位开仓时保存到这个仓位上。之后就算�
 
 ### Meme Protection
 
-**Meme Protection**（Meme 保护）在两个网络上都默认开启。当池子里可信的那一边（SOL、USDC、USDT，或 ETH、WETH、USDG）几乎为空，也就是你的跟单有超过 95% 会落在另一种代币上时，这次跟单会被跳过。Copy Logs（跟单日志）里显示为 **Meme protection**。
+**Meme Protection**（Meme 保护）在两个网络上都默认开启。跟单开仓或加仓时，如果可信的那一边（Solana 上是 SOL、USDC、USDT；Robinhood Chain 上是 ETH、WETH、USDG）几乎为空，也就是你的跟单存入的金额有超过 95% 会落在另一种代币上，这次跟单会被跳过。两种代币都可信、或者都不可信的池子不做这项检查。
+
+被 Meme Protection 拒绝算作跳过，不算失败，也不会重试。Copy Logs（跟单日志）里的原因显示为 **Meme protection**，展开这一行会告诉你怎样才能让下一次通过。
+
+有些带单钱包会把一个代币撤出来，过一会儿再只用这个代币加回去。没开 Smart Token Retention 时，带单钱包撤出时你的跟单就把代币卖了，所以加回时几乎全是 meme 代币，会被 Meme Protection 跳过。结果你的跟单仓位比带单钱包少。想跟上这类加回，有两种办法：
+
+- **开启 Smart Token Retention**（Solana，DLMM，见下文）。你的跟单会留着撤出的代币。如果带单钱包在你设的保留时长内把它加回来，你的跟单就把留着的代币加回去，Meme Protection 会放行这次加回。
+- **为这个带单钱包关掉 Meme Protection**。之后每次跟单都会执行，包括几乎全是 meme 代币的那些。
 
 ### Smart Token Retention（Solana，DLMM）
 
-默认关闭。带单钱包经常撤出一个仓位，一分钟后又把同一个代币加回来。正常情况下，你的跟单会在退出时卖掉这个代币，再在加回时重新买入。开启 **Smart Token Retention**（智能代币保留）后，你的跟单会 **把代币保留一小段时间**，如果同一个带单钱包把它加回来，就直接复用。这样省掉一次卖出和一次买入。
+默认关闭。带单钱包经常撤出流动性或平仓，一分钟后又把同一个代币加回来。正常情况下，你的跟单会在退出时卖掉这个代币，再在加回时重新买入。开启 **Smart Token Retention**（智能代币保留）后，你的跟单会 **把代币保留一小段时间**，如果同一个带单钱包把它加回来，就直接复用。这样省掉一次卖出和一次买入。DAMM V2 的退出仍然会马上卖掉代币。
 
 | 选项 | 可选值 |
 | --- | --- |
 | **Hold for**（保留时长） | 30s、**1 min**（默认）、2 min、5 min |
 | **Sells right away if**（出现以下情况立即卖出） | **Price drops more than**（价格跌幅超过）5%（0.5% 到 50%）、**This wallet sells the token**（该钱包卖出此代币），或 **Hold time runs out**（保留时间到期） |
 
-卡片会显示过去 7 天里，这个钱包在 1 分钟内和 5 分钟内把同一个代币加回来的频率。
+如果这个钱包有足够的跟单记录，卡片会显示过去 7 天里，它在 1 分钟内和 5 分钟内把同一个代币加回来的频率。
 
 <Warning>
   大多数退出之后并不会再加回来。代币卖出之前价格可能下跌，这部分亏损由你承担。关闭保留功能、暂停或停止跟单，都会卖掉所有被保留的代币。
 </Warning>
 
-被保留的代币在 Copy Logs 里显示为 **Holding**，带倒计时和 **Sell now** 按钮。
+被保留的代币在 Copy Logs 里显示为 **Holding**，带倒计时和 **Sell now** 按钮。卖掉被保留的代币，就是这次跟单的换回（swap back）。如果卖不掉，这次跟单会显示 **Tokens left in wallet**（钱包里有剩余代币），并带 **Swap to SOL** 按钮。
 
 ## 第 5 步：Label（标签）
 

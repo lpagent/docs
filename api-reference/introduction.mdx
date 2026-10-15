@@ -9,6 +9,15 @@ Please go to [LP Agent Portal](https://portal.lpagent.io/) to get an API key.
 
 All API endpoints are authenticated using the `x-api-key` header.
 
+Each key is rate limited per minute by its plan: **Basic** 5 requests, **Premium** 10, **Enterprise** 20.
+Responses carry `RateLimit-*` headers.
+
+| Status | Body | When |
+| ------ | ---- | ---- |
+| `401` | `{"message": "Unauthorized"}` | The header is missing, the key is unknown, or the key has no access (see [When a paid plan ends](#when-a-paid-plan-ends)) |
+| `401` | `{"message": "A Premium or Enterprise plan is required to access this endpoint."}` | A Basic key called a [Premium endpoint](#premium-endpoints) |
+| `429` | `{"error": "Too many requests. Please wait for a moment."}` | The key went over its requests per minute |
+
 ## Supported chains
 
 Most read endpoints accept a `chain` query parameter. It defaults to `SOL`, so existing
@@ -19,7 +28,8 @@ integrations need no change.
 | `SOL` | Solana | Meteora (DLMM, DAMM v2) |
 | `ROBINHOOD` | Robinhood Chain (EVM, chain ID `4663`) | Uniswap V3, Uniswap V4 |
 
-An unrecognised value falls back to `SOL` rather than returning an error.
+An unrecognised value falls back to `SOL` rather than returning an error, except on
+`/pools/discover`, where it matches no pools.
 
 These endpoints are chain-aware:
 
@@ -61,3 +71,17 @@ The following endpoints require a **Premium** or **Enterprise** API key plan. **
 | RPC   | `POST` | `/jito`                     |
 
 To upgrade, manage your API key and billing in the [LP Agent Portal](https://portal.lpagent.io/).
+
+## When a paid plan ends
+
+Basic is a one-time purchase and does not expire. Premium and Enterprise run for 30 days per
+payment. When a paid period ends without a renewal:
+
+- **You own Basic** (you bought it, or the key started on Basic before you upgraded): the key goes
+  back to Basic, with Basic's rate limit and endpoints.
+- **The key was created by buying Premium or Enterprise directly**: there is no Basic to fall back
+  to. The key stops working and every request returns `401 Unauthorized`.
+
+Access stops soon after the period ends. A renewing subscription gets a grace window of up to
+48 hours for the renewal payment to arrive. Buying a paid plan again, or buying Basic, in the
+[LP Agent Portal](https://portal.lpagent.io/) turns the same key back on.

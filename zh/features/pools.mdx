@@ -1,32 +1,41 @@
 ---
 title: "池子"
-description: "浏览、筛选和搜索 Solana 与 Robinhood Chain 上的流动性池"
+description: "浏览、筛选和搜索 Solana 与 Robinhood Chain 上的流动性池，或者自己创建一个新池子"
 ---
 
-**Pools**（池子）页面列出 LP Agent 追踪的所有池子。用顶栏的链选择器切换网络。
+**Pools**（池子）页面列出 LP Agent 追踪的所有池子。用顶栏的链选择器切换网络。想先从代币挑起，而不是从池子挑起，就用 [Discover](/zh/features/discover)。
 
 <Frame>
   ![Solana 上的池子](/images/app/sol-pools.jpg)
   <em>Solana 上的池子，按流动性排序</em>
 </Frame>
 
-## 视图和排序
+## 列表
 
-- 右上角可以切换 **Table**（表格，默认）或 **Card**（卡片）视图。
-- 顶栏显示有多少个池子符合条件，以及数据最后更新的时间。
+- 只有表格一种视图，每页 20 个池子。在手机上会变成列表，上面有排序按钮。
+- 表格上方显示这条链上有多少个池子符合条件；数据是新的时候，还会显示最后更新的时间。
+- 列表会自己刷新：Solana 上每分钟一次，Robinhood Chain 上每 10 秒一次。刷新后新进入这一页的池子会闪一下，排名变了的池子会滑到新位置。
 - 点列标题排序，再点一次反过来排。默认按 **Fee/TVL** 从高到低排序。
-- **Columns** 可以加更多列，比如这个代币所有池子的总流动性、波动率（24h 交易量 / 流动性），以及 Solana 上每个持有人对应的市值。
+- 在 Solana 上，**Fee/TVL** 列标题上有时间窗口选择：**24h**、**6h**、**1h** 或 **5m**。**Volume** 和 **Fees** 两列也跟着这个窗口。你选的窗口会按链记住，下次打开还是它。
+- **Columns**（列）用来开关各列。这条链能显示的列都在里面，默认全部打开。你的选择按链保存；**Show all columns** 可以一键全部恢复。
+- 在 Solana 上，点一行末尾的图表图标，会在这一行下面展开价格图。点这一行的其他地方就打开这个池子。
 
 | 列 | 含义 |
 | --- | --- |
 | **Pool** | 交易对、兑换手续费、协议（DLMM、DAMM V2、Uniswap V3、Uniswap V4）、DLMM 的 bin step、Solana 上的 organic score（有机评分）、地址和快捷链接 |
+| **Category** | 代币化股票标为 **Stock**（Robinhood Chain） |
 | **Fee/TVL** | 时间窗口内赚到的手续费相对流动性的比值（Solana 上可选 24h、6h、1h 或 5m；Robinhood Chain 上是 24h） |
 | **Liquidity** | 池子的总锁仓价值。在 Robinhood Chain 上还会显示两种代币的占比和预估 **APR** |
 | **Volume** / **Fees** | 时间窗口内的交易量和手续费 |
 | **MCAP** | 主代币的市值 |
 | **Holders** | 持有人数（Solana） |
-| **Age** | 池子存在了多久 |
-| **Category** | 代币化股票标为 **Stock**（Robinhood Chain） |
+| **Age** | 池子存在了多久，比如 **5h**、**9d** 或 **2.3y** |
+| **T Liq** | 这个代币所有池子加起来的流动性 |
+| **T Quote Liq** | 其中报价币（SOL、USDC 等）那一边的流动性（Solana） |
+| **Volatility** | 这个代币所有池子的 24h 交易量除以流动性（Solana） |
+| **MC/Holder** | 每个持有人对应的市值（Solana） |
+| **Fee/TVL 24h**、**6h**、**1h**、**5m** | 每个时间窗口的 Fee/TVL，以及换算成每小时的数值（Solana） |
+| **T Vol 24h**、**6h**、**1h** | 这个代币所有池子的交易量，以及换算成每小时的数值（Solana） |
 
 <Tip>
   很小的池子 Fee/TVL 再高，也可能很快就没了。Zap In（单币入池）之前，把流动性、交易量和池龄放在一起看。
@@ -34,17 +43,20 @@ description: "浏览、筛选和搜索 Solana 与 Robinhood Chain 上的流动�
 
 ## 筛选
 
+按 **Filters**（筛选）打开整张表单。按钮上会显示设了几项筛选（各个范围、搜索和 **Small pools**）。
+
 | 筛选项 | Solana | Robinhood Chain |
 | --- | --- | --- |
+| **Pool or token** | 粘贴池子或代币地址 | 粘贴池子或代币地址 |
 | **Quote Token** | SOL & USDC, SOL, USDC | WETH & USDG, WETH, USDG |
 | **Type** / **Protocol** | All, DLMM, DAMM V2 | All, Uniswap V3, Uniswap V4 |
 | **Category** | - | All, Stocks |
-| **Search** | 粘贴池子或代币地址 | 粘贴池子或代币地址 |
 | **Small pools** | - | **Show pools under $5k**（默认关闭） |
-| **Range filters** | 市值、池龄、流动性、24h 和 1h 交易量、24h 手续费、bin step、基础手续费、有机评分 | 市值、池龄、流动性、交易量、手续费、基础手续费 |
+| **范围**（最小值和最大值） | 市值、流动性、24h 交易量、1h 交易量、24h 手续费、池龄（小时）、基础手续费（%）、bin step、有机评分 | 市值、流动性、24h 交易量、1h 交易量、24h 手续费、池龄（小时）、基础手续费（%） |
 
-- **Filter** 应用并保存你在当前网络的筛选条件。**Clear** 全部重置。
-- **Copy link** 复制一个带当前筛选条件的链接，方便你分享这个视图。
+- 金额单位是 USD，可以直接输入 `500k`、`1.5m` 或 `2b`。
+- **Apply**（应用）会应用筛选条件、保存到当前网络，并关上表单。**Clear all** 全部重置。
+- **Copy link** 复制一个带表单里筛选条件的链接，方便你分享这个视图。
 - 在 Solana 上，新用户一开始就带有最低流动性、交易量和有机评分的门槛，免得列表被粉尘池刷屏。
 - 在 Robinhood Chain 上，低于 $5k 的池子默认隐藏，除非你打开 **Small pools**、搜索地址或者自己设最低流动性。显示 TVL 在 $50k 以上、但几乎没有交易量的池子，浏览时也会被排除。
 
@@ -67,6 +79,58 @@ description: "浏览、筛选和搜索 Solana 与 Robinhood Chain 上的流动�
 
 最近 5 次搜索会保存在 **Recent Searches**（最近搜索）下面。
 
+## Create a pool
+
+某个代币没有你想要的池子时，可以直接在 App 里用你的[代理钱包（agent wallet）](/zh/account-and-wallet)创建一个（创建池子）。入口在 [Discover](/zh/features/discover)，不在 Pools 页面：
+
+- 没有池子的代币上，按 **Create pool**。
+- 展开某个代币的池子列表，上方有 **New pool**，用来再开一个不同手续费或不同报价币的池子。
+
+这时会弹出 **Create a pool for** 窗口。在你按下窗口里的按钮之前，什么都不会发出去。
+
+| 字段 | Solana | Robinhood Chain |
+| --- | --- | --- |
+| **Protocol**（协议） | **DLMM** 或 **DAMM v2**（Meteora） | **Uniswap v3** 或 **Uniswap v4** |
+| **Quote token**（报价币） | SOL 或 USDC | ETH 或 USDG |
+| 手续费 | DLMM：先选 **Bin step**（会写明每个 bin 多大，比如 **100 (1% per bin)**），再选 **Fee**。默认是 100 的 bin step 配 1% 手续费，没有的话选最接近的。DAMM v2：只选 **Fee**，是固定费率，手续费以报价币收取。 | **Fee**：Uniswap 的标准费率档位，比如 0.05%、0.3% 或 1% |
+| 首笔存入 | DLMM：没有。建好后马上在池子页面加第一笔流动性。DAMM v2：创建池子时一起存入。 | 创建池子时一起存入 |
+
+### 起始价格
+
+**Starting price**（起始价格）是 1 个代币值多少报价币。默认填的是市场价；你改过之后，按 **Use market** 可以改回市场价。
+
+- 离市场价超过 5%，窗口会提醒你。
+- 离市场价超过 20%，不让创建：**Price too far from the market**。
+- 如果这个代币没有已知的市场价，窗口会说明。这时请自己核对价格。
+- DLMM 池子会在你的价格或略低于它的最近一个 bin 开盘，窗口会显示这个实际价格。
+
+<Warning>
+  起始价格偏离市场价的池子，一有流动性就会被套利，亏的是最先放进去的流动性。除非你有理由，否则起始价格就用市场价。
+</Warning>
+
+### 首笔存入（DAMM v2 和 Robinhood Chain）
+
+在 **First deposit in** 里输入报价币那一边的数量（SOL、USDC、ETH 或 USDG）。代币那一边就是按你的起始价格折算出来的数量。两边都从你的代理钱包里出，所以钱包里必须已经有这个代币。输入框下面会显示配对的代币数量，以及你的代理钱包里各有多少。如果不够，窗口会说明还差多少，并且不会创建池子。在 Robinhood Chain 上，你还需要一点 ETH 付 Gas。
+
+池子按两边数量的比例开盘，你的首笔存入会成为一个全区间（full-range）仓位。
+
+### 按 Create pool 之前
+
+汇总里会显示：
+
+- **Pool address**：新池子的地址。
+- **Cost to create**：创建大约要花多少，Solana 上是 SOL 的网络租金，Robinhood Chain 上是 ETH 的 Gas，不含存入的资金。
+- **First deposit**：两边的数量；DLMM 显示 **On the pool page, right after**（建好后在池子页面存入）。
+- **Signed by**：**Agent wallet**。
+
+如果同一个交易对、同样手续费的池子已经存在，按钮会变成 **Open existing pool**，直接带你过去。按钮也会告诉你还缺什么，比如 **Enter a starting price** 或 **No agent wallet on this chain**。
+
+### 建好之后
+
+- **DLMM**：会打开新池子的页面。在 **Create Position** 面板里加第一笔流动性。你是这个池子的第一个 LP，所以要为你的区间覆盖的 bin 付一次性的 **New price bin rent**（新价格 bin 租金），确认前会显示。详见[创建仓位](/zh/features/create-position)。
+- **DAMM v2**：会打开新池子的页面，你的首笔存入已经在里面了。
+- **Robinhood Chain**：窗口会确认池子已创建，并给出交易链接。等 LP Agent 收录了这个池子（通常几分钟内），池子页面和你的仓位就会出现。可以按 **Open portfolio** 或 **Open pool page** 继续。
+
 ## 池子页面
 
 点一个池子打开它。
@@ -76,15 +140,18 @@ description: "浏览、筛选和搜索 Solana 与 Robinhood Chain 上的流动�
   <em>一个 Meteora DLMM 池子：带你的价格区间和流动性深度的价格图、池子里的仓位，以及 Create Position 面板</em>
 </Frame>
 
-**顶部信息：** 交易对、协议、bin step 和基础手续费，以及实时数据：价格、市值、TVL、24h 交易量、24h 手续费、Fee/TVL 和预估手续费 APR。点交易对可以切换到同一个代币的其他池子。链接图标可以在 Meteora 或 Uniswap、GMGN、DexScreener 或区块浏览器上打开这个池子。
+**顶部信息：** 交易对、协议、bin step 和基础手续费，以及实时数据：价格、市值、TVL、24h 交易量、24h 手续费、Fee/TVL 和预估手续费 APR。点交易对可以切换到同一个代币的其他池子。链接图标可以在 Meteora 或 Uniswap 上打开池子，在 GMGN 上打开任一代币，在 DexScreener 或区块浏览器上打开池子；在 Solana 上还能在 Bubblemaps 上打开主代币的持有人分布图。
 
 **上方的标签页：**
 
-- **Price Chart**：K 线，周期从 1 分钟到 1 天。在 DLMM 池子上，流动性深度会画在价格旁边。拖动 **Min Price** 和 **Max Price** 线，就能直接目测设定价格区间。
+- **Price Chart**：K 线，周期从 1 分钟到 1 天。
+  - 图表上方的 **Pool** / **Token**：**Pool** 画的是这个池子自己的成交。**Token** 画的是这个代币在所有市场上的价格，K 线最小到 1 秒。两条链都有。
+  - 图表工具栏里的 **Price** / **MCap** 在价格和市值之间切换。在 Robinhood Chain 上只有 Token 图有这个按钮。在 Solana 上，图表显示市值时，你的区间线会变成 **Min MCap** 和 **Max MCap**，右边面板的区间也跟着变。
+  - 在 DLMM 池子上，流动性深度会画在价格旁边，并跟着池子的实时流动性变化。
+  - 拖动 **Min Price** 和 **Max Price** 线，就能直接目测设定价格区间。
 - **Pool Details**：池子地址、手续费、代币数量和各自占 TVL 的比例。在 Solana 上还有手续费历史和每个 bin 的流动性分布。
-- **Bubble**（Solana）：主代币的持有人气泡图。
 
-Solana 池子上的 **Live** 标记表示数据正在实时推送。
+Solana 池子上的 **Live** 标记表示数据正在实时推送。选中你的某个仓位后，它的实时未实现盈亏（uPnL）会显示在浏览器标签页的标题里，在别的标签页也能盯着。
 
 **下方的标签页：**
 
@@ -96,6 +163,11 @@ Solana 池子上的 **Live** 标记表示数据正在实时推送。
 | **Your Positions** / **History** | 你在这个池子里的当前仓位和已平仓的仓位。 |
 | **Your Assets** | 你钱包里的代币，Solana 上带兑换（swap）快捷入口。 |
 
+在 **Your Positions** 和 **History** 上：
+
+- 来源下拉框可以筛选：**All positions**（全部）、**Auto only**（只看标着 Auto 的仓位）或 **Manual only**（只看标着 Manual 的仓位）。跟单开的仓位只在 **All positions** 下显示。你的选择会记在这个浏览器里。在 **History** 上，只有看的是你自己的代理钱包时才有这个下拉框。
+- 你刚开的仓位，交易一上链就会出现在 **Your Positions** 里，显示你投入了什么和价格区间。价值、手续费和 uPnL 几秒后同步完成才会填上，在那之前这一行没有操作按钮。
+
 旗子图标可以举报池子。
 
 <Frame>
@@ -103,4 +175,4 @@ Solana 池子上的 **Live** 标记表示数据正在实时推送。
   <em>Robinhood Chain 上的 Positions In Pool，每一行都有 Copy</em>
 </Frame>
 
-右边的面板就是用来开仓的。详见[创建仓位](/zh/features/create-position)。
+右边的面板就是用来开仓的。详见[创建仓位](/zh/features/create-position)。选中你的某个仓位，就能在这里管理它。详见[管理仓位](/zh/features/manage-positions)。

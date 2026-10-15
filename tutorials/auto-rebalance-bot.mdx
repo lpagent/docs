@@ -73,6 +73,7 @@ Every check interval, the bot follows this flow:
 | **How much to reinvest?** | Checks SOL balance after zap-out, reserves 0.05 SOL for fees |
 | **Where to place the new range?** | Centers around the current active bin, with configurable range |
 | **What strategy to use?** | Configurable: `Spot`, `Curve`, or `BidAsk` |
+| **Which positions?** | Meteora DLMM only: the bot asks `/lp-positions/opening` for `platform=meteora`, because the re-entry places liquidity by bin |
 
 ---
 
@@ -149,7 +150,7 @@ const dynamicRange = binStep > 5 ? 20 : 50; // volatile → wider, stable → ti
 
 ### Filter by Pool Type
 
-Only rebalance DLMM positions (skip DAMM V2):
+The complete bot already asks for DLMM positions only (`platform=meteora` on `/lp-positions/opening`). If you drop that filter, the endpoint also returns DAMM V2 positions. Skip them in the loop, since the re-entry places liquidity by bin, and send `type: "meteora_damm_v2"` to `decrease-tx` if you close one:
 
 ```typescript
 if (pos.protocol !== "meteora") {
@@ -351,7 +352,8 @@ async function zapIn(poolAddress: string, amountSOL: number): Promise<string> {
 async function checkAndRebalance() {
   log("Checking positions...");
 
-  const positionsRes = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}`);
+  // DLMM positions only: the re-entry below places liquidity by bin
+  const positionsRes = await apiCall("GET", `/lp-positions/opening?owner=${OWNER}&platform=meteora`);
   const positions = positionsRes.data;
 
   if (!positions || positions.length === 0) {
@@ -385,10 +387,10 @@ async function checkAndRebalance() {
       // 2. Check available SOL
       const balanceRes = await apiCall("GET", `/token/balance?owner=${OWNER}`);
       const solBalance = balanceRes.data?.find(
-        (t: any) => t.address === "So11111111111111111111111111111111111111112"
+        (t: any) => t.tokenAddress === "So11111111111111111111111111111111111111112"
       );
 
-      const availableSOL = solBalance ? parseFloat(solBalance.uiAmount) : 0;
+      const availableSOL = solBalance ? solBalance.balance : 0;
       const reserveSOL = 0.05;
       const reinvestSOL = Math.max(0, value / (solBalance?.price || 150) * 0.95);
       const zapInAmount = Math.min(reinvestSOL, availableSOL - reserveSOL);

@@ -9,6 +9,14 @@ description: ""
 
 所有 API 接口都通过 `x-api-key` header 进行认证。
 
+每个 key 按套餐限制每分钟请求数：**Basic** 5 次，**Premium** 10 次，**Enterprise** 20 次。响应里带有 `RateLimit-*` header。
+
+| 状态码 | 响应体 | 什么时候出现 |
+| ------ | ---- | ---- |
+| `401` | `{"message": "Unauthorized"}` | 没带 header、key 不存在，或者 key 已经没有访问权限（见下文「付费套餐到期后」） |
+| `401` | `{"message": "A Premium or Enterprise plan is required to access this endpoint."}` | 用 Basic key 调用了下文列出的 Premium 接口 |
+| `429` | `{"error": "Too many requests. Please wait for a moment."}` | 这个 key 一分钟内的请求数超过了上限 |
+
 ## 支持的链
 
 大部分读取类接口都接受 `chain` 查询参数。默认值是 `SOL`，所以现有的集成不需要任何改动。
@@ -18,7 +26,7 @@ description: ""
 | `SOL` | Solana | Meteora（DLMM、DAMM v2） |
 | `ROBINHOOD` | Robinhood Chain（EVM，chain ID `4663`） | Uniswap V3、Uniswap V4 |
 
-无法识别的值会回退到 `SOL`，而不是返回错误。
+无法识别的值会回退到 `SOL`，而不是返回错误。只有 `/pools/discover` 例外：无法识别的值不会匹配到任何池子。
 
 以下接口支持多链：
 
@@ -54,3 +62,12 @@ description: ""
 | RPC   | `POST` | `/jito`                     |
 
 如需升级，请在 [LP Agent Portal](https://portal.lpagent.io/) 管理你的 API key 和账单。
+
+## 付费套餐到期后
+
+Basic 是一次性购买，不会过期。Premium 和 Enterprise 每次付款有效 30 天。付费周期结束且没有续费时：
+
+- **你拥有 Basic**（你买过 Basic，或者这个 key 一开始是 Basic、后来才升级的）：key 回到 Basic，按 Basic 的限流和接口范围使用。
+- **这个 key 是直接购买 Premium 或 Enterprise 时创建的**：没有 Basic 可以回退。key 会停止工作，所有请求都返回 `401 Unauthorized`。
+
+周期结束后不久就会停止访问。自动续费的订阅最多有 48 小时的宽限期，等续费款到账。在 [LP Agent Portal](https://portal.lpagent.io/) 重新购买付费套餐或购买 Basic，同一个 key 就会恢复使用。

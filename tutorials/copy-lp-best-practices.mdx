@@ -28,10 +28,10 @@ The copy dialog shows this advice at the bottom of the step list. It is a recomm
 Copy Percentage = your net worth ÷ the leader's net worth × 100
 ```
 
-The dialog computes this for you and shows it as **Suggested**, with an **Apply** button. If the suggestion hits the 1% minimum, the leader is much bigger than you, and even their normal positions arrive oversized for your wallet. That's where **Max Increase Amount per Tx** helps: it caps each copied open and each copied add.
+The dialog computes this for you and shows it as **Suggested**, with an **Apply** button. If the suggestion hits the 1% minimum, the leader is much bigger than you, and even their normal positions arrive oversized for your wallet. That's where **Max Increase Amount per Tx** helps: it caps each copied open and each copied add. When it cuts an open short, the leader's later adds to that position are copied at the same smaller share, so your copy keeps the leader's shape. See [How sizing works](/features/copy-lp#how-sizing-works).
 
 <Warning>
-  A Max of **0** copies nothing. To copy without a cap, leave the field empty.
+  A Max of **0** would copy nothing, so it can't be saved. To copy without a cap, leave the field empty.
 </Warning>
 
 See [Copy Settings](/features/copy-settings#step-1-sizing).
@@ -59,13 +59,13 @@ In **Settings > Security**, set floors that every copy must pass:
 
 Add tokens you never want to touch to the **Blacklist**. Copies that fail a filter show in Copy Logs with the reason.
 
-Leave **Meme Protection** on in the copy dialog: it skips copies where the SOL, USDC or USDT side of the pool is nearly empty.
+Leave **Meme Protection** on in the copy dialog: it skips copies where the SOL, USDC or USDT side would be nearly empty. If a leader often pulls a token out and puts it back as that token alone, those re-adds get skipped too. Turn on **Smart Token Retention** for that leader (below) so they can go through.
 
 ## 5. Protect Your Capital
 
 - **Stop loss**: set one in **Exit rules**. Around 15% is a common starting point. Too tight and normal price moves close you out, and every close pays swap and network costs.
 - **Fund protection**: on the Copy LP page, set a loss limit for all your copies. It pauses new copies when your closed-copy losses hit the limit, while exits keep following your leaders. See [Managing Your Copies](/features/copy-management#fund-protection-solana).
-- **Smart Token Retention**: for leaders who pull and re-add the same token within a minute, this can save a sell and a buy. It also means holding the token for a short time, so only use it where the stats in the dialog show frequent re-adds.
+- **Smart Token Retention**: for leaders who pull and re-add the same token within a minute, this can save a sell and a buy, and it lets those re-adds pass Meme Protection. It also means holding the token for a short time, so only use it where the stats in the dialog show frequent re-adds. When a fast wallet re-adds often, the **High-frequency** warning in **Sizing** says so and offers **Turn on Smart Token Retention**.
 
 ## 6. Start Small and Scale Gradually
 
@@ -77,7 +77,7 @@ Leave **Meme Protection** on in the copy dialog: it skips copies where the SOL, 
 
 1. **Copying with a tiny agent wallet**, where swap and network costs eat the fees
 2. **Picking a copy percentage by feel** instead of using the suggestion
-3. **Leaving Max at 0**, which copies nothing
+3. **Keeping an old Max of 0**, which copies nothing. The dialog marks it in red; clear the field or set a real amount
 4. **Copying a high-frequency wallet** and paying the round trip on every flip
 5. **Turning off the token filters** to get more copies
 6. **Not checking Copy Logs** when copies stop appearing. It is usually low balance or slippage, and the fix is one click away

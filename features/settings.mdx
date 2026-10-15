@@ -1,9 +1,11 @@
 ---
 title: "Settings"
-description: "Funding, auto TP/SL, slippage, token filters, notifications and your private key"
+description: "Funding, auto TP/SL, slippage, token filters, notifications, sounds, language and your private key"
 ---
 
 Open **Settings** from the account panel (click your address in the header). It has four tabs: **General**, **Swap**, **Security** and **Account**. Press **Save Changes** when you are done.
+
+The app language is not in Settings. It sits at the bottom of the account panel: see [Language](#language).
 
 ## General
 
@@ -20,7 +22,8 @@ Open **Settings** from the account panel (click your address in the header). It 
 | **Auto TP/SL** | Off by default. When on, every new position gets the default take profit and stop loss below it (10% / 10%). Copies use their own exit rules instead. See [Take Profit & Stop Loss](/features/take-profit-stop-loss). |
 | **Manage Manual Position** | Lets LP Agent manage positions you open outside LP Agent, for example directly on Meteora, so you can use TP/SL on them. On by default for new accounts. |
 | **Realtime Portfolio** (Solana) | Stream open positions live instead of refreshing every 10 seconds. Saved on this device. |
-| **Realtime Numbers** | **Highlight** or **Animate**: how live values react when they change. Saved on this device. |
+| **Realtime Numbers** | **Highlight** or **Animate**: how live values react when they change. On a phone, values just update, without either effect. Saved on this device. |
+| **Position Sounds** | A short chime when a position opens or closes. On by default. Switching it on plays the chime once. Saved on this device. See [Notifications](/features/notifications#position-sounds). |
 
 <Frame>
   ![More General settings](/images/app/settings-general-more.png)
@@ -60,5 +63,18 @@ These filters apply before any position is opened or copied. A token that fails 
 | Setting | What it does |
 | --- | --- |
 | **Export Private Key** | Export your agent wallet's key. See [Account & Wallet](/account-and-wallet#export-your-private-key). |
-| **Account Linking** | Only for accounts created before the wallet upgrade: link extra emails and wallets. |
+| **Discord** | Press **Connect** to link your Discord account, so when you open a ticket on our Discord, support knows it's you and can pull up your positions. **Unlink** removes it. **Link Discord** under **Finish setup** in the account panel brings you here too. |
+| **WeChat ID** | Only shown when the app is in 中文. Only the LP Agent team sees it. |
 | **System Notifications** | Push notifications for take profit, stop loss and copy events, with a switch per event. See [Notifications](/features/notifications). |
+
+## Language
+
+LP Agent comes in English and Simplified Chinese (中文).
+
+- **The first time you open it**, the app follows your browser's language list: if Chinese comes before English there, it opens in 中文. Otherwise it opens in English.
+- **To switch**, click your address in the header to open the account panel. Near the bottom, next to **Language**, pick **EN** or **中文**. The app changes right away.
+- Your pick is saved in this browser and wins over the browser language from then on.
+
+<Note>
+  The switch is in the account panel, so you need to be signed in to change it. Signed out, the app follows your browser's language.
+</Note>
