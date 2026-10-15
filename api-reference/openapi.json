@@ -29,7 +29,7 @@
   "paths": {
     "/lp-positions/opening": {
       "get": {
-        "summary": "Get opening LP positions for an owner",
+        "summary": "Get open LP positions for an owner",
         "description": "Retrieves current liquidity pool positions that are open for a specific wallet owner. Covers every protocol served on the requested chain (`meteora,meteora_damm_v2` on `SOL`, `uniswap_v3,uniswap_v4` on `ROBINHOOD`); pass `platform` to narrow it.",
         "tags": [
           "Positions"
@@ -70,7 +70,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Successfully retrieved opening positions",
+            "description": "Successfully retrieved open positions",
             "content": {
               "application/json": {
                 "schema": {
@@ -1322,7 +1322,7 @@
                         },
                         "opening_lp": {
                           "type": "string",
-                          "description": "Number of opening LP positions",
+                          "description": "Number of open LP positions",
                           "example": "8"
                         },
                         "total_pool": {
