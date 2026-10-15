@@ -3,12 +3,17 @@ title: "管理仓位"
 description: "加仓、减仓、Zap Out、领取手续费和复投"
 ---
 
-在你的 [Portfolio](/zh/features/portfolio) 里，打开某个仓位的菜单（三个点）。在池子页面上，选中你的某个仓位，右边面板里也有同样的操作。
+在你的 [Portfolio](/zh/features/portfolio) 里，打开某个仓位的菜单（三个点）。在池子页面上，在 **Your Positions** 里选中你的某个仓位，右边面板里也有同样的操作：
+
+- **Solana**：**Current**、**Deposit**、**Withdraw**、**Close**、**Claim Fee** 和 **Compound**。
+- **Robinhood Chain**：**Increase**、**Withdraw**、**Claim** 和 **Close**。
+
+在 Solana 上，**Current** 一眼看清这个仓位：**Min price**、**Current** 和 **Max price**，每一端离当前价格有多远，流动性和未领取的手续费，还有 **Close** 和 **Zap out to SOL** 两个按钮。在 DLMM 上，它还会实时画出仓位的各个 bin 和当前活跃 bin 的位置。
 
 | 操作 | Solana DLMM | Solana DAMM v2 | Robinhood Chain |
 | --- | --- | --- | --- |
 | 加仓 | 支持 | 从池子页面操作 | 支持 |
-| 减仓 | 按百分比和按价格段 | 按百分比 | 按百分比，以 ETH、USDG 或两者到账 |
+| 减仓 | 按百分比，也可以在图上选 bin | 按百分比 | 按百分比，以 ETH、USDG 或两者到账 |
 | Zap Out（一键出池，即平仓） | 支持，带预估 | 支持 | 支持，带预估 |
 | 一键 Zap Out | 支持 | - | - |
 | 领取手续费 | 支持 | 支持 | 支持 |
@@ -19,17 +24,17 @@ description: "加仓、减仓、Zap Out、领取手续费和复投"
 
 往同一个价格区间里加更多流动性。
 
-- **Solana**：会打开池子页面，并锁定你的价格区间。选 **Zap In** 或 **Both Tokens** 和一个策略，然后按 **Increase Position**。
+- **Solana**：会打开池子页面，并锁定你的价格区间。选 **Zap In** 或 **Both Tokens** 和一个策略，然后按 **Increase Position**。**MAX** 和开新仓位时一样，会先留出兑换缓冲和手续费。
 - **Robinhood Chain**：选 ETH 或 USDG（默认是这个仓位开仓时用的那种）。你投入的资金会按仓位的价格区间拆分。按 **Increase Position**。
 
 ## 减仓
 
-取出一部分流动性。
+取出一部分流动性。在池子页面上就是 **Withdraw** 标签页。
 
 <Tabs>
   <Tab title="Solana">
     - 输入要移除的百分比，或者用滑杆（0%、25%、50%、75%、100%）。默认是 100%。
-    - 在 DLMM 上，你还可以在 bin 图表下方选一个**价格段**："You will receive X% from price A to price B"（你会拿回价格 A 到价格 B 之间的 X%）。适合只取出价格已经离开的那部分区间。
+    - 在 DLMM 上，你还可以选从哪些 bin 里取：在 bin 图上横着拖动就是新选一段，抓住选中段的任一边可以挪动它。没选中的 bin 会变暗，按 **All bins** 恢复成全部。图下面会写 "You will receive X% from price A to price B"（你会拿回价格 A 到价格 B 之间的 X%）。适合只取出价格已经离开的那部分区间。
     - 选择资金怎么到账：两种代币、其中任一种代币，或者 SOL。
     - 按 **Decrease**。
   </Tab>
@@ -51,9 +56,9 @@ description: "加仓、减仓、Zap Out、领取手续费和复投"
 
 - 每个到账选项都会显示扣掉兑换成本后你能拿到多少的实时预估，每 10 秒刷新一次。没有兑换路径的选项会被禁用。
 - **Est. PnL after close** 根据实时兑换报价，显示平仓后你的盈亏会是多少。最终金额可能随价格和滑点有小幅变动。
-- 平仓后你会看到结果，还可以做成盈亏卡片分享出去。
+- 平仓后你会看到结果，还可以做成盈亏卡片分享出去。平仓时会响一声提示音（见 [Settings](/zh/features/settings) 里的 **Position Sounds**）。
 
-在 Solana DLMM 上还有**一键 Zap Out**：仓位那一行的闪电图标，或者池子页面上的 **Zap out to SOL**。它会直接把 100% 平仓换成 SOL，没有确认步骤。
+在 Solana DLMM 上还有**一键 Zap Out**：仓位那一行的闪电图标，或者池子页面上的 **Zap out to SOL**。它会直接把 100% 平仓换成 SOL，没有确认步骤，然后打开盈亏分享卡片。在卡片上勾选 **Don't show again**（不再显示），下次就只弹一条带 **Share** 按钮的简短提示。
 
 在 Robinhood Chain 上，默认到账币种是开仓时用的币种（ETH 或 USDG）。如果因为价格变动，有部分代币没能兑换，LP Agent 会在不久后用更大的滑点重试。
 
@@ -61,16 +66,18 @@ description: "加仓、减仓、Zap Out、领取手续费和复投"
 
 领取还没领的 LP 手续费收益，不动仓位本身。
 
-- **Solana**：弹窗会按代币列出未领取的手续费。按 **Claim Fees**。在 DLMM 上，另一种代币的手续费会自动帮你兑换成 SOL；DAMM v2 的手续费按原样到账。
+- **Solana**：表单会按代币列出未领取的手续费，在池子页面上这些数字会实时更新。**Swap claimed fees to SOL**（把领取的手续费换成 SOL）默认勾选，DLMM 和 DAMM v2 都有：按 **Claim Fees as SOL**。取消勾选就按原代币到账，然后按 **Claim Fees**。如果换成 SOL 没成功，手续费照样领到了，你的 agent 会很快重试兑换。
 - **Robinhood Chain**：**Receive as ETH**（或 USDG）默认开启，会把你的手续费兑换成这个币种。关掉它就按原代币到账。按 **Claim fees**。
 
 ## 复投（Solana DLMM）
 
-**Compound**（复投）一步完成两件事：领取未领取的手续费，再把它们加回同一个仓位。在仓位菜单里按 **Compound**。
+**Compound**（复投）一步完成两件事：领取未领取的手续费，再把它们加回同一个仓位。在仓位菜单或者池子页面上按 **Compound**。在池子页面上，手续费汇总会实时更新。
 
 ## 止盈和止损
 
 点仓位上的 **Settings** 标签，设置止盈和止损。详见[止盈与止损](/zh/features/take-profit-stop-loss)。
+
+如果你开着池子页面的时候，止盈、止损或跟单退出平掉了你的某个仓位，会响一声平仓提示音。如果这个仓位正被选中，面板会自动取消选中。
 
 ## 报告问题
 

@@ -20,8 +20,11 @@ Each row is a wallet you follow:
 | **Copy size** | For example "10% of each position, up to 2 SOL", plus any pool type filters. |
 | **Auto exit** | Your take profit and stop loss, or Off. |
 | **Positions** | How many copies were opened from this wallet. |
+| **Last activity** | When this wallet last opened or closed a position, for example "4m ago". A dash means no activity is known yet. |
 | **PnL** | Your profit from this wallet's copies. |
 | **Copy** | Switch to pause or resume copying. |
+
+Click **Last activity** or **PnL** to sort by it, and again to flip the order. The sort is kept in the page address, so a reload or a bookmark opens the list sorted the same way.
 
 The row menu has **Edit settings**, **View portfolio**, **Copy address** and **Stop copying**. **Find Smart LP** takes you to the leaderboard.
 
@@ -44,7 +47,7 @@ Your PnL can differ from the wallet you copy: your own TP/SL can close earlier, 
 
 ## Copy Logs
 
-Copy Logs is the full record of every copy: opened, closed, and the ones that did not happen, with the reason.
+Copy Logs is the record of every copy with activity in the last 7 days: opened, closed, and the ones that did not happen, with the reason.
 
 <Frame>
   ![Copy Logs](/images/app/rh-copy-logs.jpg)
@@ -54,8 +57,9 @@ Copy Logs is the full record of every copy: opened, closed, and the ones that di
 ### Filters and columns
 
 - Tabs: **All**, **Not opened**, **Failed**, **Open** and **Closed**, with counts.
-- Filter by source wallet in the **Source** column header.
+- Filter by the wallet you copy from with the funnel in the **Source** column header (on a phone, the button above the list). Search by label or any part of the address; press Enter when one wallet is left to pick it. Active wallets are listed before paused ones.
 - Columns: **Position**, **Source** (leader and its position), **Result**, **PnL**, **Why** and **Time**.
+- A dot next to each source wallet shows whether you still copy it: green for active, grey with **Paused**. In the **Source** column, a hollow dot with **Not copied** marks a wallet you stopped copying whose logs are still within the 7 days.
 
 Result labels:
 
@@ -90,6 +94,10 @@ Most reasons come with a button that takes you straight to the fix:
 | Token failed safety check / Token below quality floor | **Edit filters** |
 | Rug-risk leader / Leader's own token launch | None: skipped to keep you safe |
 
+For **Meme protection**, the fix panel also explains that if the leader often pulls a token out and puts it back, turning on Smart Token Retention for that leader lets those re-adds through. See [Meme Protection](/features/copy-settings#meme-protection).
+
+With Smart Token Retention on, selling a kept token is the copy's swap back. If that sale fails, the copy shows **Tokens left in wallet** with **Swap to SOL**.
+
 If your agent wallet is short on funds, a banner at the top of Copy Logs says how much you have, what the last copy needed, and how many copies did not open.
 
 ### Expand a row
@@ -98,7 +106,7 @@ Click a row to see its timeline (retries are folded, with "Fixed on retry" when 
 
 ### Report a copy
 
-Something looks off? Press **Report this copy**, pick what looks wrong (didn't copy the leader, wrong amount, PnL looks off, tokens stuck, didn't close with the leader, something else), add details and press **Send report**. The copy's logs are attached for you.
+Something looks off? Expand the row and press **Something off? Report this copy** (or **Report this copy** when the row says there is nothing to change on your side), pick what looks wrong (didn't copy the leader, wrong amount, PnL looks off, tokens stuck, didn't close with the leader, something else), add details and press **Send report**. The copy's logs are attached for you. You get a ticket number, and its progress (**Sent**, **Checking**, **Fixed** and so on) shows on the copy's row and in the Account panel under [Reports](/account-and-wallet#reports). To chat about it, open a Discord ticket and mention the number.
 
 ## Protections that pause copying
 

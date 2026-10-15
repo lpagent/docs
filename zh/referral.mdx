@@ -25,7 +25,7 @@ Referral 页面上的数据每 15 分钟更新一次。
 
 <Steps>
   <Step title="拿到邀请码">
-    任何 LP Agent 合作伙伴都可以给你一个。你也可以在我们的 [Discord](https://discord.gg/h8YDHtzmRU) 里问。
+    任何 LP Agent 合作伙伴都可以给你一个。你也可以在我们的 [Discord](https://discord.gg/lpagent) 里问。
   </Step>
   <Step title="填写邀请码">
     通过合作伙伴的链接（`app.lpagent.io/?referral=CODE`）注册，或者进入 **Referral > My cashback**，在 **Enter your referral code**（输入推荐码）下面填入邀请码，然后点 **Turn on cashback**（开启返现）。输入时，页面就会显示这个邀请码能给你返多少。
@@ -92,7 +92,33 @@ Referral 页面上的数据每 15 分钟更新一次。
 
 ## Meteora 推荐奖励（Solana）
 
-LP Agent 钱包接入了 Meteora 自己的推荐计划。在 LP Agent 返现之外，**Meteora 会把你 DLMM 仓位产生的协议手续费的 2% 以 USDC 发给你**，每个 Meteora 周期发一次。**My cashback** 里的 **Meteora referral rewards** 卡片会显示本周期的预估、可领取金额、已领取金额和总额。奖励会一直可以领取，不会过期。
+LP Agent 钱包会加入 Meteora 自己的推荐计划。在 LP Agent 返现之外，**Meteora 会把你 DLMM 仓位产生的协议手续费的 2% 以 USDC 发给你**，每个 Meteora 周期发一次。
+
+### 选择你的 Meteora 推荐码
+
+新的 Solana 代理钱包有 **24 小时**来选择加入哪个 Meteora 推荐码。在这段时间里，**Meteora referral rewards**（Meteora 推荐奖励）卡片会显示 **Pick a code**（选择推荐码）和剩余时间，[账户面板](/zh/account-and-wallet)的 **Finish setup**（完成设置）里也会有一行 **Meteora referral code**（Meteora 推荐码）。两个地方都可以选：
+
+- **LPAGENT**（默认）：LP Agent 自己的推荐码。
+- **A friend's code**（朋友的推荐码）：朋友在 Meteora 上创建的推荐码。这不是 LP Agent 的合作伙伴邀请码，请向对方要 Meteora 推荐码。
+
+不管选哪个推荐码，你拿到的都是同样的 2%。推荐码只代表是谁带你来的。如果你没有按时选择，LP Agent 会关联 **LPAGENT**。
+
+<Warning>
+  每个钱包只能关联一个推荐码。Meteora 不允许更改，所以关联朋友的推荐码之前，应用会请你再确认一次。请和给你推荐码的人核对拼写。
+</Warning>
+
+### 你的 Meteora 奖励
+
+**My cashback** 里的 **Meteora referral rewards** 卡片会显示 **Linked via**（已关联）和你的钱包所用的推荐码，然后是：
+
+- **This cycle, so far**（本周期至今）：进行中周期的预估。
+- **Ready to claim**（可领取）：已结束周期的奖励。
+- **Claimed**（已领取）：已经发到你 LP Agent 钱包的金额。
+- **Total earned**（累计赚取）：你加入以来的全部奖励。
+
+下方的表格列出每个周期的日期、状态和奖励。卡片每 15 分钟更新一次。目前还不能在 LP Agent 里领取这些奖励。奖励会一直可以领取，不会过期。
+
+如果卡片提示你的钱包还没加入 Meteora 推荐计划，请在 [Discord](https://discord.gg/lpagent) 上找我们。
 
 ## 合作伙伴
 
@@ -101,7 +127,7 @@ LP Agent 钱包接入了 Meteora 自己的推荐计划。在 LP Agent 返现之�
   <em>第 1 赛季的 Refer & earn 仅限受邀者</em>
 </Frame>
 
-在第 1 赛季，**Refer & earn**（推荐赚钱）只对受邀的合作伙伴开放。合作伙伴有一个专属面板，可以看到自己的链接、被推荐人和收益，具体条款会直接单独沟通。如果你在运营社区、想成为合作伙伴，请在 [Discord](https://discord.gg/h8YDHtzmRU) 上联系我们。
+在第 1 赛季，**Refer & earn**（推荐赚钱）只对受邀的合作伙伴开放。合作伙伴有一个专属面板，可以看到自己的链接、被推荐人和收益，具体条款会直接单独沟通。如果你在运营社区、想成为合作伙伴，请在 [Discord](https://discord.gg/lpagent) 上联系我们。
 
 ## 常见问题
 
@@ -114,6 +140,9 @@ LP Agent 钱包接入了 Meteora 自己的推荐计划。在 LP Agent 返现之�
   </Accordion>
   <Accordion title="我填错了邀请码">
     应用内无法更改邀请码。请在 Discord 上找我们。
+  </Accordion>
+  <Accordion title="Meteora 推荐码可以更改吗？">
+    不可以。Meteora 会把每个钱包永久关联到一个推荐码。所以关联朋友的推荐码之前，应用会请你再确认一次。
   </Accordion>
   <Accordion title="第一笔返现什么时候到账？">
     你的返现达到最低发放额（0.1 SOL 或 0.005 ETH）后，在接下来的那个月 1 号到账。

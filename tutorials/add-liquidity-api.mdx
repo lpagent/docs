@@ -48,8 +48,8 @@ Withdrawing liquidity follows a similar pattern:
 1. GET POSITIONS   Find your open positions
    GET /lp-positions/opening
         ↓
-2. GET QUOTES      (Optional) Preview what you'll receive
-   POST /position/decrease-quotes
+2. ESTIMATE        (Optional) See what each output option pays out
+   POST /position/zap-out-estimates
         ↓
 3. GENERATE TXS   API creates unsigned withdrawal transactions
    POST /position/decrease-tx
@@ -74,7 +74,7 @@ Before diving into code, here are the key concepts:
 
 ## Prerequisites
 
-- An LP Agent API key (get one from the [API Dashboard](https://app.lpagent.io/open-api))
+- An LP Agent API key (get one from the [LP Agent Portal](https://portal.lpagent.io/))
 - A Solana wallet keypair
 - Node.js >= 18
 
@@ -145,20 +145,27 @@ Browse available pools and filter by your criteria. The API returns pools sorted
 const discoverRes = await apiCall("GET",
   "/pools/discover?" + new URLSearchParams({
     chain: "SOL",
-    sortBy: "vol_24h",        // sort by 24h volume
+    platform: "meteora",       // DLMM pools: this guide places liquidity by bin
+    sortBy: "vol_24h",         // sort by 24h volume
     sortOrder: "desc",
     pageSize: "5",
-    min_market_cap: "5",       // min $5M market cap
-    min_liquidity: "50",       // min $50K TVL
+    min_market_cap: "5000000", // min $5M market cap (plain USD)
+    min_liquidity: "50000",    // min $50K TVL (plain USD)
   }).toString()
 );
 
 const pool = discoverRes.data[0];
 console.log(`Pool: ${pool.token0_symbol}/${pool.token1_symbol} (${pool.pool})`);
-console.log(`Protocol: ${pool.protocol}`); // "meteora" or "meteora_damm_v2"
+console.log(`Protocol: ${pool.protocol}`); // "meteora" (DLMM)
 ```
 
-**What you get back:** A list of pools with their addresses, token pairs, TVL, volume, and protocol type. The API supports both Meteora DLMM and DAMM V2 pools: the same code works for both.
+**What you get back:** A list of pools with their addresses, token pairs, TVL, volume, and protocol type. Dollar filters such as `min_market_cap` and `min_liquidity` take plain USD amounts.
+
+Discover returns both Meteora DLMM (`meteora`) and DAMM V2 (`meteora_damm_v2`) pools. The next step reads the DLMM active bin, so this guide asks for DLMM pools only. Drop `platform` to see DAMM V2 pools too: `add-tx` detects the pool type from the address.
+
+<Tip>
+To rank pools by recent fee yield, use `sortBy: "fee_tvl_ratio"` with `feeTVLInterval` set to `5m`, `1h`, `6h` or `24h`. Each pool also reports its fees for the last 5 minutes, 1 hour and 6 hours in `fee_5m`, `fee_1h` and `fee_6h` (USD).
+</Tip>
 
 ### Step 3: Get Pool Info & Set Your Range
 
@@ -250,23 +257,34 @@ for (const pos of positionsRes.data) {
 }
 ```
 
-**What you get back:** Each position includes its encrypted ID (needed for withdrawal), current value, PnL, whether it's in range, and token details.
+**What you get back:** Each position includes its `id` (the position address, which you pass as `position_id` to withdraw), its `protocol` (`meteora` for DLMM, `meteora_damm_v2` for DAMM V2), current value, PnL, whether it's in range, and token details.
 
-### Step 2: Get Quotes (Optional)
+### Step 2: Estimate the Payout (Optional)
 
-Preview what you'll receive before withdrawing. The API shows quotes for different output options.
+See what each output option really pays out before you withdraw. Each estimate is priced on the same swap route `decrease-tx` builds, with swaps and fees already taken.
 
 ```typescript
-const positionId = positionsRes.data[0].id; // encrypted position ID
+const position = positionsRes.data[0];
+const positionId = position.id; // the position address
 
-const quotesRes = await apiCall("POST", "/position/decrease-quotes", {
-  id: positionId,
+const estimatesRes = await apiCall("POST", "/position/zap-out-estimates", {
+  position_id: positionId,
   bps: 10000,    // 10000 = 100% withdrawal, 5000 = 50%, etc.
 });
 
-const quotes = quotesRes.data;
-console.log(`Token prices: $${quotes.price.token0} / $${quotes.price.token1}`);
+for (const est of estimatesRes.data.estimates) {
+  if (!est.ok) {
+    console.log(`${est.output}: unavailable (${est.error})`);
+    continue;
+  }
+  const received = est.receive.map((r: any) => `${r.uiAmount} of ${r.address}`).join(" + ");
+  console.log(`${est.output}: ${received} = $${est.valueUsd.toFixed(2)} (at pool price: $${est.marketValueUsd.toFixed(2)})`);
+}
 ```
+
+<Note>
+`zap-out-estimates` covers Meteora DLMM positions. Skip this step for a DAMM V2 position.
+</Note>
 
 ### Step 3: Generate Zap-Out Transactions
 
@@ -280,6 +298,7 @@ const decreaseTxRes = await apiCall("POST", "/position/decrease-tx", {
   slippage_bps: 500,
   output: "allBaseToken",      // withdraw to SOL (see table below)
   provider: "JUPITER_ULTRA",
+  type: position.protocol === "meteora_damm_v2" ? "meteora_damm_v2" : "meteora",
 });
 
 console.log(`Generated ${decreaseTxRes.data.closeTxsWithJito.length} close txs`);
@@ -343,7 +362,7 @@ Always use the `landing-decrease-tx` endpoint instead of submitting transactions
 ### Tips
 
 - **Transaction landing**: Always use LP Agent's landing endpoints instead of direct RPC. Better success rates via Jito: for free.
-- **DAMM V2 pools**: Both zap-in and zap-out auto-detect pool types. The same code works for DLMM and DAMM V2.
+- **DAMM V2 pools**: Zap-in detects the pool type from the pool address. Zap-out does not: send `type: "meteora_damm_v2"` to `decrease-tx` for a DAMM V2 position (copy it from the position's `protocol`). `zap-out-estimates` covers DLMM positions only.
 - **Partial zap-out**: Use `bps` less than 10000 to withdraw only a portion (e.g., `5000` = 50%).
 
 ---
@@ -419,13 +438,14 @@ async function zapIn(poolAddress: string, amountSOL: number) {
 }
 
 // ===================== ZAP-OUT =====================
-async function zapOut(positionId: string, bps: number = 10000) {
+async function zapOut(positionId: string, protocol: string, bps: number = 10000) {
   const decreaseTx = await apiCall("POST", "/position/decrease-tx", {
     position_id: positionId,
     bps,
     owner: OWNER,
     slippage_bps: 500,
     output: "allBaseToken",
+    type: protocol === "meteora_damm_v2" ? "meteora_damm_v2" : "meteora",
   });
 
   const signedCloseTxs = decreaseTx.data.closeTxsWithJito.map(signTx);
@@ -446,7 +466,7 @@ async function zapOut(positionId: string, bps: number = 10000) {
 async function main() {
   // Discover a pool
   const discover = await apiCall("GET", "/pools/discover?" + new URLSearchParams({
-    chain: "SOL", sortBy: "vol_24h", sortOrder: "desc", pageSize: "1",
+    chain: "SOL", platform: "meteora", sortBy: "vol_24h", sortOrder: "desc", pageSize: "1",
   }));
   const pool = discover.data[0];
   console.log(`Pool: ${pool.token0_symbol}/${pool.token1_symbol}`);
@@ -462,7 +482,7 @@ async function main() {
     console.log(`Position value: $${position.currentValue}, PnL: ${position.pnl.percent}%`);
 
     // Zap-Out: withdraw 100% to SOL
-    await zapOut(position.id, 10000);
+    await zapOut(position.id, position.protocol, 10000);
   }
 }
 

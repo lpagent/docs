@@ -24,13 +24,13 @@ The copy dialog opens when you press **Copy LP** on a wallet's portfolio, or cli
 | **Max Increase Amount per Tx** | Optional cap on each copied open and each copied add, in your TP/SL currency. Leave it empty for no cap. |
 | **Funding currency** (Robinhood Chain) | Shows whether new copies use ETH or USDG, and your ETH for gas. Change it in Settings. |
 
-You need a Copy Percentage, a Max, or both.
+You need a Copy Percentage, a Max, or both. With only a Max, each copy matches the leader's amount, up to the Max. When the Max cuts an open short, the leader's later adds to that position are copied at the smaller share the open got. See [How sizing works](/features/copy-lp#how-sizing-works).
 
 <Warning>
-  A Max of **0** copies nothing. To copy without a cap, leave the field empty.
+  A Max of **0** would copy nothing, so it can't be saved. To copy without a cap, leave the field empty. An older copy still set to 0 shows a red note under the field.
 </Warning>
 
-**Fast wallets:** when the leader holds positions for less than 18 minutes on average (Solana) or 1 hour (Robinhood Chain), the dialog shows a **High-frequency** warning. You pay a swap in, a swap back and network fees on every flip, whether or not the trade worked.
+**Fast wallets:** when the leader holds positions for less than 18 minutes on average (Solana) or 1 hour (Robinhood Chain), the dialog shows a **High-frequency** warning. You pay a swap in, a swap back and network fees on every flip, whether or not the trade worked. On Solana, when that wallet also often adds the same token back within a minute of an exit, the warning says how often and offers **Turn on Smart Token Retention**.
 
 ## Step 2: Exit rules
 
@@ -87,24 +87,31 @@ Guards that change what LP Agent does with this wallet's trades.
 
 ### Meme Protection
 
-On by default, both networks. Skips a copy when the trusted side of the pool (SOL, USDC, USDT, or ETH, WETH, USDG) would be nearly empty, that is, when more than 95% of your copy would sit in the other token. Copy Logs shows these as **Meme protection**.
+On by default, both networks. Skips a copied open or add when its trusted side (SOL, USDC, USDT on Solana; ETH, WETH, USDG on Robinhood Chain) would be nearly empty, that is, when more than 95% of what your copy deposits would sit in the other token. Pools where both tokens are trusted, or neither is, are not checked.
+
+A Meme Protection refusal is a skip, not a failure: it is not retried. Copy Logs shows the reason **Meme protection**, and the row says what lets the next one through.
+
+Some leaders pull a token out and put it back a moment later as that token alone. Without Smart Token Retention, your copy sells the token when the leader pulls it, so the re-add would be almost all meme token and Meme Protection skips it. Your copy then holds less than the leader. Two ways to follow these re-adds:
+
+- **Turn on Smart Token Retention** (Solana, DLMM, below). Your copy keeps the token it pulled. If the leader adds it back within your hold time, your copy puts the kept token back, and Meme Protection lets that re-add through.
+- **Turn Meme Protection off** for this leader. Every copy then goes through, including ones that are almost all meme token.
 
 ### Smart Token Retention (Solana, DLMM)
 
-Off by default. Leaders often pull a position and add the same token back a minute later. Normally your copy sells the token on exit and buys it again on the re-add. With Smart Token Retention on, your copy **keeps the token for a short time** instead, and reuses it if the same leader adds it back. That skips a sell and a buy.
+Off by default. Leaders often pull liquidity, or close, and add the same token back a minute later. Normally your copy sells the token on exit and buys it again on the re-add. With Smart Token Retention on, your copy **keeps the token for a short time** instead, and reuses it if the same leader adds it back. That skips a sell and a buy. DAMM V2 exits still sell the token right away.
 
 | Option | Choices |
 | --- | --- |
 | **Hold for** | 30s, **1 min** (default), 2 min, 5 min |
 | **Sells right away if** | **Price drops more than** 5% (0.5% to 50%), **This wallet sells the token**, or **Hold time runs out** |
 
-The card shows how often this wallet added the same token back within 1 and 5 minutes over the last 7 days.
+When this wallet has enough copy history, the card shows how often it added the same token back within 1 and 5 minutes over the last 7 days.
 
 <Warning>
   Most exits are not added back. Until the token is sold, its price can drop and you take that loss. Turning retention off, pausing or stopping the copy sells any kept tokens.
 </Warning>
 
-Kept tokens show as **Holding** in Copy Logs, with a countdown and a **Sell now** button.
+Kept tokens show as **Holding** in Copy Logs, with a countdown and a **Sell now** button. Selling a kept token is that copy's swap back. If it can't be sold, the copy shows **Tokens left in wallet** with a **Swap to SOL** button.
 
 ## Step 5: Label
 

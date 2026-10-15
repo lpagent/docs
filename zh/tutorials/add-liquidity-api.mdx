@@ -48,8 +48,8 @@ LP Agent 为 zap-in 和 zap-out 都内置了基于 Jito bundle 的交易上链�
 1. GET POSITIONS   Find your open positions
    GET /lp-positions/opening
         ↓
-2. GET QUOTES      (Optional) Preview what you'll receive
-   POST /position/decrease-quotes
+2. ESTIMATE        (Optional) See what each output option pays out
+   POST /position/zap-out-estimates
         ↓
 3. GENERATE TXS   API creates unsigned withdrawal transactions
    POST /position/decrease-tx
@@ -74,7 +74,7 @@ LP Agent 为 zap-in 和 zap-out 都内置了基于 Jito bundle 的交易上链�
 
 ## 前置条件
 
-- 一个 LP Agent API key（在 [API Dashboard](https://app.lpagent.io/open-api) 获取）
+- 一个 LP Agent API key（在 [LP Agent Portal](https://portal.lpagent.io/) 获取）
 - 一个 Solana 钱包 keypair
 - Node.js >= 18
 
@@ -145,20 +145,27 @@ function signTransaction(base64Tx: string): string {
 const discoverRes = await apiCall("GET",
   "/pools/discover?" + new URLSearchParams({
     chain: "SOL",
-    sortBy: "vol_24h",        // sort by 24h volume
+    platform: "meteora",       // DLMM pools: this guide places liquidity by bin
+    sortBy: "vol_24h",         // sort by 24h volume
     sortOrder: "desc",
     pageSize: "5",
-    min_market_cap: "5",       // min $5M market cap
-    min_liquidity: "50",       // min $50K TVL
+    min_market_cap: "5000000", // min $5M market cap (plain USD)
+    min_liquidity: "50000",    // min $50K TVL (plain USD)
   }).toString()
 );
 
 const pool = discoverRes.data[0];
 console.log(`Pool: ${pool.token0_symbol}/${pool.token1_symbol} (${pool.pool})`);
-console.log(`Protocol: ${pool.protocol}`); // "meteora" or "meteora_damm_v2"
+console.log(`Protocol: ${pool.protocol}`); // "meteora" (DLMM)
 ```
 
-**返回内容：** 一个池子列表，包含地址、交易对、TVL、交易量和协议类型。API 同时支持 Meteora DLMM 和 DAMM V2 池子：同一套代码两种都能用。
+**返回内容：** 一个池子列表，包含地址、交易对、TVL、交易量和协议类型。`min_market_cap`、`min_liquidity` 这类金额筛选条件直接填美元数，不用换算成百万或千。
+
+Discover 会同时返回 Meteora DLMM（`meteora`）和 DAMM V2（`meteora_damm_v2`）池子。下一步要读取 DLMM 的 active bin，所以本教程只查 DLMM 池子。去掉 `platform` 就能看到 DAMM V2 池子：`add-tx` 会根据池子地址自动识别池子类型。
+
+<Tip>
+想按最近的手续费收益给池子排序，用 `sortBy: "fee_tvl_ratio"`，并把 `feeTVLInterval` 设为 `5m`、`1h`、`6h` 或 `24h`。每个池子还会在 `fee_5m`、`fee_1h`、`fee_6h` 里给出最近 5 分钟、1 小时和 6 小时赚到的手续费（美元）。
+</Tip>
 
 ### 第 3 步：获取池子信息并设定区间
 
@@ -250,23 +257,34 @@ for (const pos of positionsRes.data) {
 }
 ```
 
-**返回内容：** 每个仓位都包含加密 ID（提取时要用）、当前价值、盈亏（PnL）、是否在区间内，以及代币详情。
+**返回内容：** 每个仓位都包含 `id`（仓位地址，提取时作为 `position_id` 传入）、`protocol`（DLMM 是 `meteora`，DAMM V2 是 `meteora_damm_v2`）、当前价值、盈亏（PnL）、是否在区间内，以及代币详情。
 
-### 第 2 步：获取报价（可选）
+### 第 2 步：估算能拿到多少（可选）
 
-提取之前，先预览你能收到多少。API 会给出不同输出选项的报价。
+提取之前，先看看每种输出选项实际能拿到多少。每条估算都按 `decrease-tx` 实际使用的兑换路径计算，已经扣掉兑换和手续费。
 
 ```typescript
-const positionId = positionsRes.data[0].id; // encrypted position ID
+const position = positionsRes.data[0];
+const positionId = position.id; // the position address
 
-const quotesRes = await apiCall("POST", "/position/decrease-quotes", {
-  id: positionId,
+const estimatesRes = await apiCall("POST", "/position/zap-out-estimates", {
+  position_id: positionId,
   bps: 10000,    // 10000 = 100% withdrawal, 5000 = 50%, etc.
 });
 
-const quotes = quotesRes.data;
-console.log(`Token prices: $${quotes.price.token0} / $${quotes.price.token1}`);
+for (const est of estimatesRes.data.estimates) {
+  if (!est.ok) {
+    console.log(`${est.output}: unavailable (${est.error})`);
+    continue;
+  }
+  const received = est.receive.map((r: any) => `${r.uiAmount} of ${r.address}`).join(" + ");
+  console.log(`${est.output}: ${received} = $${est.valueUsd.toFixed(2)} (at pool price: $${est.marketValueUsd.toFixed(2)})`);
+}
 ```
+
+<Note>
+`zap-out-estimates` 只支持 Meteora DLMM 仓位。DAMM V2 仓位请跳过这一步。
+</Note>
 
 ### 第 3 步：生成 Zap-Out 交易
 
@@ -280,6 +298,7 @@ const decreaseTxRes = await apiCall("POST", "/position/decrease-tx", {
   slippage_bps: 500,
   output: "allBaseToken",      // withdraw to SOL (see table below)
   provider: "JUPITER_ULTRA",
+  type: position.protocol === "meteora_damm_v2" ? "meteora_damm_v2" : "meteora",
 });
 
 console.log(`Generated ${decreaseTxRes.data.closeTxsWithJito.length} close txs`);
@@ -343,7 +362,7 @@ console.log(`Zap-Out Success! Tx: https://solscan.io/tx/${landRes.data.signature
 ### 小贴士
 
 - **交易上链**：始终使用 LP Agent 的上链接口，不要直接走 RPC。通过 Jito 成功率更高：而且免费。
-- **DAMM V2 池子**：zap-in 和 zap-out 都会自动识别池子类型。同一套代码适用于 DLMM 和 DAMM V2。
+- **DAMM V2 池子**：zap-in 会根据池子地址自动识别池子类型，zap-out 不会：DAMM V2 仓位调用 `decrease-tx` 时要传 `type: "meteora_damm_v2"`（从仓位的 `protocol` 字段复制过来）。`zap-out-estimates` 只支持 DLMM 仓位。
 - **部分 Zap-Out**：把 `bps` 设为小于 10000 的值，就只提取一部分（例如 `5000` = 50%）。
 
 ---
@@ -419,13 +438,14 @@ async function zapIn(poolAddress: string, amountSOL: number) {
 }
 
 // ===================== ZAP-OUT =====================
-async function zapOut(positionId: string, bps: number = 10000) {
+async function zapOut(positionId: string, protocol: string, bps: number = 10000) {
   const decreaseTx = await apiCall("POST", "/position/decrease-tx", {
     position_id: positionId,
     bps,
     owner: OWNER,
     slippage_bps: 500,
     output: "allBaseToken",
+    type: protocol === "meteora_damm_v2" ? "meteora_damm_v2" : "meteora",
   });
 
   const signedCloseTxs = decreaseTx.data.closeTxsWithJito.map(signTx);
@@ -446,7 +466,7 @@ async function zapOut(positionId: string, bps: number = 10000) {
 async function main() {
   // Discover a pool
   const discover = await apiCall("GET", "/pools/discover?" + new URLSearchParams({
-    chain: "SOL", sortBy: "vol_24h", sortOrder: "desc", pageSize: "1",
+    chain: "SOL", platform: "meteora", sortBy: "vol_24h", sortOrder: "desc", pageSize: "1",
   }));
   const pool = discover.data[0];
   console.log(`Pool: ${pool.token0_symbol}/${pool.token1_symbol}`);
@@ -462,7 +482,7 @@ async function main() {
     console.log(`Position value: $${position.currentValue}, PnL: ${position.pnl.percent}%`);
 
     // Zap-Out: withdraw 100% to SOL
-    await zapOut(position.id, 10000);
+    await zapOut(position.id, position.protocol, 10000);
   }
 }
 

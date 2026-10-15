@@ -32,10 +32,11 @@ curl -X GET "https://api.lpagent.io/open-api/v1/pools/discover?chain=SOL&pageSiz
 
 ### 1) 发现池子和市场状态
 
-- `GET /pools/discover` → 按条件筛选/排序查找池子
+- `GET /pools/discover` → 按条件筛选/排序查找池子（在 Solana 上，Fee/TVL 排序可以按 `5m`、`1h`、`6h` 或 `24h` 窗口计算）
 - `GET /pools/{poolId}/info` → 查看池子状态和 active bin 相关信息
+- `GET /pools/{poolId}/positions` → 某个池子里开的仓位
 - `GET /pools/{poolId}/onchain-stats` → 链上池子指标
-- `GET /pools/{poolId}/top-lpers` → 头部流动性提供者（LP）
+- `GET /pools/{poolId}/top-lpers` → 头部流动性提供者（LP）（Premium）
 
 ### 2) 追踪仓位和投资组合分析
 
@@ -43,19 +44,47 @@ curl -X GET "https://api.lpagent.io/open-api/v1/pools/discover?chain=SOL&pageSiz
 - `GET /lp-positions/historical` → 历史/已平仓仓位
 - `GET /lp-positions/overview` → 汇总的投资组合指标
 - `GET /lp-positions/logs` → 仓位活动日志
+- `GET /lp-positions/position` → 单个仓位的详情
 - `GET /lp-positions/revenue/{owner}` → 收益/盈亏时间序列数据
 
 ### 3) 执行流动性操作（zap-in 单币入池 / zap-out 一键出池）
 
 - `POST /pools/{poolId}/add-tx` → 生成未签名的 zap-in 交易
 - `POST /pools/landing-add-tx` → 提交已签名的 zap-in 交易
-- `POST /position/decrease-quotes` → 预览 zap-out 的输出
+- `POST /position/zap-out-estimates` → 估算每种 zap-out 输出方式实际能拿到多少
 - `POST /position/decrease-tx` → 生成未签名的 zap-out 交易
 - `POST /position/landing-decrease-tx` → 提交已签名的 zap-out 交易
 
-### 4) 钱包工具
+### 4) 领取手续费
+
+- `POST /position/claim-fee-tx` → 生成未签名的领取手续费交易，可选附带换成 SOL 的交易
+- `POST /position/landing-claim-fee-tx` → 提交已签名的领取手续费交易
+
+### 5) 钱包和网络工具
 
 - `GET /token/balance` → 钱包代币余额
+- `POST /rpc`、`POST /rpc/historical` → Solana JSON-RPC（Premium）
+- `POST /jito` → 发送 Jito bundle（Premium）
+
+## 支持的链
+
+读取类接口接受 `chain=SOL`（默认）或 `chain=ROBINHOOD`。所有构建或发送交易的接口都只支持 Solana。
+
+| 接口 | Solana（`SOL`） | Robinhood Chain（`ROBINHOOD`） |
+| --- | --- | --- |
+| `GET /lp-positions/opening`、`/historical`、`/overview`、`/logs`、`/position` | 支持 | 支持 |
+| `GET /lp-positions/revenue/{owner}` | 支持 | 支持 |
+| `GET /token/balance` | 支持 | 支持 |
+| `GET /pools/discover` | 支持 | 支持 |
+| `GET /pools/{poolId}/positions`、`/onchain-stats`、`/top-lpers` | 支持 | 支持 |
+| `GET /pools/{poolId}/info` | 支持 | 不支持 |
+| `POST /pools/{poolId}/add-tx`、`/pools/landing-add-tx` | 支持 | 不支持 |
+| `POST /position/zap-out-estimates` | 支持（仅 Meteora DLMM） | 不支持 |
+| `POST /position/decrease-tx`、`/position/landing-decrease-tx` | 支持 | 不支持 |
+| `POST /position/claim-fee-tx`、`/position/landing-claim-fee-tx` | 支持 | 不支持 |
+| `POST /rpc`、`/rpc/historical`、`/jito` | 支持 | 不支持 |
+
+`chain` 和 `platform` 在每个接口上的具体行为，见 [API 参考简介](/zh/api-reference/introduction)。
 
 ## 端到端流程
 
@@ -81,7 +110,7 @@ curl -X GET "https://api.lpagent.io/open-api/v1/pools/discover?chain=SOL&pageSiz
   </Step>
 </Steps>
 
-### 流程 B：列出仓位 -> 报价 -> Zap-Out
+### 流程 B：列出仓位 -> 估算 -> Zap-Out
 
 适用于你的 AI 想关闭一个 LP 仓位的全部或一部分。
 
@@ -89,11 +118,11 @@ curl -X GET "https://api.lpagent.io/open-api/v1/pools/discover?chain=SOL&pageSiz
   <Step title="1) 获取当前仓位">
     调用 `GET /lp-positions/opening?owner=<wallet>`，选定目标仓位的 `id`。
   </Step>
-  <Step title="2) 预览移除流动性后的输出（可选）">
-    用 `id` 和 `bps` 调用 `POST /position/decrease-quotes`。
+  <Step title="2) 估算能拿到多少（可选）">
+    用 `position_id`（仓位的 `id`）和 `bps` 调用 `POST /position/zap-out-estimates`。每条估算对应一种 `output` 方式，告诉你钱包最终能收到什么。仅支持 Meteora DLMM 仓位。
   </Step>
   <Step title="3) 生成移除流动性交易">
-    调用 `POST /position/decrease-tx`，传入 `position_id`、`bps`、`owner`、`slippage_bps` 和 `output` 模式。
+    调用 `POST /position/decrease-tx`，传入 `position_id`、`bps`、`owner`、`slippage_bps` 和 `output` 模式。如果是 DAMM V2 仓位，还要传 `type: "meteora_damm_v2"`（就是仓位的 `protocol`）。
   </Step>
   <Step title="4) 本地签名">
     用 owner 钱包签名 base64 交易。
@@ -109,7 +138,7 @@ curl -X GET "https://api.lpagent.io/open-api/v1/pools/discover?chain=SOL&pageSiz
 
 1. 轮询 `GET /lp-positions/opening?owner=...`
 2. 对每个 `inRange=false` 的仓位：
-   - zap-out 旧仓位（`decrease-tx` + `landing-decrease-tx`）
+   - zap-out 旧仓位（`decrease-tx` + `landing-decrease-tx`，`type` 按仓位的 `protocol` 来填）
    - 检查可用的 SOL（`GET /token/balance`）
    - 获取池子的 active bin（`GET /pools/{poolId}/info`）
    - zap-in 新仓位（`add-tx` + `landing-add-tx`）
@@ -117,8 +146,10 @@ curl -X GET "https://api.lpagent.io/open-api/v1/pools/discover?chain=SOL&pageSiz
 
 ## 关键参数和限制
 
-- `bps`：`0..10000`（10000 = 100%）
+- `bps`：`decrease-tx` 上是 `0..10000`，`zap-out-estimates` 上是 `1..10000`（10000 = 100%）
 - `slippage_bps`：`0..10000`
+- `decrease-tx` 和 `claim-fee-tx` 的仓位类型枚举：`meteora`（DLMM，默认）、`meteora_damm_v2`
+- `pools/discover` 的 `feeTVLInterval`：`5m`、`1h`、`6h`、`24h`
 - `percentX`：`0..1`
 - 策略枚举：`Spot`、`Curve`、`BidAsk`
 - 添加模式枚举：`normal`、`zap-in`
@@ -135,6 +166,8 @@ curl -X GET "https://api.lpagent.io/open-api/v1/pools/discover?chain=SOL&pageSiz
 - 签名和密钥处理只放在可信的运行环境里
 - 交易过期了（超过区块高度窗口）就重新生成
 - 对临时性的 API/网络故障，加上带退避的重试
+- 别超过你套餐的每分钟请求数（Basic 5、Premium 10、Enterprise 20）；收到 `429` 就等一下再重试
+- 收到 `401` 加 `Unauthorized`，说明 key 没带、不存在或者已经没有访问权限（比如付费套餐到期了），见 [API 参考简介](/zh/api-reference/introduction)
 - 始终记录请求 ID、接口和 owner（不要泄露密钥）
 
 ## 最简 TypeScript API 封装
@@ -165,7 +198,8 @@ async function apiCall(method: string, path: string, apiKey: string, body?: obje
 1. [API 参考简介](/zh/api-reference/introduction)
 2. [通过 API 进行 Zap-In 和 Zap-Out](/zh/tutorials/add-liquidity-api)
 3. [自动再平衡机器人](/zh/tutorials/auto-rebalance-bot)
-4. [AI 页面](/zh/ai)
+4. [复投 LP 手续费收益](/zh/tutorials/compound-lp-fees)
+5. [AI 页面](/zh/ai)
 
 <Card title="需要完整的接口 schema？" icon="book" href="/zh/api-reference/introduction">
   打开 **API Reference** 标签页，查看基于 OpenAPI 生成的完整接口详情。

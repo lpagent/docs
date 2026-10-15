@@ -1,0 +1,91 @@
+---
+title: "Discover"
+description: "找到值得做 LP 的代币：按交易量、Fee/TVL、安全性和 smart LP 实时排名，一键打开它的池子"
+---
+
+LP 亏钱，多半是代币选错了，而不是区间没设好。**Discover**（发现）就是先选代币的地方：它把 Solana 和 Robinhood Chain 上有池子的代币，按交易量怎么变化、池子赚多少手续费、看起来有多安全、有没有 smart LP 在里面来排名。从一个代币可以直接打开它最好的池子；还没有池子的，可以自己创建一个。
+
+Discover 是应用的首页：打开 [app.lpagent.io](https://app.lpagent.io/) 或点 logo 就会进入，它也排在菜单第一位。
+
+<Frame>
+  ![Solana 上的 Discover](/images/app/sol-discover.jpg)
+  <em>Solana 上的 Discover，Trending 预设（示例数据）</em>
+</Frame>
+
+## 选一个列表
+
+先在左边选链（**Solana** 或 **Robinhood**），再选一个预设。每个预设就是一种排序加一个筛选，之后两者都可以再改。
+
+| 预设 | 显示什么 |
+| --- | --- |
+| **Trending** | 正在起量的代币：按 **Vol chg 1h** 排序，也就是这一小时的交易量和上一小时相比。只有交易量过了门槛的代币才参与排名，所以从 $40 涨到 $900 的代币不会排到最前面。门槛写在表格上方。 |
+| **New** | 最新的代币排最前。刚创建一分钟以内的代币，年龄按秒计。 |
+| **Top Fee/TVL** | 过去一小时里，池子相对流动性赚手续费最多的代币。 |
+| **Smart money in** | 在它的池子里持仓的 smart LP 最多的代币。 |
+| **No Pool** | 有交易量、但还没有值得列出的池子的代币，可以由你来[创建一个](/zh/features/pools#create-a-pool)。 |
+
+Discover 会记住你上次选的链和列表（预设或排序、**Hide risky** 和你的筛选），下次打开时直接回到那里。别人分享的链接则打开链接里的列表。表格会自动刷新，表格上方那行写着上次刷新的时间，两次刷新之间价格实时跳动。
+
+## 看懂一行
+
+| 列 | 含义 |
+| --- | --- |
+| **Token** | logo、代号、名称和池子数量（或 **No Pool**）。logo 上的小徽标表示它来自哪个发射平台，比如 pump.fun、LetsBonk、Bags、Jupiter Studio、MetaDAO、Raydium LaunchLab 或 StonkFun。 |
+| **Age** | 代币创建了多久 |
+| **Price 24h** | 价格、24h 涨跌和 24h 走势小图 |
+| **MCap** / **Holders** | 市值和持有人数 |
+| **Vol 24h** / **Vol chg** | 24h 交易量，以及 1h 或 24h 内交易量的变化 |
+| **Liquidity** | 这个代币已列出的池子的总流动性 |
+| **Fee/TVL** | 它的池子在 5m、1h、6h 或 24h 内的手续费相对流动性的比值 |
+| **Safety** | organic score（有机评分）和安全分（见下文），下面是前 10 持有人和开发者持仓 |
+| **Smart LPs** | 有多少 smart LP 在这个代币的池子里持有未平仓仓位，以及最近一小时的变化（比如 **+2 in 1h**） |
+
+- 点列标题排序，再点一次反过来排。
+- **Columns** 可以开关各列。窗口太窄放不下所有列时，次要的列会让位，菜单里会标成 **No room**。
+- 在手机上每个代币是一张卡片：排序用的指标显示在右边，一排小按钮代替列标题来排序。
+
+<Tip>
+  按好 LP 的顺序来看一个代币：先看代币安不安全，再看交易量健不健康，最后看 Fee/TVL 好不好。Risky 评分的代币 Fee/TVL 特别高，往往正是因为它有风险。
+</Tip>
+
+## 安全分和 Hide risky
+
+每个代币都有一个满分 100 的安全分：**Safe**（75 分及以上）、**Caution**（40 到 74 分）或 **Risky**（40 分以下）。把鼠标放在分数上，可以看到它是怎么算出来的：
+
+| 检查项 | 说明 |
+| --- | --- |
+| **Mint authority** | **Revoked** 表示没有人能再增发这个代币 |
+| **Freeze authority** | **Revoked** 表示没有人能冻结你的代币 |
+| **Top 10 holders** / **Dev holdings** | 筹码有多集中 |
+| **Organic score** | 交易里有多少看起来是真实交易 |
+| **Holders** | 持有人数 |
+| **Impersonation flag** | 这个代号属于一个已登记的代币，但这是另一个合约。这一行会标 **Fake ticker**。 |
+
+打开 **Hide risky** 会隐藏 40 分以下的代币。没有审计数据的代币也会被隐藏，因为它们没有分数可以达标。Robinhood Chain 目前还没有代币审计来源，所以那里的代币只显示能拿到的检查项。
+
+## 筛选
+
+**Filters** 可以给任何列表加条件：代币（地址或代号）、有没有池子，以及市值、流动性、24h 交易量、持有人数和年龄（小时）的范围。金额单位是美元，可以输入 `500k`、`1.5m` 或 `2b`。生效的筛选会以小标签显示在表格上方，点叉号可以去掉。
+
+## 打开池子
+
+<Frame>
+  ![展开一个代币的所有池子](/images/app/sol-discover-pools.jpg)
+  <em>展开一个代币的所有池子，Fee/TVL 最高的排在最前（示例数据）</em>
+</Frame>
+
+- **Open pool** 直接进入这个代币最好的池子，在那里[添加流动性](/zh/features/create-position)。
+- 点这一行（或它的箭头）可以展开这个代币的所有池子，显示流动性、24h 交易量、手续费，以及 5m、1h、6h 和 24h 的 Fee/TVL。最好的那个池子带 **Top fee/TVL** 标签。每个池子都有自己的 **Open pool**。
+- 展开列表里的 **New pool**，或者没有池子的代币上的 **Create pool**，会打开创建池子的窗口。见[创建池子](/zh/features/pools#create-a-pool)。
+
+Discover 本身没有存入这一步：添加流动性总是在池子页面完成，所以和应用里其他地方一样受到同样的保护。
+
+## 分享列表
+
+Discover 的链接带着链、预设、排序和筛选，你发给别人，对方打开的就是同一个列表。
+
+## 相关页面
+
+- [池子](/zh/features/pools)：LP Agent 追踪的所有池子，带池子级别的筛选
+- [添加流动性](/zh/features/create-position)：池子页面的存入面板
+- [Smart LP](/zh/features/smart-lp)：**Smart LPs** 这一列背后的钱包

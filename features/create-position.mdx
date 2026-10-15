@@ -3,7 +3,9 @@ title: "Create a Position"
 description: "Zap into a pool from a single token, pick your range and strategy"
 ---
 
-Open a pool from the [Pools](/features/pools) page. The panel on the right is where you add liquidity. Positions are opened from your [agent wallet](/account-and-wallet#your-agent-wallet), so there is no wallet popup.
+Open a pool from the [Pools](/features/pools) page or from [Discover](/features/discover). The panel on the right is where you add liquidity. Positions are opened from your [agent wallet](/account-and-wallet#your-agent-wallet), so there is no wallet popup.
+
+No pool for your token yet? You can [create one](/features/pools#create-a-pool).
 
 <Tabs>
   <Tab title="Solana (Meteora)">
@@ -19,6 +21,8 @@ Open a pool from the [Pools](/features/pools) page. The panel on the right is wh
 
     Type an amount in SOL (or USD with the **$** toggle), use **HALF** or **MAX**, or press a preset: **0.1 SOL**, **0.5 SOL**, **1 SOL**, **5 SOL**. Presets bigger than your balance are greyed out. The sliders icon lets you edit your presets (up to 6).
 
+    **MAX** puts in as much as your SOL can cover once the swap buffer, position rent, any new price bin rent and transaction fees are set aside. It keeps to that amount as the costs update or you change the range, until you type over it. If the amount plus those costs is more than you hold, the box says **Not enough SOL for fees** and **Create Position** stays disabled.
+
     **Token Distribution** sets how your SOL is split between the two tokens, 50/50 by default. When your range sits entirely on one side of the price, it locks: a range below the price is 100% SOL (no swap needed), a range above the price is 100% token.
 
     ### 2. Strategy (DLMM)
@@ -33,21 +37,41 @@ Open a pool from the [Pools](/features/pools) page. The panel on the right is wh
 
     The preview chart shows exactly how your liquidity will sit around the current price.
 
-    ### 3. Price Range
+    ### 3. Range
 
     Pick a preset or set it yourself:
 
     - **±5%** (default), **±10%**: bracket the current price.
     - **-50%**, **-70%**: the whole range sits below the price. This is a one-sided, SOL-only position that buys the token as the price falls.
-    - Type **Min Price** and **Max Price**, step them by 1%, or drag the lines on the chart.
+    - The sliders icon edits the presets (up to 6). **±** brackets the price, **+** and **-** keep the whole range above or below it.
+    - Type the min and max yourself, step them with the buttons in each box, or drag the lines on the chart.
+
+    The **Price** / **MCap** / **Bin** switch next to **Range** sets what the two boxes show:
+
+    | Unit | The boxes show | One step moves |
+    | --- | --- | --- |
+    | **Price** | **Min Price** and **Max Price** | 1% |
+    | **MCap** | **Min MCap** and **Max MCap**, the market cap at each end | 1% |
+    | **Bin** | **Min Bin** and **Max Bin**, the bin IDs your range would use, with the **Active bin** under them | One bin |
+
+    Switching units never moves your range, and presets stay in percent in every unit. **MCap** is greyed out when the token's supply is unknown. The app remembers your unit in this browser.
 
     The panel shows how many bins your range covers. Your range is fixed when you open the panel and does not follow the live price.
 
     ### Costs before you confirm
 
-    The summary shows the SOL needed, the **position rent** (refundable when you close) and any **new price bin rent**. If you are the first LP in some price bins of this pool, Meteora charges a one-time rent to open each one, and it stays with the pool after you close. Narrow your range to avoid it.
+    The summary shows the SOL needed to create the position, in SOL and USD, and what it is made of:
 
-    Press **Create Position**. When it lands, the position appears on your Portfolio a few seconds later while it syncs from the chain.
+    | Line | What it is |
+    | --- | --- |
+    | **Deposit** | The amount you typed |
+    | **Swap & fee buffer** | Covers the swap and transaction fees. What is not used stays in your wallet. |
+    | **Position rent** | Refundable when you close |
+    | **New price bin rent** | One-time, non-refundable. Only when your range needs new price bins. |
+
+    If you are the first LP in some price bins of this pool, Meteora charges a one-time rent to open each one, and it stays with the pool after you close. A bar under the range shows which parts of your range other LPs already opened and which ones you would pay for. Narrow your range to avoid it.
+
+    Press **Create Position**. When it lands, a chime plays (turn it off with **Position Sounds** in [Settings](/features/settings)), and the position shows in **Your Positions** on the pool page right away, with what you put in and its range. Its value, fees and uPnL fill in a few seconds later, once it has synced from the chain. The panel then selects it, so you see its **Current** tab and its range on the chart.
 
     <Note>
       DAMM v2 pools use a simpler form: type an amount of SOL and press **Create Position**. There is no strategy or range to set; the SOL is split by the pool's ratio.
@@ -64,19 +88,22 @@ Open a pool from the [Pools](/features/pools) page. The panel on the right is wh
     - **Zap In** (default): pay in **ETH** or **USDG**, and LP Agent splits it across the pair. The default is your **Base Token** from Settings. You never need WETH; it shows as ETH. When you pay in ETH, a little is kept back for gas.
     - **Both Tokens**: deposit both tokens as they are, with no swap. Anything that doesn't fit your range comes back to you.
 
-    Use **HALF**, **MAX** or the ETH presets (**0.01**, **0.05**, **0.1**, **0.5 ETH**).
+    Use **HALF**, **MAX** or the ETH presets (**0.01**, **0.05**, **0.1**, **0.5 ETH**). The sliders icon lets you edit your presets.
 
     ### 2. Price Range
 
     - **±5%** (default), **±10%**: bracket the current price. The narrower the range, the more fees you earn while the price stays inside it.
     - **-50%**, **-70%**: one-sided, below the price. It only starts earning once the price falls into it.
     - Custom **Min Price** and **Max Price**, in USD per token, on the same scale as the chart. You can drag the lines on the chart too.
+    - The sliders icon edits the presets (up to 6).
 
     Prices snap to the pool's tick spacing.
 
     ### 3. Confirm
 
     The confirm card shows your **Swap slippage** (the gear opens Settings), **You deposit**, **Price range**, **Current price** and **Signed by: Your agent wallet**. Press **Zap In**.
+
+    When it lands, a chime plays and the position shows in **Your Positions** right away with its token ID, what you put in and its range. Value, fees and uPnL fill in once it has synced.
   </Tab>
 </Tabs>
 

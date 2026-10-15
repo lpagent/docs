@@ -67,6 +67,7 @@ lpagent positions revenue <addr>
 
 ```bash
 lpagent pools discover --chain SOL --sort-by tvl
+lpagent pools discover --chain SOL --sort-by fee_tvl_ratio --fee-tvl-interval 1h
 lpagent pools info <poolId>
 lpagent pools positions <poolId> --status Open
 lpagent pools onchain-stats <poolId>
@@ -81,10 +82,14 @@ lpagent pools add-tx <poolId> --owner <addr> --strategy Spot --input-sol 1
 lpagent pools landing-add-tx --file signed-tx.json
 
 # Zap-Out
-lpagent tx decrease-quotes --id <id> --bps 10000
+lpagent tx zap-out-estimates --position-id <id> --bps 10000
 lpagent tx decrease-tx --position-id <id> --bps 10000 --owner <addr> --slippage-bps 500
 lpagent tx landing-decrease-tx --file signed-tx.json
 ```
+
+<Note>
+`tx zap-out-estimates` 会在你执行 `decrease-tx` 之前，显示每种输出方式（`allToken0`、`allToken1`、`both`、`allBaseToken`）实际能拿到多少。需要 CLI v0.4.0 或更高版本，新版本里 `tx decrease-quotes` 保留为它的别名。旧版本调用的是已经移除的 `/position/decrease-quotes` 接口，会失败，所以请运行 `lpagent upgrade` 升级。
+</Note>
 
 ### 代币和原始 API 访问
 
@@ -92,7 +97,7 @@ lpagent tx landing-decrease-tx --file signed-tx.json
 lpagent token balance --owner <addr>
 
 lpagent api get /lp-positions/opening --query "owner=<addr>"
-lpagent api post /position/decrease-quotes --data '{"id":"...","bps":5000}'
+lpagent api post /position/zap-out-estimates --data '{"position_id":"...","bps":5000}'
 ```
 
 ## 输出模式

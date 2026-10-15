@@ -45,7 +45,9 @@ The **$** toggle in the header switches every number between the native token (S
 
 ## Open positions
 
-The summary line shows **Total value**, **Total uPnL**, **Total claimed fee** and **Total unclaim fee**. Filter by **Type** (protocol) and switch between **Table** and **Card**.
+The summary line shows **Total value**, **Total uPnL**, **Total claimed fee** and **Total unclaim fee**. Filter by **Type** (protocol) and switch between **Table** (the default) and **Card**.
+
+On a phone, **Table** keeps every column and scrolls sideways. **Card** shows a compact list instead, with a sort menu on top.
 
 | Column | Meaning |
 | --- | --- |
@@ -63,7 +65,20 @@ A warning shows next to a token with very few holders.
 
 ## Historical positions
 
-Every closed position, newest first, with invested, total fee, PnL, DPR and when it closed. Turn on **Hide small PnL positions** to hide dust. A yellow icon marks rows whose numbers look wrong; they are left out of your stats.
+Every closed position, newest first, with invested, total fee, PnL, DPR and when it closed. Switch between **Table** and **Card**, the same way as for open positions.
+
+Press **Filter** to narrow the list. The number on the button shows how many filters are on.
+
+| Filter | What it does |
+| --- | --- |
+| **Type** | The protocol: DLMM or DAMM V2 on Solana; Uniswap V3 or Uniswap V4 on Robinhood Chain. |
+| **Source** | **All positions**, **Auto only** or **Manual only**. Only on your own agent wallet. |
+| **Pool** | One pool this wallet has closed positions in. Search by pair, or paste a pool address. |
+| **PnL** | A minimum and a maximum PnL, in the currency the page shows (USD, SOL or ETH). Both ends are included. |
+
+Press **Apply** to use them, or **Reset** to clear them all. The filters are kept in the page link, so a bookmark opens the same filtered list.
+
+Turn on **Hide Small PnL** to hide dust. A yellow icon marks rows whose numbers look wrong; they are left out of your stats.
 
 ## Position details
 
@@ -71,10 +86,10 @@ Click a position to open its details:
 
 - **Profit And Loss**, **Age**, **Liquidity** (current value next to what the tokens would be worth if you had just held them) and **Fee** (claimed and unclaimed, per token).
 - On Solana DLMM, a **Price Bin** chart of your liquidity per bin and the current price.
-- **History**: every transaction on the position, with links.
+- **History**: every transaction on the position, with links. **Export CSV** downloads it as a spreadsheet file: time (UTC), transaction hash, action, status, each token's amount, price and USD value, and the total in USD and in SOL or ETH. Numbers are written in full, not shortened (no "1.2k").
 - **Logs** (your positions only): what LP Agent did, such as take profit queued or close success.
 - For copied positions, which leader position it was copied from.
 
 ## Live updates
 
-Open positions refresh every 10 seconds and when you come back to the tab. On Solana you can stream them live instead with **Settings > General > Realtime Portfolio**. **Realtime Numbers** picks whether changing values flash or roll.
+Open positions refresh every 10 seconds and when you come back to the tab. On Solana you can stream them live instead with **Settings > General > Realtime Portfolio**. **Realtime Numbers** picks whether changing values flash or roll. On a phone, values just update, without either effect.

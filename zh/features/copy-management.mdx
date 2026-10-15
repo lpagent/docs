@@ -20,8 +20,11 @@ description: "Copied Wallets、Analysis、Copy Logs，以及会暂停跟单的�
 | **Copy size** | 例如 "10% of each position, up to 2 SOL"（每个仓位的 10%，最多 2 SOL），以及任何池子类型筛选。 |
 | **Auto exit** | 你的止盈和止损，或者 Off。 |
 | **Positions** | 从这个钱包跟单开了多少个仓位。 |
+| **Last activity** | 这个钱包最后一次开仓或平仓是多久以前，比如 "4m ago"（4 分钟前）。显示短横线表示还没有已知的活动。 |
 | **PnL** | 你从这个钱包的跟单里赚到的盈亏（PnL）。 |
 | **Copy** | 开关，用来暂停或恢复跟单。 |
+
+点击 **Last activity** 或 **PnL** 按它排序，再点一次反转顺序。排序会保存在页面地址里，所以刷新页面或打开书签时，列表还是同样的排序。
 
 行菜单里有 **Edit settings**、**View portfolio**、**Copy address** 和 **Stop copying**。**Find Smart LP** 会带你去排行榜。
 
@@ -44,7 +47,7 @@ description: "Copied Wallets、Analysis、Copy Logs，以及会暂停跟单的�
 
 ## Copy Logs
 
-Copy Logs 是每一次跟单的完整记录：开了的、平了的，还有没发生的那些以及原因。
+Copy Logs 记录最近 7 天里有动静的每一次跟单：开了的、平了的，还有没发生的那些以及原因。
 
 <Frame>
   ![Copy Logs](/images/app/rh-copy-logs.jpg)
@@ -54,8 +57,9 @@ Copy Logs 是每一次跟单的完整记录：开了的、平了的，还有没�
 ### 筛选和列
 
 - 标签页：**All**、**Not opened**、**Failed**、**Open** 和 **Closed**，带数量。
-- 在 **Source** 列标题里按来源钱包筛选。
+- 用 **Source** 列标题里的漏斗按你跟的钱包筛选（手机上是列表上方的按钮）。可以按标签或地址的任意一段搜索；只剩一个钱包时按 Enter 直接选中。正在跟单的钱包排在已暂停的前面。
 - 列：**Position**、**Source**（带单钱包和它的仓位）、**Result**、**PnL**、**Why** 和 **Time**。
+- 每个来源钱包旁边有一个圆点，表示你是否还在跟它：绿色是正在跟单，灰色带 **Paused** 是已暂停。在 **Source** 列里，空心圆点带 **Not copied** 表示你已经不再跟单、但日志还在这 7 天内的钱包。
 
 结果标签：
 
@@ -90,6 +94,10 @@ Copy Logs 是每一次跟单的完整记录：开了的、平了的，还有没�
 | Token failed safety check / Token below quality floor（代币没通过安全检查 / 代币低于质量下限） | **Edit filters** |
 | Rug-risk leader / Leader's own token launch（有 Rug 风险的带单钱包 / 带单钱包自己发的币） | 无：为了保护你而跳过 |
 
+对于 **Meme protection**，修复面板还会说明：如果这个带单钱包经常把代币撤出再加回去，为它开启 Smart Token Retention 就能让这些加回通过。见 [Meme Protection](/zh/features/copy-settings)。
+
+开启 Smart Token Retention 时，卖掉被保留的代币就是这次跟单的换回（swap back）。如果卖不掉，这次跟单会显示 **Tokens left in wallet**，并带 **Swap to SOL** 按钮。
+
 如果你的代理钱包资金不够，Copy Logs 顶部会有一个横幅，告诉你现在有多少、上一次跟单需要多少，以及有多少跟单没开出来。
 
 ### 展开一行
@@ -98,7 +106,7 @@ Copy Logs 是每一次跟单的完整记录：开了的、平了的，还有没�
 
 ### 报告一次跟单
 
-哪里看着不对？按 **Report this copy**，选择哪里不对（没跟上带单钱包、金额不对、盈亏看起来不对、代币卡住了、没跟着带单钱包平仓、其他），补充细节后按 **Send report**。这次跟单的日志会自动帮你附上。
+哪里看着不对？展开这一行，按 **Something off? Report this copy**（如果这一行写着你这边没什么可改的，按钮是 **Report this copy**），选择哪里不对（没跟上带单钱包、金额不对、盈亏看起来不对、代币卡住了、没跟着带单钱包平仓、其他），补充细节后按 **Send report**。这次跟单的日志会自动帮你附上。你会拿到一个工单编号，处理进度（**Sent**、**Checking**、**Fixed** 等）会显示在这次跟单的那一行，以及账户面板的 [Reports](/zh/account-and-wallet) 里。想聊聊的话，在 Discord 开一个工单并提到这个编号。
 
 ## 会暂停跟单的保护机制
 

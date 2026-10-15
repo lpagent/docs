@@ -3,12 +3,17 @@ title: "Manage Positions"
 description: "Increase, decrease, zap out, claim fees and compound"
 ---
 
-Open the menu (three dots) on a position in your [Portfolio](/features/portfolio). On a pool page, select one of your positions to get the same actions in the right-hand panel.
+Open the menu (three dots) on a position in your [Portfolio](/features/portfolio). On a pool page, select one of your positions in **Your Positions** to get the same actions in the right-hand panel:
+
+- **Solana**: **Current**, **Deposit**, **Withdraw**, **Close**, **Claim Fee** and **Compound**.
+- **Robinhood Chain**: **Increase**, **Withdraw**, **Claim** and **Close**.
+
+On Solana, **Current** shows the position at a glance: its **Min price**, **Current** and **Max price**, with how far each bound sits from the current price, its liquidity and unclaimed fees, and **Close** and **Zap out to SOL** buttons. On DLMM it also draws the position's bins, live, against the active bin.
 
 | Action | Solana DLMM | Solana DAMM v2 | Robinhood Chain |
 | --- | --- | --- | --- |
 | Increase | Yes | From the pool page | Yes |
-| Decrease | By % and by price band | By % | By %, paid out in ETH, USDG or both |
+| Decrease | By %, and by picking bins on the chart | By % | By %, paid out in ETH, USDG or both |
 | Zap out (close) | Yes, with estimates | Yes | Yes, with estimates |
 | One-click zap out | Yes | - | - |
 | Claim fees | Yes | Yes | Yes |
@@ -19,17 +24,17 @@ Open the menu (three dots) on a position in your [Portfolio](/features/portfolio
 
 Add more liquidity to the same range.
 
-- **Solana**: opens the pool page with your range locked. Choose **Zap In** or **Both Tokens** and a strategy, then press **Increase Position**.
+- **Solana**: opens the pool page with your range locked. Choose **Zap In** or **Both Tokens** and a strategy, then press **Increase Position**. **MAX** works as it does on a new position: it leaves room for the swap buffer and fees.
 - **Robinhood Chain**: pick ETH or USDG (it defaults to what the position was opened with). Your deposit is split to match the position's range. Press **Increase Position**.
 
 ## Decrease
 
-Take part of your liquidity out.
+Take part of your liquidity out. On the pool page this is the **Withdraw** tab.
 
 <Tabs>
   <Tab title="Solana">
     - Enter the percentage to remove, or use the slider (0%, 25%, 50%, 75%, 100%). It starts at 100%.
-    - On DLMM you can also pick a **price band** under the bin chart: "You will receive X% from price A to price B". Useful to take out only the part of your range the price has left.
+    - On DLMM you can also choose which bins to withdraw from: drag across the bars of the bin chart for a new pick, or grab either edge of the pick to move it. Bins outside the pick are dimmed, and **All bins** resets it. The line under the chart reads "You will receive X% from price A to price B". Useful to take out only the part of your range the price has left.
     - Choose how to receive your funds: both tokens, either token, or SOL.
     - Press **Decrease**.
   </Tab>
@@ -51,9 +56,9 @@ Close the whole position and receive one token.
 
 - Each payout option shows a live estimate of what you get after swap costs, refreshed every 10 seconds. Options with no swap route are disabled.
 - **Est. PnL after close** shows what your PnL will be, from a live swap quote. The final amount can move a little with price and slippage.
-- After closing, you see the result and can share it as a PnL card.
+- After closing, you see the result and can share it as a PnL card. A chime plays when the position closes (see **Position Sounds** in [Settings](/features/settings)).
 
-On Solana DLMM there is also a **one-click zap out**: the lightning icon on a position row, or **Zap out to SOL** on the pool page. It closes 100% straight into SOL without a confirm step.
+On Solana DLMM there is also a **one-click zap out**: the lightning icon on a position row, or **Zap out to SOL** on the pool page. It closes 100% straight into SOL without a confirm step, then opens the PnL share card. Tick **Don't show again** on that card to get a short notice with a **Share** button instead next time.
 
 On Robinhood Chain, the default payout is the currency the position was opened with (ETH or USDG). If some tokens could not be swapped because the price moved, LP Agent retries with more slippage shortly after.
 
@@ -61,16 +66,18 @@ On Robinhood Chain, the default payout is the currency the position was opened w
 
 Collect your unclaimed LP fees without touching the position.
 
-- **Solana**: the dialog lists your unclaimed fees per token. Press **Claim Fees**. On DLMM, fees paid in the other token are swapped to SOL for you; DAMM v2 fees arrive as they are.
+- **Solana**: the form lists your unclaimed fees per token. On the pool page the numbers update live. **Swap claimed fees to SOL** is ticked by default, on DLMM and DAMM v2: press **Claim Fees as SOL**. Untick it to keep the fee tokens as they are, then press **Claim Fees**. If the swap to SOL does not go through, your fees are still claimed and your agent retries the swap shortly.
 - **Robinhood Chain**: **Receive as ETH** (or USDG) is on by default and swaps your fees into that currency. Turn it off to receive the tokens as they are. Press **Claim fees**.
 
 ## Compound (Solana DLMM)
 
-**Compound** claims the unclaimed fees and adds them back into the same position, in one step. Press **Compound** in the position menu.
+**Compound** claims the unclaimed fees and adds them back into the same position, in one step. Press **Compound** in the position menu or on the pool page. The fee summary updates live on the pool page.
 
 ## Take profit and stop loss
 
 Click the **Settings** badge on a position to set a take profit and a stop loss. See [Take Profit & Stop Loss](/features/take-profit-stop-loss).
+
+If a take profit, stop loss or copy exit closes one of your positions while you have a pool page open, the close chime plays. If that position was selected, the panel lets go of it.
 
 ## Report a problem
 

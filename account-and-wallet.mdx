@@ -1,6 +1,6 @@
 ---
 title: "Account & Wallet"
-description: "Sign-in options, your agent wallet, deposits, withdrawals and private key export"
+description: "Sign-in options, your agent wallet, the Account panel, support reports, deposits, withdrawals and private key export"
 ---
 
 ## Signing in
@@ -12,9 +12,13 @@ Press **Connect Wallet** in the header. You can sign in with:
 | **Wallet extension** (Phantom, Solflare, MetaMask, Rabby and others) | Pick your wallet and approve a sign-in message. No transaction, no gas. The wallet you used last is at the top. |
 | **WalletConnect** (desktop) | Scan the QR code with your phone's wallet, approve the connection, then approve the sign-in message. |
 | **Phone** | Pick your wallet from the list or search for it. Some wallets open LP Agent inside their own browser. If your wallet is not listed, open LP Agent in your wallet's built-in browser and connect from there. |
-| **Email** | Enter your email and type the 6-digit code you receive. The code comes from our wallet provider, Turnkey, and expires after a few minutes. |
+| **Email** | Enter your email and type the 6-digit code you receive. The code comes from our wallet provider, Turnkey, and expires after a few minutes. Addresses that contain a `+` are not accepted. |
 
 A quick browser check runs before your wallet is asked to sign. It normally passes on its own.
+
+<Note>
+  Always sign in with the wallet or email you signed up with. Your agent wallet is not a sign-in wallet: if you import it into Phantom or another wallet and sign in with it, LP Agent opens a new, separate account with its own empty agent wallet. Your positions and funds stay in your original account.
+</Note>
 
 ### One network per account
 
@@ -30,11 +34,13 @@ You can still browse pools and wallets on the other network, but you can only op
 
 LP Agent moved to a new wallet infrastructure in September 2026. Most existing accounts were moved over and **kept the same agent wallet address**: just connect the same wallet you always used.
 
-If your account was not moved yet, the app says so and opens your previous login for you. You can also use **Already have an LP Agent account? Use your existing login** at the bottom of the wallet picker.
+The old login is gone from the app. If your browser was still signed in with it, the app signs you out once. Connect your wallet again to continue.
+
+If your wallet or email belongs to an account that has not moved yet, the app tells you so when you sign in. Open a ticket on our [Discord](https://discord.gg/lpagent) and the team restores your access.
 
 ### Sessions
 
-You stay signed in while you use the app, for up to 7 days. **Disconnect** (in the account panel) signs you out on this device.
+You stay signed in while you use the app, for up to 7 days. If the app stays closed for more than a day, you sign in again. **Disconnect** (in the Account panel) signs you out on this device.
 
 ## Your agent wallet
 
@@ -45,28 +51,78 @@ Every account has an **agent wallet** (shown as **Embedded Wallet** in the app).
 - You can export its private key and import it into any wallet.
 - Automation can only do LP actions and swaps with it. See [Security](/security).
 
-Open the account panel by clicking your address in the header.
+Open the Account panel by clicking your address in the header.
+
+## The Account panel
 
 <Frame>
   ![Account panel](/images/app/rh-account-panel.png)
-  <em>The account panel: your agent wallet, Deposit, Withdraw, Settings and your assets</em>
+  <em>The Account panel: your agent wallet, Deposit, Withdraw, Settings and your assets</em>
 </Frame>
 
 The panel shows:
 
-- **Signed in with**: the wallet (or email) you signed in with, when it differs from the agent wallet.
+- **Signed in with**: the wallet you signed in with, when it is not the agent wallet.
 - **Embedded Wallet**: your agent wallet address, with a copy button.
 - **Deposit**, **Withdraw** and **Settings**.
-- **Assets**: your tokens with their value. Small balances under $1 are folded behind **Show all**. Tap a token to swap it.
-- **Get API Key**, **Docs**, **Disconnect**, and links to our Discord and X.
+- **Finish setup**: steps you have not done yet. It disappears once they are done. See [Finish setup](#finish-setup).
+- **Reports**: your three latest reports and where they are at, with **See all**. See [Reports](#reports).
+- **Assets**: your tokens with their value, and the total in dollars and in SOL or ETH. Small balances under $1 are folded behind **Show all**. Tap a token to swap it.
+- **Get API Key**, **Docs**, **Language**, **Disconnect**, and links to our Discord and X.
+
+When something in the panel needs a look, an **amber dot** appears on your wallet button in the header: a setup step, or an update on one of your reports. LP Agent does not show popups for these.
 
 <Note>
   Accounts created before the upgrade that never granted access see **Grant full access** instead of Deposit and Withdraw. Granting access creates the agent wallet.
 </Note>
 
+### Finish setup
+
+| Row | What it does |
+| --- | --- |
+| **Meteora referral code** | Solana only, for a new agent wallet. Pick which Meteora referral code your wallet joins under, before the time shown. If you skip it, LP Agent links its own code, LPAGENT. See [Meteora referral rewards](/referral#meteora-referral-rewards-solana). |
+| **Link Discord** | Opens **Settings > Account** at the Discord row. See [Link your Discord](#link-your-discord). |
+
+### Language
+
+The app comes in English and 中文 (Simplified Chinese). The first time, it follows your browser's language. To switch, use **Language** in the Account panel. Your choice is saved in this browser.
+
+## Link your Discord
+
+Go to **Settings > Account** and press **Connect** on the **Discord** row. Discord asks you to authorize LP Agent, then sends you back to the app. The row then shows **Connected as @yourname**. Press **Unlink** to remove it.
+
+Why link it:
+
+- When you open a ticket on our [Discord](https://discord.gg/lpagent), support knows it's you and can pull up your positions right away.
+- Tickets you open on our Discord show up in your **Reports**, next to the reports you send from the app.
+
+Linking does not send you any messages. Support talks to you in the tickets you open.
+
+When the app is in 中文, the same tab also has a **WeChat ID** field. Only the LP Agent team sees it.
+
+## Reports
+
+Something looks wrong with a position? Press **Report** on it (in Portfolio, in a position's details, or in a pool's position list), describe what looks wrong and press **Submit**. For a copy, use **Something off? Report this copy** in [Copy Logs](/features/copy-management#copy-logs): pick what went wrong, and the copy's logs are attached for you.
+
+Every report gets a ticket number. Follow it in the Account panel under **Reports**:
+
+| Status | What it means |
+| --- | --- |
+| **Sent** | The team has your report. |
+| **Checking** | The team is looking into it. |
+| **Need more info** | The team needs more from you. Open a ticket on Discord and mention the ticket number. |
+| **Fixed** | The team fixed it. You may be asked **Is it working now?**: answer **All good** or **Still need help**. |
+| **Closed** | Done. Closed reports leave the panel. |
+
+Open a report to see each step with its date, what you sent, and the ticket number with a **Copy** button. To chat about it, press **Open a Discord ticket** and mention the number.
+
+<Tip>
+  You can report without signing in. The report is saved in this browser and moves to your account when you connect.
+</Tip>
+
 ## Deposit
 
-Press **Deposit** in the header or in the account panel.
+Press **Deposit** in the header or in the Account panel.
 
 - **From (your wallet name)**: type an amount or press **Max**, then press **Deposit** and confirm in your wallet. Max keeps a tiny amount behind for the network fee.
 - **Receive**: a QR code and the agent wallet address. Send from any wallet or exchange. Only send on the network shown, or the funds may be lost.
@@ -80,7 +136,7 @@ Email sign-ins only have **Receive**. There is no card or bank purchase in the a
 
 ## Withdraw
 
-Press **Withdraw** in the account panel. It takes three steps:
+Press **Withdraw** in the Account panel. It takes three steps:
 
 1. **Select Token**: any token in your agent wallet.
 2. **Destination and Amount**: paste the address, or use your primary (sign-in) wallet.
@@ -100,7 +156,7 @@ Go to **Settings > Account > Export Private Key** and press **Export**.
   Anyone with this key controls the wallet and everything in it. Never share it or paste it into a website.
 </Warning>
 
-You can import the key into Phantom, Solflare, Backpack, MetaMask, Rabby or any other wallet for the same network.
+You can import the key into Phantom, Solflare, Backpack, MetaMask, Rabby or any other wallet for the same network. Keep signing in to LP Agent with your original wallet: signing in with the imported agent wallet opens a separate, new account.
 
 ## Install LP Agent as an app
 
