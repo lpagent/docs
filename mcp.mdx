@@ -1,0 +1,155 @@
+---
+title: "LP Agent MCP"
+description: "Manage your own LP positions by chatting with Claude, Cursor and other AI apps"
+---
+
+## What it is
+
+LP Agent MCP lets an AI app work your LP Agent account for you. Ask it "how are my positions doing?", "close the ones out of range" or "copy this wallet with 20%", and it reads your account and acts on it.
+
+- It works on **your own account only**: your agent wallet, your positions, your copies.
+- Actions run from your **agent wallet**, with the same rules as the app.
+- It also answers questions about LP Agent from these docs.
+
+It is an [MCP](https://modelcontextprotocol.io) server at:
+
+```text
+https://mcp.lpagent.io/mcp
+```
+
+<Note>
+  Building your own product on LP Agent data? Use the [Open API](/api-reference/introduction) with an API key instead. The MCP is for managing your own account by hand, and its [limits](#limits) are set for that.
+</Note>
+
+## What you need
+
+- An LP Agent account with an agent wallet.
+- At least **1 SOL in your agent wallet**, counting its free balance and the value of its open positions. Below that the MCP only answers questions about the docs. Your login wallet does not count.
+- An access token (next step).
+
+## 1. Make an access token
+
+In the app, open **Settings > Account > Access tokens** and press **New token**.
+
+| Field | What to pick |
+| - | - |
+| **Name** | Something that tells you where it is used, like "Claude on my laptop". |
+| **Access** | **Read & trade** lets the AI open, add, withdraw, rebalance, claim and compound, change TP/SL and run your copies. **Read only** lets it see your balances, positions, PnL and copy settings, and nothing moves. |
+| **Expires** | 7, 30, 60 or 90 days, or never. A token that never expires works until you revoke it, so pick a date unless only you use the machine. |
+
+Press **Create token** and copy it. It starts with `lpat_` and is **shown only once**. If you lose it, revoke it and make a new one.
+
+<Warning>
+  Treat a token like a password. Anyone who has a Read & trade token can trade from your agent wallet until you revoke it. Never paste it into a chat, a screenshot or a shared file.
+</Warning>
+
+You can have up to 10 active tokens. Make one per app or machine, so you can revoke one without touching the others.
+
+## 2. Add it to your AI app
+
+The token dialog shows the setup with your token already filled in. You can also copy it from here.
+
+<Tabs>
+  <Tab title="Claude Code">
+    Run in a terminal:
+
+    ```bash
+    claude mcp add --transport http lpagent https://mcp.lpagent.io/mcp \
+      --header "Authorization: Bearer lpat_YOUR_TOKEN"
+    ```
+
+    Then start Claude Code and ask "What's in my LP Agent account?".
+  </Tab>
+  <Tab title="Cursor">
+    Add to `~/.cursor/mcp.json`:
+
+    ```json
+    {
+      "mcpServers": {
+        "lpagent": {
+          "url": "https://mcp.lpagent.io/mcp",
+          "headers": { "Authorization": "Bearer lpat_YOUR_TOKEN" }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Other apps">
+    Any MCP client that connects to a remote server by URL and lets you set a request header:
+
+    ```text
+    URL     https://mcp.lpagent.io/mcp
+    Header  Authorization: Bearer lpat_YOUR_TOKEN
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+  Apps that connect only with a sign-in button (such as connectors in the Claude or ChatGPT web apps) are not supported yet.
+</Note>
+
+## What it can do
+
+### Read your account
+
+- Your account, agent wallet and default settings
+- Wallet balances
+- Open and closed positions, with PnL, fees and range
+- Portfolio PnL for all time, 7 days, 1, 3 months and this year
+- One position in detail and its full transaction history
+- A position's TP/SL and automation settings
+- A preview of what a withdrawal would pay out
+- Your copies, their settings and the Copy Logs
+- Pools: the Discover list with its sorts and filters, and one pool's detail
+
+### Act on your account (Read & trade tokens)
+
+- **Open a position** in a pool, with a range as bins, prices or a percent around the price, and Spot, Curve or Bid-Ask
+- **Add** to a position, **withdraw** part of it or **close** it
+- **Rebalance** a Meteora DLMM position into a new range, including the sell or buy ladder of quick rebalance
+- **Claim** or **compound** fees
+- **Set TP/SL**, auto compound and auto rebalance on a position, and your account defaults
+- **Start, change, pause or stop copying** a wallet you choose
+
+Every action lands on chain the moment it runs, from your agent wallet. There is no undo. Most AI apps ask you to approve each action before it runs; read what it is about to do (pool, amount, range, copy size) before you say yes.
+
+### Answer questions about LP Agent
+
+It searches these docs to answer how-to questions, at any balance.
+
+### What it does not do
+
+- Look at other wallets. There is no leaderboard, no wallet search and no tool that reads someone else's positions.
+- Move funds out of your agent wallet. Withdraw to another address in the app.
+- Use your login wallet. Everything runs from the agent wallet.
+- Plain swaps, limit orders, creating pools, Claim SOL, referrals or exporting your private key. Use the app for those.
+
+## Limits
+
+Limits are per account, across all of its tokens:
+
+| What | Per minute | Per day (UTC) |
+| - | - | - |
+| All requests | 60 | 3,000 |
+| Pool data (Discover, pool detail) | 5 | 150 |
+| Actions (open, withdraw, rebalance, copy...) | 10 | 200 |
+
+Pool discovery returns up to 10 pools a page and 3 pages. When a limit is hit, the AI is told how long to wait.
+
+For pool data in bulk, use the [Open API](/api-key-dashboard/dashboard).
+
+## Keep track of your tokens
+
+**Settings > Account > Access tokens** shows every token with its access, expiry and when and from which app it was last used. Open a token to see its recent actions. Revoke a token there and it stops working on its next request.
+
+For security and support, LP Agent keeps a log of the requests and tool calls made with each token: which tool, its inputs, the time and the app.
+
+## Troubleshooting
+
+| What you see | What to do |
+| - | - |
+| The token is not valid, expired or revoked | Make a new token in Settings and update your AI app. |
+| Only the docs tools are available | Your agent wallet holds less than 1 SOL. Deposit to it in the app; the rest opens within a minute or two. |
+| "This access token is read only" | Make a Read & trade token if you want the AI to act. |
+| "Limit reached" | Wait the time it says. Ask for a few pools, not every pool. |
+| An action was refused | The same rules as the app apply. Read the reason the AI gives, or try it in the app. |

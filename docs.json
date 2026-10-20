@@ -103,6 +103,7 @@
                 "group": "AI",
                 "pages": [
                   "ai",
+                  "mcp",
                   "llms-txt",
                   "ai-api-guide",
                   "cli"
@@ -244,6 +245,7 @@
                 "group": "AI",
                 "pages": [
                   "zh/ai",
+                  "zh/mcp",
                   "zh/llms-txt",
                   "zh/ai-api-guide",
                   "zh/cli"
