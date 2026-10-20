@@ -24,7 +24,7 @@ https://mcp.lpagent.io/mcp
 ## What you need
 
 - An LP Agent account with an agent wallet.
-- At least **1 SOL in your agent wallet**, counting its free balance and the value of its open positions. Below that the MCP only answers questions about the docs. Your login wallet does not count.
+- At least **1 SOL in your agent wallet** to look up pools or put new money in (open a position, add to one, rebalance, start a copy). It counts the wallet's free balance and the value of its open positions; your login wallet does not count. Below that, everything else still works: your positions, PnL, copies and Copy Logs, withdrawing and closing, claiming, TP/SL, and pausing or stopping copies.
 - An access token (next step).
 
 ## 1. Make an access token
@@ -149,7 +149,7 @@ For security and support, LP Agent keeps a log of the requests and tool calls ma
 | What you see | What to do |
 | - | - |
 | The token is not valid, expired or revoked | Make a new token in Settings and update your AI app. |
-| Only the docs tools are available | Your agent wallet holds less than 1 SOL. Deposit to it in the app; the rest opens within a minute or two. |
+| It can't look up pools, open, add, rebalance or start a copy | Your agent wallet holds less than 1 SOL. Deposit to it in the app; those open within a minute or two. |
 | "This access token is read only" | Make a Read & trade token if you want the AI to act. |
 | "Limit reached" | Wait the time it says. Ask for a few pools, not every pool. |
 | An action was refused | The same rules as the app apply. Read the reason the AI gives, or try it in the app. |
