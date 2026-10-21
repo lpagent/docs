@@ -103,18 +103,18 @@
                 "group": "AI",
                 "pages": [
                   "ai",
-                  {
-                    "group": "LP Agent MCP",
-                    "pages": [
-                      "mcp",
-                      "mcp/claude",
-                      "mcp/chatgpt",
-                      "mcp/grok"
-                    ]
-                  },
                   "llms-txt",
                   "ai-api-guide",
                   "cli"
+                ]
+              },
+              {
+                "group": "LP Agent MCP",
+                "pages": [
+                  "lp-agent-mcp",
+                  "lp-agent-mcp/claude",
+                  "lp-agent-mcp/chatgpt",
+                  "lp-agent-mcp/grok"
                 ]
               }
             ]
@@ -253,18 +253,18 @@
                 "group": "AI",
                 "pages": [
                   "zh/ai",
-                  {
-                    "group": "LP Agent MCP",
-                    "pages": [
-                      "zh/mcp",
-                      "zh/mcp/claude",
-                      "zh/mcp/chatgpt",
-                      "zh/mcp/grok"
-                    ]
-                  },
                   "zh/llms-txt",
                   "zh/ai-api-guide",
                   "zh/cli"
+                ]
+              },
+              {
+                "group": "LP Agent MCP",
+                "pages": [
+                  "zh/lp-agent-mcp",
+                  "zh/lp-agent-mcp/claude",
+                  "zh/lp-agent-mcp/chatgpt",
+                  "zh/lp-agent-mcp/grok"
                 ]
               }
             ]
@@ -380,6 +380,34 @@
     {
       "source": "/zh/api-reference/positions/get-opening-lp-positions-for-an-owner",
       "destination": "/zh/api-reference/positions/get-open-lp-positions-for-an-owner"
+    },
+    {
+      "source": "/mcp/claude",
+      "destination": "/lp-agent-mcp/claude"
+    },
+    {
+      "source": "/mcp/chatgpt",
+      "destination": "/lp-agent-mcp/chatgpt"
+    },
+    {
+      "source": "/mcp/grok",
+      "destination": "/lp-agent-mcp/grok"
+    },
+    {
+      "source": "/zh/mcp/claude",
+      "destination": "/zh/lp-agent-mcp/claude"
+    },
+    {
+      "source": "/zh/mcp/chatgpt",
+      "destination": "/zh/lp-agent-mcp/chatgpt"
+    },
+    {
+      "source": "/zh/mcp/grok",
+      "destination": "/zh/lp-agent-mcp/grok"
+    },
+    {
+      "source": "/zh/mcp",
+      "destination": "/zh/lp-agent-mcp"
     }
   ]
 }
