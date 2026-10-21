@@ -10,6 +10,7 @@ LP Agent MCP lets an AI app work your LP Agent account for you. Ask it "how are 
 - It works on **your own account only**: your agent wallet, your positions, your copies.
 - Actions run from your **agent wallet**, with the same rules as the app.
 - It also answers questions about LP Agent from these docs.
+- Its answers link into the [app](https://app.lpagent.io), so the position, pool or copy it talks about opens in one click.
 
 It is an [MCP](https://modelcontextprotocol.io) server at:
 
@@ -100,7 +101,13 @@ The token dialog shows the setup with your token already filled in. You can also
 - A position's TP/SL and automation settings
 - A preview of what a withdrawal would pay out
 - Your copies, their settings and the Copy Logs
-- Pools: the Discover list with its sorts and filters, and one pool's detail
+- Pools and tokens: the Discover lists with their sorts and filters, including tokens by how much their price moved in the last 5 minutes, 1, 6 or 24 hours, and one pool's detail
+
+### Review a position
+
+Ask why a position made or lost money. It works out the entry and exit price, how far the token moved against your range, what the position held going in and coming out, the fees against the price loss, how long it was open and, on Solana, how old the token was and who held it. Then it gives a few lessons tied to your settings: range, stop loss, Meme Protection, copy size.
+
+It can also go through your worst closed positions together and find what they have in common. Apps that show MCP prompts list both as **Review a position** and **Lessons from my worst positions**.
 
 ### Act on your account (Read & trade tokens)
 
@@ -124,6 +131,16 @@ It searches these docs to answer how-to questions, at any balance.
 - Use your login wallet. Everything runs from the agent wallet.
 - Plain swaps, limit orders, creating pools, Claim SOL, referrals or exporting your private key. Use the app for those.
 
+## Things to ask
+
+- "How are my positions doing? Close the ones out of range."
+- "Find tokens up more than 40% in the last hour that have a pool I can LP."
+- "Open a Bid-Ask position in this pool with 0.5 SOL, down to 40% below the price."
+- "Why did my last position lose money?"
+- "Review my 5 worst positions and tell me what to change."
+- "Pause my copies and set a 10% stop loss on everything open."
+- "How much does the Open API cost?"
+
 ## Limits
 
 Limits are per account, across all of its tokens:
@@ -131,10 +148,10 @@ Limits are per account, across all of its tokens:
 | What | Per minute | Per day (UTC) |
 | - | - | - |
 | All requests | 60 | 3,000 |
-| Pool data (Discover, pool detail) | 5 | 150 |
+| Pool data (Discover pools and tokens, pool detail) | 5 | 150 |
 | Actions (open, withdraw, rebalance, copy...) | 10 | 200 |
 
-Pool discovery returns up to 10 pools a page and 3 pages. When a limit is hit, the AI is told how long to wait.
+Discover returns up to 10 rows a page and 3 pages. When a limit is hit, the AI is told how long to wait.
 
 For pool data in bulk, use the [Open API](/api-key-dashboard/dashboard).
 
