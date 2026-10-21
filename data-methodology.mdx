@@ -52,7 +52,7 @@ By focusing on T1 and T2, we provide a consistent measure of how the liquidity p
 
 ## Your agent wallet's PnL
 
-On Solana, LP Agent makes every swap in and out of your agent wallet's positions itself: zapping in, zapping out, rebalancing and copying. So your agent wallet's PnL already counts them: what went in, what came out and the fees earned, in SOL and in USD. It is exact. There is no need to rebuild it from the transactions, and the T0 to T3 gap above does not apply to it.
+On Solana and Robinhood Chain, LP Agent makes every swap in and out of your agent wallet's positions itself: zapping in, zapping out, rebalancing and copying. So your agent wallet's PnL already counts them: what went in, what came out and the fees earned, in SOL and in USD. It is exact. There is no need to rebuild it from the transactions, and the T0 to T3 gap above does not apply to it.
 
 ## True PnL on closed copies
 
@@ -61,7 +61,3 @@ When a copied position closes, LP Agent checks its result against the on-chain t
 ## Other wallets' PnL
 
 PnL on another wallet's portfolio is computed from indexed on-chain data and can miss swaps made outside the position, transfers, and positions opened in unusual ways. That is why other wallets' portfolios show a notice that PnL might not reflect their actual earnings. Treat it as a guide, not accounting.
-
-## Robinhood Chain
-
-Robinhood Chain PnL measures the liquidity leg only and does not yet include the swaps in and out of a position. See [Robinhood Chain Integration](/integration/robinhood#known-limitations) for the full list of limitations.
