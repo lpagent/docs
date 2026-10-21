@@ -103,7 +103,15 @@
                 "group": "AI",
                 "pages": [
                   "ai",
-                  "mcp",
+                  {
+                    "group": "LP Agent MCP",
+                    "pages": [
+                      "mcp",
+                      "mcp/claude",
+                      "mcp/chatgpt",
+                      "mcp/grok"
+                    ]
+                  },
                   "llms-txt",
                   "ai-api-guide",
                   "cli"
@@ -245,7 +253,15 @@
                 "group": "AI",
                 "pages": [
                   "zh/ai",
-                  "zh/mcp",
+                  {
+                    "group": "LP Agent MCP",
+                    "pages": [
+                      "zh/mcp",
+                      "zh/mcp/claude",
+                      "zh/mcp/chatgpt",
+                      "zh/mcp/grok"
+                    ]
+                  },
                   "zh/llms-txt",
                   "zh/ai-api-guide",
                   "zh/cli"

@@ -1,0 +1,56 @@
+---
+title: "在 Claude 里使用 LP Agent"
+sidebarTitle: "Claude"
+description: "把 LP Agent 添加到 Claude 一次，之后就能用大白话问你的仓位"
+---
+
+添加 LP Agent 之后，你可以问 Claude「我的仓位怎么样？」或「把我最大那个仓位的手续费领了」，它会根据你自己的 LP Agent 账户来回答。
+
+Claude 把这种扩展叫做**连接器**（connector）：它让 Claude 替你使用另一个应用。LP Agent 还不在 Claude 的连接器列表里，所以需要用地址添加一次，大约一分钟。
+
+## 你需要准备
+
+- 一个 Claude 账户（claude.ai、Claude 桌面版或手机 App 都可以），免费版也能用。
+- 一个有内置钱包的 LP Agent 账户。
+
+## 把 LP Agent 添加到 Claude
+
+<Steps>
+  <Step title="打开连接器">
+    在 [claude.ai](https://claude.ai) 打开 **Customize**，再打开 **Connectors**。也可以直接打开 [claude.ai/customize/connectors](https://claude.ai/customize/connectors)。
+  </Step>
+  <Step title="添加 LP Agent">
+    点 **Add custom connector**，填写：
+
+    - **Name**：LP Agent
+    - **URL**：`https://mcp.lpagent.io/mcp`
+
+    其他保持不变，点 **Add**。
+  </Step>
+  <Step title="连接你的 LP Agent 账户">
+    点 LP Agent 旁边的 **Connect**，会打开 LP Agent 页面。需要的话先登录，然后选择：
+
+    - **Read & trade**（读取和交易）：Claude 还能替你开仓、平仓、管理仓位和跟单。**Read only**（只读）：只能查看。
+    - **有效期**：7、30、60 或 90 天，或在你断开前一直有效。
+
+    点 **允许**，就会回到 Claude，LP Agent 显示为已连接。
+  </Step>
+  <Step title="问 Claude">
+    新开一个对话，问「我的 LP Agent 账户里有什么？」。第一次使用时 Claude 会先征求你的同意，点允许即可。
+  </Step>
+</Steps>
+
+<Warning>
+  只有在你自己刚刚在 Claude 里点了 **Connect** 时，才在 LP Agent 页面点**允许**。如果这个页面的链接是通过其他方式发给你的，请点**取消**。
+</Warning>
+
+## 小提示
+
+- **手机上**：在 claude.ai 添加后，Claude App 里也能用。
+- **动用资金前**，Claude 会让你确认。点同意前先看清它要做什么（池子、金额、价格区间、跟单金额）。
+- **在某个对话里关掉**：点输入框里的 **+**，打开 **Connectors**，关掉 LP Agent。
+- **免费版**只能添加一个自定义连接器。
+- **Team 和 Enterprise 版**：由 Owner 在 **Organization settings > Connectors** 里为组织添加一次，之后每个人点 **Connect**，用自己的 LP Agent 账户登录。
+- **断开**：在 LP Agent 打开 **设置 > 账户 > 访问令牌**，点 Claude 旁边的**断开**。也可以在 Claude 的 **Customize > Connectors** 里移除。
+
+想知道可以问什么？请看[可以这样问](/zh/mcp#可以这样问)。它能做什么、不能做什么，请看 [LP Agent MCP](/zh/mcp)。

@@ -1,0 +1,54 @@
+---
+title: "Use LP Agent in ChatGPT"
+sidebarTitle: "ChatGPT"
+description: "Add LP Agent to ChatGPT once, then ask about your positions in plain words"
+---
+
+Once LP Agent is added, you can ask ChatGPT things like "how are my positions doing?" or "close the ones out of range", and it answers from your own LP Agent account.
+
+ChatGPT lets you add apps that are not in its store through **developer mode**, a setting you turn on once. You then add LP Agent by its address. It takes a few minutes.
+
+## What you need
+
+- A paid ChatGPT plan: Plus, Pro, Business, Enterprise or Edu. On Business, Enterprise and Edu, your workspace admin may have to allow it first.
+- An LP Agent account with an agent wallet.
+
+## Add LP Agent to ChatGPT
+
+<Steps>
+  <Step title="Turn on developer mode">
+    In ChatGPT, open **Settings**, then **Apps & Connectors**. Scroll to **Advanced settings** and turn on **Developer mode**. Confirm the message about apps that are not verified.
+  </Step>
+  <Step title="Add LP Agent">
+    Back in **Apps & Connectors**, press **Create**. Fill in:
+
+    - **Name**: LP Agent
+    - **MCP Server URL**: `https://mcp.lpagent.io/mcp`
+    - **Authentication**: OAuth
+
+    Tick the box that you trust this app and press **Create**.
+  </Step>
+  <Step title="Connect your LP Agent account">
+    ChatGPT opens an LP Agent page. Sign in if it asks, then choose:
+
+    - **Read & trade**: ChatGPT can also open, close and manage positions and copies for you. **Read only**: it can only look.
+    - **How long**: 7, 30, 60 or 90 days, or until you disconnect it.
+
+    Press **Allow**. You are back in ChatGPT.
+  </Step>
+  <Step title="Ask ChatGPT">
+    Start a new chat. Press **+** in the chat box, pick **Developer mode** and switch LP Agent on, then ask "What's in my LP Agent account?".
+  </Step>
+</Steps>
+
+<Warning>
+  Press **Allow** on the LP Agent page only if you just added or connected LP Agent in ChatGPT yourself. If a link to that page reaches you any other way, press **Cancel**.
+</Warning>
+
+## Good to know
+
+- **Menus move**: ChatGPT changes these settings often. If you can't find them, search Settings for "Developer mode".
+- **Before it moves money**, ChatGPT asks you to confirm the action. Read what it is about to do (pool, amount, range, copy size) before you say yes.
+- **Disconnect**: in LP Agent, open **Settings > Account > Access tokens** and press **Disconnect** next to ChatGPT. You can also delete it in ChatGPT under **Apps & Connectors**.
+
+Want ideas for what to ask? See [Things to ask](/mcp#things-to-ask). For what it can and can't do, see [LP Agent MCP](/mcp).

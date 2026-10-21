@@ -1,0 +1,42 @@
+---
+title: "在 Grok 里使用 LP Agent"
+sidebarTitle: "Grok"
+description: "把 LP Agent 添加到 Grok 一次，之后就能用大白话问你的仓位"
+---
+
+添加 LP Agent 之后，你可以问 Grok「我的仓位怎么样？」，它会根据你自己的 LP Agent 账户来回答。
+
+Grok 把这种扩展叫做**连接器**（connector）：它让 Grok 替你使用另一个应用。用地址添加 LP Agent 一次即可。
+
+## 你需要准备
+
+- 一个 [grok.com](https://grok.com) 账户。
+- 一个有内置钱包的 LP Agent 账户。
+
+## 把 LP Agent 添加到 Grok
+
+<Steps>
+  <Step title="打开连接器">
+    在 [grok.com](https://grok.com) 打开 **Connectors**。
+  </Step>
+  <Step title="添加 LP Agent">
+    点 **New connector**，选 **Custom**。把 `https://mcp.lpagent.io/mcp` 粘贴为 URL 并保存。
+  </Step>
+  <Step title="连接你的 LP Agent 账户">
+    连接它，会打开 LP Agent 页面。需要的话先登录，选择 **Read & trade**（读取和交易）或 **Read only**（只读）和有效期，然后点**允许**。
+  </Step>
+  <Step title="问 Grok">
+    新开一个对话，问「我的 LP Agent 账户里有什么？」。
+  </Step>
+</Steps>
+
+<Warning>
+  只有在你自己刚刚在 Grok 里连接了 LP Agent 时，才在 LP Agent 页面点**允许**。如果这个页面的链接是通过其他方式发给你的，请点**取消**。
+</Warning>
+
+## 小提示
+
+- **动用资金前**，先看清 Grok 要做什么（池子、金额、价格区间、跟单金额）再同意。
+- **断开**：在 LP Agent 打开 **设置 > 账户 > 访问令牌**，点 Grok 旁边的**断开**。
+
+想知道可以问什么？请看[可以这样问](/zh/mcp#可以这样问)。它能做什么、不能做什么，请看 [LP Agent MCP](/zh/mcp)。
