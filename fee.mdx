@@ -47,8 +47,10 @@ The rule follows the action, not how the position was opened. A position you ope
 ## What the fee pays for
 
 - **The fastest copies.** LP Agent watches the wallets you copy on chain in real time: 90% of copies land within 3.5 seconds of the leader's move. On Solana they land through Jito bundles, for a better landing rate.
+- **Layers of protection, so you don't lose money for nothing.** Token filters (market cap, volume, holders, organic score and a blacklist) skip bad tokens, Meme Protection skips copies with an empty safe side, hooked Uniswap V4 pools are skipped unless you allow them, Fund protection pauses copying when your losses hit your limit, and Take Profit and Stop Loss close positions at your levels. See [Security](/security#protections-on-your-trades).
 - **Nothing to run.** No bot, server or RPC node to set up or pay for. Copies, [Take Profit and Stop Loss](/features/take-profit-stop-loss), auto rebalance and compounding keep running around the clock, even when your computer is off.
 - **Your keys stay protected.** Your agent wallet's keys live with Turnkey on secure hardware, and the key that automation signs with cannot send your funds anywhere but your own accounts. See [Security](/security).
+- **Pools found for you.** No hunting for pools yourself: [Discover](/features/discover) ranks pools and tokens by fees, volume and price moves, with safety checks, and [Smart LP](/features/smart-lp) shows wallets worth copying.
 - **0% swap fee.** Zaps, rebalances and copies swap tokens with no LP Agent fee on the swap.
 - **You pay when you earn.** Opening a copy is free, and the 8% comes only out of LP fees collected. A copy that earns no fees costs nothing.
 
@@ -66,3 +68,5 @@ The rule follows the action, not how the position was opened. A position you ope
 <Tip>
   Referral cashback gives part of these fees back to you every month. See [Referral Program](/referral).
 </Tip>
+
+Questions or ideas about fees? Open a ticket or share your feedback on our [Discord](https://discord.gg/lpagent). The team is listening.
