@@ -40,6 +40,10 @@ Claude 把这种扩展叫做**连接器**（connector）：它让 Claude 替你�
   </Step>
 </Steps>
 
+<Note>
+  **要开仓或平仓，请把 Claude 从 Auto 切换到 Manual。** 在 **Auto** 模式下，Claude 不问你就执行操作，并且会拒绝任何动用资金的操作，即使是你让它做的。在 **Manual** 模式下，它每次操作前都会先问你，你同意后才执行。
+</Note>
+
 <Warning>
   只有在你自己刚刚在 Claude 里点了 **Connect** 时，才在 LP Agent 页面点**允许**。如果这个页面的链接是通过其他方式发给你的，请点**取消**。
 </Warning>
@@ -47,7 +51,7 @@ Claude 把这种扩展叫做**连接器**（connector）：它让 Claude 替你�
 ## 小提示
 
 - **手机上**：在 claude.ai 添加后，Claude App 里也能用。
-- **动用资金前**，Claude 会让你确认。点同意前先看清它要做什么（池子、金额、价格区间、跟单金额）。
+- **动用资金前**（Manual 模式下），Claude 会让你确认。点同意前先看清它要做什么（池子、金额、价格区间、跟单金额）。
 - **在某个对话里关掉**：点输入框里的 **+**，打开 **Connectors**，关掉 LP Agent。
 - **免费版**只能添加一个自定义连接器。
 - **Team 和 Enterprise 版**：由 Owner 在 **Organization settings > Connectors** 里为组织添加一次，之后每个人点 **Connect**，用自己的 LP Agent 账户登录。
