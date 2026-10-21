@@ -63,8 +63,7 @@
                 "pages": [
                   "integration/overview",
                   "integration/meteora",
-                  "integration/robinhood",
-                  "integration/meteora-airdrop"
+                  "integration/robinhood"
                 ]
               },
               {
@@ -213,8 +212,7 @@
                 "pages": [
                   "zh/integration/overview",
                   "zh/integration/meteora",
-                  "zh/integration/robinhood",
-                  "zh/integration/meteora-airdrop"
+                  "zh/integration/robinhood"
                 ]
               },
               {
@@ -408,6 +406,14 @@
     {
       "source": "/zh/mcp",
       "destination": "/zh/lp-agent-mcp"
+    },
+    {
+      "source": "/integration/meteora-airdrop",
+      "destination": "/integration/meteora"
+    },
+    {
+      "source": "/zh/integration/meteora-airdrop",
+      "destination": "/zh/integration/meteora"
     }
   ]
 }
