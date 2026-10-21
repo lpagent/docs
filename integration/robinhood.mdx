@@ -178,9 +178,6 @@ conventions. Handle these explicitly rather than assuming Solana shapes.
   not settled accounting, and reconcile against on-chain data for anything financial.
 </Warning>
 
-- **Swap legs are outside the ledger.** Position PnL measures the liquidity leg only. The
-  swaps that enter and exit a position (up to four per cycle) are not booked into it,
-  and their cost is material relative to typical LP gains.
 - **Open positions do not carry a live value.** The stored current value of an open
   position is not continuously refreshed, so any PnL derived from it is unreliable while
   the position is open. Use `GET /lp-positions/position` for a live read.
