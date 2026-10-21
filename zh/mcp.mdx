@@ -1,6 +1,6 @@
 ---
 title: "LP Agent MCP"
-description: "在 Claude、ChatGPT、Grok 等 AI 应用里用聊天管理你自己的 LP 仓位"
+description: "在 Claude、Cursor 等 AI 应用里用聊天管理你自己的 LP 仓位"
 ---
 
 ## 这是什么
@@ -41,7 +41,7 @@ https://mcp.lpagent.io/mcp
 点 **Create token**（创建令牌）并复制。令牌以 `lpat_` 开头，**只显示一次**。丢了的话，撤销它再新建一个。
 
 <Warning>
-  把令牌当作密码。拿到 Read & trade 令牌的人在你撤销之前都能用你的内置钱包交易。你的链接里也包含令牌，请同样保管。两者都不要贴到聊天、截图或共享文件里。
+  把令牌当作密码。拿到 Read & trade 令牌的人在你撤销之前都能用你的内置钱包交易。不要把它贴到聊天、截图或共享文件里。
 </Warning>
 
 最多可以同时有 10 个有效令牌。每个应用或设备用一个，这样撤销其中一个不会影响其他的。
@@ -50,22 +50,7 @@ https://mcp.lpagent.io/mcp
 
 令牌弹窗里会直接给出已经填好令牌的配置，你也可以从这里复制。
 
-Claude、ChatGPT 和 Grok 只能填 URL，所以要用**带令牌的链接**：
-
-```text
-https://mcp.lpagent.io/mcp/lpat_YOUR_TOKEN
-```
-
 <Tabs>
-  <Tab title="Claude">
-    适用于 claude.ai 以及 Claude 桌面版和手机 App。
-
-    1. 打开 **Customize > Connectors**，点 **Add custom connector**。
-    2. 名称填 LP Agent，把你的链接粘贴为 URL。
-    3. 不用开启登录，点 **Add**。
-
-    免费版可以添加一个自定义连接器。Team 和 Enterprise 版只有 Owner 能添加。
-  </Tab>
   <Tab title="Claude Code">
     在终端里运行：
 
@@ -76,22 +61,33 @@ https://mcp.lpagent.io/mcp/lpat_YOUR_TOKEN
 
     然后打开 Claude Code，问「我的 LP Agent 账户里有什么？」
   </Tab>
-  <Tab title="ChatGPT">
-    需要付费版（Plus、Pro、Business、Enterprise 或 Edu）。
+  <Tab title="Cursor">
+    添加到 `~/.cursor/mcp.json`：
 
-    1. 打开 **Settings > Apps & Connectors > Advanced**，打开 **Developer mode**。
-    2. 点 **Create**，名称填 LP Agent，把你的链接粘贴为 URL。
-    3. **Authentication** 选 **No authentication**，勾选信任选项，点 **Create**。
-
-    然后在对话的工具菜单里打开 LP Agent。ChatGPT 的菜单经常变动，找不到的话，在 Settings 里找 Developer mode。
+    ```json
+    {
+      "mcpServers": {
+        "lpagent": {
+          "url": "https://mcp.lpagent.io/mcp",
+          "headers": { "Authorization": "Bearer lpat_YOUR_TOKEN" }
+        }
+      }
+    }
+    ```
   </Tab>
-  <Tab title="Grok">
-    1. 在 grok.com 打开 **Connectors**，点 **New connector**，选 **Custom**。
-    2. 把你的链接粘贴为 URL 并保存。
+  <Tab title="其他应用">
+    任何能通过 URL 连接远程服务器、并允许设置请求头的 MCP 客户端：
+
+    ```text
+    URL     https://mcp.lpagent.io/mcp
+    Header  Authorization: Bearer lpat_YOUR_TOKEN
+    ```
   </Tab>
 </Tabs>
 
-其他 MCP 应用也可以用：只能填 URL 的用链接；能设置请求头的，用 `https://mcp.lpagent.io/mcp` 加上 `Authorization: Bearer lpat_YOUR_TOKEN`。
+<Note>
+  只能通过登录按钮连接的应用（例如 Claude 或 ChatGPT 网页版里的连接器）暂不支持。
+</Note>
 
 ## 它能做什么
 

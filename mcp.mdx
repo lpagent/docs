@@ -1,6 +1,6 @@
 ---
 title: "LP Agent MCP"
-description: "Manage your own LP positions by chatting with Claude, ChatGPT, Grok and other AI apps"
+description: "Manage your own LP positions by chatting with Claude, Cursor and other AI apps"
 ---
 
 ## What it is
@@ -41,7 +41,7 @@ In the app, open **Settings > Account > Access tokens** and press **New token**.
 Press **Create token** and copy it. It starts with `lpat_` and is **shown only once**. If you lose it, revoke it and make a new one.
 
 <Warning>
-  Treat a token like a password. Anyone who has a Read & trade token can trade from your agent wallet until you revoke it. Your link holds the token too, so keep it the same way. Never paste either into a chat, a screenshot or a shared file.
+  Treat a token like a password. Anyone who has a Read & trade token can trade from your agent wallet until you revoke it. Never paste it into a chat, a screenshot or a shared file.
 </Warning>
 
 You can have up to 10 active tokens. Make one per app or machine, so you can revoke one without touching the others.
@@ -50,22 +50,7 @@ You can have up to 10 active tokens. Make one per app or machine, so you can rev
 
 The token dialog shows the setup with your token already filled in. You can also copy it from here.
 
-Claude, ChatGPT and Grok take only a URL, so they get a **link with your token in it**:
-
-```text
-https://mcp.lpagent.io/mcp/lpat_YOUR_TOKEN
-```
-
 <Tabs>
-  <Tab title="Claude">
-    Works in claude.ai and the Claude desktop and mobile apps.
-
-    1. Open **Customize > Connectors** and press **Add custom connector**.
-    2. Name it LP Agent and paste your link as the URL.
-    3. Leave sign-in off and press **Add**.
-
-    On the Free plan you can add one custom connector. On Team and Enterprise plans, only an Owner can add one.
-  </Tab>
   <Tab title="Claude Code">
     Run in a terminal:
 
@@ -76,22 +61,33 @@ https://mcp.lpagent.io/mcp/lpat_YOUR_TOKEN
 
     Then start Claude Code and ask "What's in my LP Agent account?".
   </Tab>
-  <Tab title="ChatGPT">
-    Needs a paid plan (Plus, Pro, Business, Enterprise or Edu).
+  <Tab title="Cursor">
+    Add to `~/.cursor/mcp.json`:
 
-    1. Open **Settings > Apps & Connectors > Advanced** and turn on **Developer mode**.
-    2. Press **Create**, name it LP Agent and paste your link as the URL.
-    3. Set **Authentication** to **No authentication**, tick the trust box and press **Create**.
-
-    Then turn LP Agent on from the tools menu in a chat. ChatGPT moves these menus often; if you don't see them, look for Developer mode in Settings.
+    ```json
+    {
+      "mcpServers": {
+        "lpagent": {
+          "url": "https://mcp.lpagent.io/mcp",
+          "headers": { "Authorization": "Bearer lpat_YOUR_TOKEN" }
+        }
+      }
+    }
+    ```
   </Tab>
-  <Tab title="Grok">
-    1. At grok.com, open **Connectors**, press **New connector** and pick **Custom**.
-    2. Paste your link as the URL and save.
+  <Tab title="Other apps">
+    Any MCP client that connects to a remote server by URL and lets you set a request header:
+
+    ```text
+    URL     https://mcp.lpagent.io/mcp
+    Header  Authorization: Bearer lpat_YOUR_TOKEN
+    ```
   </Tab>
 </Tabs>
 
-Another MCP app works too: one that takes only a URL uses the link, one that can send a header uses `https://mcp.lpagent.io/mcp` with `Authorization: Bearer lpat_YOUR_TOKEN`.
+<Note>
+  Apps that connect only with a sign-in button (such as connectors in the Claude or ChatGPT web apps) are not supported yet.
+</Note>
 
 ## What it can do
 
