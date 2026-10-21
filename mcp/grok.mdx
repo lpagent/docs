@@ -1,0 +1,42 @@
+---
+title: "Use LP Agent in Grok"
+sidebarTitle: "Grok"
+description: "Add LP Agent to Grok once, then ask about your positions in plain words"
+---
+
+Once LP Agent is added, you can ask Grok things like "how are my positions doing?", and it answers from your own LP Agent account.
+
+Grok calls an add-on like this a **connector**: it lets Grok use another app for you. You add LP Agent once by its address.
+
+## What you need
+
+- A Grok account on [grok.com](https://grok.com).
+- An LP Agent account with an agent wallet.
+
+## Add LP Agent to Grok
+
+<Steps>
+  <Step title="Open Connectors">
+    On [grok.com](https://grok.com), open **Connectors**.
+  </Step>
+  <Step title="Add LP Agent">
+    Press **New connector** and pick **Custom**. Paste `https://mcp.lpagent.io/mcp` as the URL and save.
+  </Step>
+  <Step title="Connect your LP Agent account">
+    Connect it. An LP Agent page opens. Sign in if it asks, choose **Read & trade** or **Read only** and how long, then press **Allow**.
+  </Step>
+  <Step title="Ask Grok">
+    Start a new chat and ask "What's in my LP Agent account?".
+  </Step>
+</Steps>
+
+<Warning>
+  Press **Allow** on the LP Agent page only if you just connected LP Agent in Grok yourself. If a link to that page reaches you any other way, press **Cancel**.
+</Warning>
+
+## Good to know
+
+- **Before it moves money**, read what Grok is about to do (pool, amount, range, copy size) before you say yes.
+- **Disconnect**: in LP Agent, open **Settings > Account > Access tokens** and press **Disconnect** next to Grok.
+
+Want ideas for what to ask? See [Things to ask](/mcp#things-to-ask). For what it can and can't do, see [LP Agent MCP](/mcp).

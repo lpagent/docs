@@ -1,0 +1,56 @@
+---
+title: "Use LP Agent in Claude"
+sidebarTitle: "Claude"
+description: "Add LP Agent to Claude once, then ask about your positions in plain words"
+---
+
+Once LP Agent is added, you can ask Claude things like "how are my positions doing?" or "claim the fees on my biggest position", and it answers from your own LP Agent account.
+
+Claude calls an add-on like this a **connector**: it lets Claude use another app for you. LP Agent is not in Claude's list of connectors yet, so you add it once by its address. It takes about a minute.
+
+## What you need
+
+- A Claude account, on claude.ai or the Claude desktop or phone app. The free plan works.
+- An LP Agent account with an agent wallet.
+
+## Add LP Agent to Claude
+
+<Steps>
+  <Step title="Open Connectors">
+    On [claude.ai](https://claude.ai), open **Customize**, then **Connectors**. You can also go straight to [claude.ai/customize/connectors](https://claude.ai/customize/connectors).
+  </Step>
+  <Step title="Add LP Agent">
+    Press **Add custom connector**. Fill in:
+
+    - **Name**: LP Agent
+    - **URL**: `https://mcp.lpagent.io/mcp`
+
+    Leave everything else as it is and press **Add**.
+  </Step>
+  <Step title="Connect your LP Agent account">
+    Press **Connect** next to LP Agent. An LP Agent page opens. Sign in if it asks, then choose:
+
+    - **Read & trade**: Claude can also open, close and manage positions and copies for you. **Read only**: it can only look.
+    - **How long**: 7, 30, 60 or 90 days, or until you disconnect it.
+
+    Press **Allow**. You are back in Claude, and LP Agent shows as connected.
+  </Step>
+  <Step title="Ask Claude">
+    Start a new chat and ask "What's in my LP Agent account?". The first time, Claude asks before it uses LP Agent: allow it.
+  </Step>
+</Steps>
+
+<Warning>
+  Press **Allow** on the LP Agent page only if you just pressed **Connect** in Claude yourself. If a link to that page reaches you any other way, press **Cancel**.
+</Warning>
+
+## Good to know
+
+- **On your phone**: once added on claude.ai, LP Agent is in the Claude app too.
+- **Before it moves money**, Claude asks you to approve the action. Read what it is about to do (pool, amount, range, copy size) before you say yes.
+- **Turn it off for one chat**: press **+** in the chat box, open **Connectors** and switch LP Agent off.
+- **The free plan** allows one custom connector.
+- **Team and Enterprise plans**: an Owner adds LP Agent once for the organization under **Organization settings > Connectors**. Then each person presses **Connect** and signs in with their own LP Agent account.
+- **Disconnect**: in LP Agent, open **Settings > Account > Access tokens** and press **Disconnect** next to Claude. You can also remove it under **Customize > Connectors** in Claude.
+
+Want ideas for what to ask? See [Things to ask](/mcp#things-to-ask). For what it can and can't do, see [LP Agent MCP](/mcp).

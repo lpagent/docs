@@ -1,0 +1,207 @@
+---
+title: "LP Agent MCP"
+description: "在 Claude、ChatGPT、Grok 等 AI 应用里用聊天管理你自己的 LP 仓位"
+---
+
+## 这是什么
+
+LP Agent MCP 让 AI 应用替你操作你的 LP Agent 账户。问它「我的仓位怎么样？」「把超出区间的平仓」或「用 20% 跟单这个钱包」，它会读取你的账户并执行。
+
+- 只作用于**你自己的账户**：你的内置钱包、你的仓位、你的跟单。
+- 所有操作都从你的**内置钱包**执行，规则和 App 里一样。
+- 它也能根据本文档回答关于 LP Agent 的问题。
+- 它的回答会附上 [App](https://app.lpagent.io) 里的链接，点一下就能打开它说的仓位、池子或跟单。
+
+它是一个 [MCP](https://modelcontextprotocol.io) 服务器，地址：
+
+```text
+https://mcp.lpagent.io/mcp
+```
+
+<Note>
+  如果你要基于 LP Agent 的数据做自己的产品，请用 [Open API](/zh/api-reference/introduction) 和 API key。MCP 是给你手动管理自己账户用的，它的限制（见下文）也是按这个设定的。
+</Note>
+
+## 你需要准备
+
+- 一个有内置钱包的 LP Agent 账户。
+- 查询池子或投入新资金（开仓、加仓、再平衡、开始跟单）需要**内置钱包里至少有 1 SOL**，包括可用余额和当前仓位的价值，登录钱包不计算在内。低于这个数时，其他功能照常可用：查看仓位、PnL、跟单和跟单日志，减仓和平仓，领取手续费，止盈止损，以及暂停或停止跟单。
+- Claude、ChatGPT 或 Grok（登录即可）；或者给 Claude Code、Cursor 等应用用的访问令牌。
+
+## 连接你的 AI 应用
+
+Claude、ChatGPT 和 Grok 通过**登录** LP Agent 连接，不需要复制令牌。Claude Code、Cursor 等应用使用[访问令牌](#访问令牌)。
+
+所有应用都用同一个 URL：
+
+```text
+https://mcp.lpagent.io/mcp
+```
+
+<Tabs>
+  <Tab title="Claude">
+    适用于 claude.ai 以及 Claude 桌面版和手机 App。
+
+    1. 打开 **Customize > Connectors**，点 **Add custom connector**。
+    2. 名称填 LP Agent，粘贴 URL，点 **Add**。
+    3. 点 **Connect**。会打开 LP Agent：登录，选择 Claude 能做什么，点 **允许**。
+
+    免费版可以添加一个自定义连接器。Team 和 Enterprise 版由 Owner 添加一次，每个成员用自己的 LP Agent 账户连接。
+
+    详细步骤：[在 Claude 里使用 LP Agent](/zh/mcp/claude)。
+  </Tab>
+  <Tab title="ChatGPT">
+    需要付费版（Plus、Pro、Business、Enterprise 或 Edu）。
+
+    1. 打开 **Settings > Apps & Connectors > Advanced**，打开 **Developer mode**。
+    2. 点 **Create**，名称填 LP Agent，粘贴 URL，**Authentication** 选 **OAuth**。勾选信任选项，点 **Create**。
+    3. 连接它。会打开 LP Agent：登录，选择 ChatGPT 能做什么，点 **允许**。
+
+    ChatGPT 的菜单经常变动，找不到的话，在 Settings 里找 Developer mode。
+
+    详细步骤：[在 ChatGPT 里使用 LP Agent](/zh/mcp/chatgpt)。
+  </Tab>
+  <Tab title="Grok">
+    1. 在 grok.com 打开 **Connectors**，点 **New connector**，选 **Custom**。
+    2. 粘贴 URL 并保存。
+    3. 连接它。会打开 LP Agent：登录，选择 Grok 能做什么，点 **允许**。
+
+    详细步骤：[在 Grok 里使用 LP Agent](/zh/mcp/grok)。
+  </Tab>
+  <Tab title="Claude Code">
+    先[创建访问令牌](#访问令牌)，然后在终端里运行：
+
+    ```bash
+    claude mcp add --transport http lpagent https://mcp.lpagent.io/mcp \
+      --header "Authorization: Bearer lpat_YOUR_TOKEN"
+    ```
+
+    然后打开 Claude Code，问「我的 LP Agent 账户里有什么？」
+  </Tab>
+  <Tab title="Cursor 和其他应用">
+    先[创建访问令牌](#访问令牌)。Cursor 添加到 `~/.cursor/mcp.json`：
+
+    ```json
+    {
+      "mcpServers": {
+        "lpagent": {
+          "url": "https://mcp.lpagent.io/mcp",
+          "headers": { "Authorization": "Bearer lpat_YOUR_TOKEN" }
+        }
+      }
+    }
+    ```
+
+    其他能通过 URL 连接、并允许设置请求头的 MCP 应用也一样：用上面的 URL，加上请求头 `Authorization: Bearer lpat_YOUR_TOKEN`。
+  </Tab>
+</Tabs>
+
+### 应用请求连接时
+
+LP Agent 会显示是哪个应用在请求，以及允许后会回到哪里。选择 **Read & trade**（读取和交易）或 **Read only**（只读）和有效期（7、30、60 或 90 天，或在你断开前一直有效），然后点 **允许**。
+
+<Warning>
+  只有在你刚刚从那个应用发起连接时才允许。如果有人发给你这个页面的链接，请点**取消**：允许的话，对方的应用就能用你的账户。
+</Warning>
+
+## 访问令牌
+
+用于 Claude Code、Cursor 等需要令牌的应用。在 App 里打开 **Settings > Account > Access tokens**（设置 > 账户 > 访问令牌），点 **New token**（新建令牌）。
+
+| 字段 | 怎么选 |
+| - | - |
+| **名称** | 写清楚用在哪里，例如「我笔记本上的 Claude Code」。 |
+| **权限** | **Read & trade**（读取和交易）允许 AI 开仓、加仓、减仓、再平衡、领取和复投、修改止盈止损、管理跟单。**Read only**（只读）只能查看余额、仓位、PnL 和跟单设置，不会动用资金。 |
+| **有效期** | 7、30、60 或 90 天，或永久。永久令牌在你撤销前一直有效，除非这台设备只有你在用，否则请选一个期限。 |
+
+点 **Create token**（创建令牌）并复制。令牌以 `lpat_` 开头，**只显示一次**。丢了的话，撤销它再新建一个。令牌弹窗会直接给出已经填好令牌的 Claude Code、Cursor 和其他应用的配置。
+
+<Warning>
+  把令牌当作密码。拿到 Read & trade 令牌的人在你撤销之前都能用你的内置钱包交易。不要把它贴到聊天、截图或共享文件里。
+</Warning>
+
+令牌和已连接的应用加起来最多 10 个。每个应用或设备用一个令牌，这样撤销其中一个不会影响其他的。
+
+## 它能做什么
+
+### 读取你的账户
+
+- 账户、内置钱包和默认设置
+- 钱包余额
+- 当前仓位和已平仓仓位，包括 PnL、手续费和价格区间
+- 资产组合 PnL：全部、7 天、1 个月、3 个月和今年
+- 单个仓位的详情和完整交易记录
+- 仓位的止盈止损和自动化设置
+- 减仓前预估能拿回多少
+- 你的跟单、跟单设置和跟单日志
+- 池子和代币：Discover 列表（支持排序和筛选，包括按代币最近 5 分钟、1、6 或 24 小时的涨跌幅找代币）和单个池子的详情
+
+### 复盘仓位
+
+问它某个仓位为什么赚了或亏了。它会算出开仓和平仓价格、代币相对你的价格区间走了多少、仓位进出时持有什么、手续费和价格损失的对比、持仓多久，以及（Solana 上）开仓时代币上线多久、持有人情况如何。然后给出几条和你的设置相关的建议：价格区间、止损、Meme Protection、跟单金额。
+
+它也可以把你亏得最多的几个已平仓仓位放在一起看，找出它们的共同点。支持 MCP 提示词的应用会显示 **Review a position** 和 **Lessons from my worst positions** 两个现成提示词。
+
+### 操作你的账户（需要 Read & trade）
+
+- **开仓**：价格区间可以用 bin、价格或当前价格上下的百分比，策略可选 Spot、Curve 或 Bid-Ask
+- **加仓**、**减仓**或**平仓**
+- **再平衡** Meteora DLMM 仓位到新的价格区间，包括快速再平衡的卖出或买入阶梯
+- **领取**或**复投**手续费
+- **设置**仓位的止盈止损、自动复投和自动再平衡，以及账户默认设置
+- **开始、修改、暂停或停止跟单**你选的钱包
+
+每个操作一执行就上链，从你的内置钱包发出，无法撤回。大多数 AI 应用会在每次操作前让你确认；点确认前先看清它要做什么（池子、金额、价格区间、跟单金额）。
+
+### 回答关于 LP Agent 的问题
+
+它会搜索本文档来回答使用问题，余额多少都可以用。
+
+### 它不做什么
+
+- 查看别人的钱包。没有排行榜、没有钱包搜索，也没有能读取别人仓位的工具。
+- 把资金转出内置钱包。请在 App 里提现到其他地址。
+- 使用你的登录钱包。所有操作都从内置钱包执行。
+- 普通兑换、限价单、创建池子、Claim SOL、邀请或导出私钥。这些请在 App 里操作。
+
+## 可以这样问
+
+- 「我的仓位怎么样？把超出价格区间的都平掉。」
+- 「找最近 1 小时涨了 40% 以上、有池子可以做 LP 的代币。」
+- 「在这个池子用 0.5 SOL 开一个 Bid-Ask 仓位，下限到当前价格下方 40%。」
+- 「我上一个仓位为什么亏了？」
+- 「复盘我亏得最多的 5 个仓位，告诉我该改什么。」
+- 「暂停我的跟单，并给所有当前仓位设 10% 止损。」
+- 「Open API 多少钱？」
+
+## 限制
+
+限制按账户计算，该账户的所有令牌合计：
+
+| 内容 | 每分钟 | 每天（UTC） |
+| - | - | - |
+| 全部请求 | 60 | 3,000 |
+| 池子数据（Discover 池子和代币、池子详情） | 5 | 150 |
+| 操作（开仓、减仓、再平衡、跟单……） | 10 | 200 |
+
+Discover 每页最多返回 10 条，最多 3 页。达到限制时，AI 会被告知需要等多久。
+
+如果需要批量的池子数据，请使用 [Open API](/zh/api-key-dashboard/dashboard)。
+
+## 管理你的令牌
+
+**Settings > Account > Access tokens**（设置 > 账户 > 访问令牌）会列出每个令牌和已连接应用的权限、有效期，以及上次在什么时候、由哪个应用使用。展开一个可以看到它最近的操作。在这里撤销令牌或断开应用后，它在下一次请求时就会失效。
+
+出于安全和支持需要，LP Agent 会记录每个令牌和已连接应用发出的请求和工具调用：调用了哪个工具、输入内容、时间和应用。
+
+## 常见问题
+
+| 你看到的 | 怎么做 |
+| - | - |
+| 令牌无效、已过期或已撤销 | 在设置里新建一个令牌，并更新你的 AI 应用。 |
+| 登录页面提示已过期或已使用 | 它只有 10 分钟有效，且只能用一次。请回到应用重新连接。 |
+| 应用被断开了 | 回到应用重新连接。重新连接会替换旧的连接。 |
+| 不能查询池子、开仓、加仓、再平衡或开始跟单 | 你的内置钱包少于 1 SOL。在 App 里充值后，一两分钟内这些功能就会开放。 |
+| 「This access token is read only」 | 如果想让 AI 执行操作，请新建一个 Read & trade 令牌。 |
+| 「Limit reached」 | 按提示等待。一次只问几个池子，不要问所有池子。 |
+| 操作被拒绝 | 规则和 App 里一样。看看 AI 给出的原因，或者在 App 里试一下。 |

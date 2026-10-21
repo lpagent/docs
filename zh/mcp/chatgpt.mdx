@@ -1,0 +1,54 @@
+---
+title: "在 ChatGPT 里使用 LP Agent"
+sidebarTitle: "ChatGPT"
+description: "把 LP Agent 添加到 ChatGPT 一次，之后就能用大白话问你的仓位"
+---
+
+添加 LP Agent 之后，你可以问 ChatGPT「我的仓位怎么样？」或「把超出区间的平仓」，它会根据你自己的 LP Agent 账户来回答。
+
+ChatGPT 通过**开发者模式**（developer mode）添加还不在它商店里的应用，这个设置只需打开一次，然后用地址添加 LP Agent，几分钟就好。
+
+## 你需要准备
+
+- ChatGPT 付费版：Plus、Pro、Business、Enterprise 或 Edu。Business、Enterprise 和 Edu 可能需要工作区管理员先允许。
+- 一个有内置钱包的 LP Agent 账户。
+
+## 把 LP Agent 添加到 ChatGPT
+
+<Steps>
+  <Step title="打开开发者模式">
+    在 ChatGPT 打开 **Settings**，再打开 **Apps & Connectors**。滚动到 **Advanced settings**，打开 **Developer mode**，并确认关于未验证应用的提示。
+  </Step>
+  <Step title="添加 LP Agent">
+    回到 **Apps & Connectors**，点 **Create**，填写：
+
+    - **Name**：LP Agent
+    - **MCP Server URL**：`https://mcp.lpagent.io/mcp`
+    - **Authentication**：OAuth
+
+    勾选信任这个应用的选项，点 **Create**。
+  </Step>
+  <Step title="连接你的 LP Agent 账户">
+    ChatGPT 会打开 LP Agent 页面。需要的话先登录，然后选择：
+
+    - **Read & trade**（读取和交易）：ChatGPT 还能替你开仓、平仓、管理仓位和跟单。**Read only**（只读）：只能查看。
+    - **有效期**：7、30、60 或 90 天，或在你断开前一直有效。
+
+    点 **允许**，就会回到 ChatGPT。
+  </Step>
+  <Step title="问 ChatGPT">
+    新开一个对话，点输入框里的 **+**，选择 **Developer mode** 并打开 LP Agent，然后问「我的 LP Agent 账户里有什么？」。
+  </Step>
+</Steps>
+
+<Warning>
+  只有在你自己刚刚在 ChatGPT 里添加或连接了 LP Agent 时，才在 LP Agent 页面点**允许**。如果这个页面的链接是通过其他方式发给你的，请点**取消**。
+</Warning>
+
+## 小提示
+
+- **菜单会变**：ChatGPT 经常调整这些设置。找不到的话，在 Settings 里搜索「Developer mode」。
+- **动用资金前**，ChatGPT 会让你确认。点同意前先看清它要做什么（池子、金额、价格区间、跟单金额）。
+- **断开**：在 LP Agent 打开 **设置 > 账户 > 访问令牌**，点 ChatGPT 旁边的**断开**。也可以在 ChatGPT 的 **Apps & Connectors** 里删除。
+
+想知道可以问什么？请看[可以这样问](/zh/mcp#可以这样问)。它能做什么、不能做什么，请看 [LP Agent MCP](/zh/mcp)。
