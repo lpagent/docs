@@ -1,0 +1,50 @@
+---
+title: "Use LP Agent in Cursor"
+sidebarTitle: "Cursor"
+description: "Add LP Agent to Cursor once, then ask about your positions in plain words"
+---
+
+Once LP Agent is added, you can ask Cursor things like "how are my positions doing?", and it answers from your own LP Agent account.
+
+You add LP Agent once by its address and sign in: there is no token to copy.
+
+## What you need
+
+- Cursor.
+- An LP Agent account with an agent wallet.
+
+## Add LP Agent to Cursor
+
+<Steps>
+  <Step title="Add LP Agent">
+    Add LP Agent to `~/.cursor/mcp.json` to use it everywhere, or to `.cursor/mcp.json` in a project to use it there only:
+
+    ```json
+    {
+      "mcpServers": {
+        "lpagent": { "url": "https://mcp.lpagent.io/mcp" }
+      }
+    }
+    ```
+
+    If the file already has other servers, add the `lpagent` entry next to them.
+  </Step>
+  <Step title="Connect your LP Agent account">
+    In Cursor's MCP settings, find LP Agent and sign in to it. An LP Agent page opens in your browser. Sign in if it asks, choose **Read & trade** or **Read only** and how long, then press **Allow**. The page names the app **Cursor / Grok Bot**: the two sign in the same way.
+  </Step>
+  <Step title="Ask Cursor">
+    Open a new chat and ask "What's in my LP Agent account?".
+  </Step>
+</Steps>
+
+<Warning>
+  Press **Allow** on the LP Agent page only if you just connected LP Agent in Cursor yourself. If a link to that page reaches you any other way, press **Cancel**.
+</Warning>
+
+## Good to know
+
+- **Before it moves money**, read what Cursor is about to do (pool, amount, range, copy size) before you say yes.
+- **Prefer a token?** Cursor also takes an [access token](/lp-agent-mcp#access-tokens): add `"headers": { "Authorization": "Bearer lpat_YOUR_TOKEN" }` next to the `url`.
+- **Disconnect**: in LP Agent, open **Settings > Account > Access tokens** and press **Disconnect** next to Cursor / Grok Bot.
+
+Want ideas for what to ask? See [Things to ask](/lp-agent-mcp#things-to-ask). For what it can and can't do, see [LP Agent MCP](/lp-agent-mcp).
