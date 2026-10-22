@@ -1,0 +1,50 @@
+---
+title: "在 Cursor 里使用 LP Agent"
+sidebarTitle: "Cursor"
+description: "把 LP Agent 添加到 Cursor 一次，之后就能用大白话问你的仓位"
+---
+
+添加 LP Agent 之后，你可以问 Cursor「我的仓位怎么样？」，它会根据你自己的 LP Agent 账户来回答。
+
+用地址添加 LP Agent 一次，然后登录即可，不需要复制令牌。
+
+## 你需要准备
+
+- Cursor。
+- 一个有内置钱包的 LP Agent 账户。
+
+## 把 LP Agent 添加到 Cursor
+
+<Steps>
+  <Step title="添加 LP Agent">
+    把 LP Agent 添加到 `~/.cursor/mcp.json`（所有项目都能用），或项目里的 `.cursor/mcp.json`（只在该项目里用）：
+
+    ```json
+    {
+      "mcpServers": {
+        "lpagent": { "url": "https://mcp.lpagent.io/mcp" }
+      }
+    }
+    ```
+
+    如果文件里已经有其他服务器，把 `lpagent` 加在它们旁边。
+  </Step>
+  <Step title="连接你的 LP Agent 账户">
+    在 Cursor 的 MCP 设置里找到 LP Agent 并登录。浏览器会打开 LP Agent 页面。需要的话先登录，选择 **Read & trade**（读取和交易）或 **Read only**（只读）和有效期，然后点**允许**。页面上的应用名称是 **Cursor / Grok Bot**：两者的登录方式相同。
+  </Step>
+  <Step title="问 Cursor">
+    新开一个对话，问「我的 LP Agent 账户里有什么？」。
+  </Step>
+</Steps>
+
+<Warning>
+  只有在你自己刚刚在 Cursor 里连接了 LP Agent 时，才在 LP Agent 页面点**允许**。如果这个页面的链接是通过其他方式发给你的，请点**取消**。
+</Warning>
+
+## 小提示
+
+- **动用资金前**，先看清 Cursor 要做什么（池子、金额、价格区间、跟单金额）再同意。
+- **想用令牌？** Cursor 也可以用[访问令牌](/zh/lp-agent-mcp#访问令牌)：在 `url` 旁边加上 `"headers": { "Authorization": "Bearer lpat_YOUR_TOKEN" }`。
+- **断开**：在 LP Agent 打开 **设置 > 账户 > 访问令牌**，点 Cursor / Grok Bot 旁边的**断开**。
+
+想知道可以问什么？请看[可以这样问](/zh/lp-agent-mcp#可以这样问)。它能做什么、不能做什么，请看 [LP Agent MCP](/zh/lp-agent-mcp)。

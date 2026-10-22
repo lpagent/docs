@@ -1,7 +1,7 @@
 ---
 sidebarTitle: "概览"
 title: "LP Agent MCP"
-description: "在 Claude、ChatGPT、Grok 等 AI 应用里用聊天管理你自己的 LP 仓位"
+description: "在 Claude、ChatGPT、Grok、Cursor 等 AI 应用里用聊天管理你自己的 LP 仓位"
 ---
 
 ## 这是什么
@@ -27,11 +27,11 @@ https://mcp.lpagent.io/mcp
 
 - 一个有内置钱包的 LP Agent 账户。
 - 查询池子或投入新资金（开仓、加仓、再平衡、开始跟单）需要**内置钱包里至少有 1 SOL**，包括可用余额和当前仓位的价值，登录钱包不计算在内。低于这个数时，其他功能照常可用：查看仓位、PnL、跟单和跟单日志，减仓和平仓，领取手续费，止盈止损，以及暂停或停止跟单。
-- Claude、ChatGPT 或 Grok（登录即可）；或者给 Claude Code、Cursor 等应用用的访问令牌。
+- Claude、ChatGPT、Grok、Grok Bot 或 Cursor（登录即可）；或者给 Claude Code、Codex 等应用用的访问令牌。
 
 ## 连接你的 AI 应用
 
-Claude、ChatGPT 和 Grok 通过**登录** LP Agent 连接，不需要复制令牌。Claude Code、Cursor 等应用使用[访问令牌](#访问令牌)。
+Claude、ChatGPT、Grok、Grok Bot 和 Cursor 通过**登录** LP Agent 连接，不需要复制令牌。Claude Code、Codex 等应用使用[访问令牌](#访问令牌)。
 
 所有应用都用同一个 URL：
 
@@ -69,6 +69,32 @@ https://mcp.lpagent.io/mcp
 
     详细步骤：[在 Grok 里使用 LP Agent](/zh/lp-agent-mcp/grok)。
   </Tab>
+  <Tab title="Grok Bot">
+    复制下面这句，在 Grok Bot 的对话里发送：
+
+    ```text
+    Add LP Agent as a custom connector: https://mcp.lpagent.io/mcp
+    ```
+
+    Grok Bot 会添加它并打开 LP Agent：登录，选择 Grok Bot 能做什么，点 **允许**。
+
+    详细步骤：[在 Grok Bot 里使用 LP Agent](/zh/lp-agent-mcp/grok-bot)。
+  </Tab>
+  <Tab title="Cursor">
+    把 LP Agent 添加到 `~/.cursor/mcp.json`，或项目里的 `.cursor/mcp.json`：
+
+    ```json
+    {
+      "mcpServers": {
+        "lpagent": { "url": "https://mcp.lpagent.io/mcp" }
+      }
+    }
+    ```
+
+    然后在 Cursor 的 MCP 设置里登录 LP Agent。浏览器会打开 LP Agent：登录，选择 Cursor 能做什么，点 **允许**。
+
+    详细步骤：[在 Cursor 里使用 LP Agent](/zh/lp-agent-mcp/cursor)。
+  </Tab>
   <Tab title="Claude Code">
     先[创建访问令牌](#访问令牌)，然后在终端里运行：
 
@@ -79,18 +105,13 @@ https://mcp.lpagent.io/mcp
 
     然后打开 Claude Code，问「我的 LP Agent 账户里有什么？」
   </Tab>
-  <Tab title="Cursor 和其他应用">
-    先[创建访问令牌](#访问令牌)。Cursor 添加到 `~/.cursor/mcp.json`：
+  <Tab title="Codex 和其他应用">
+    先[创建访问令牌](#访问令牌)。Codex 添加到 `~/.codex/config.toml`：
 
-    ```json
-    {
-      "mcpServers": {
-        "lpagent": {
-          "url": "https://mcp.lpagent.io/mcp",
-          "headers": { "Authorization": "Bearer lpat_YOUR_TOKEN" }
-        }
-      }
-    }
+    ```toml
+    [mcp_servers.lpagent]
+    url = "https://mcp.lpagent.io/mcp"
+    http_headers = { Authorization = "Bearer lpat_YOUR_TOKEN" }
     ```
 
     其他能通过 URL 连接、并允许设置请求头的 MCP 应用也一样：用上面的 URL，加上请求头 `Authorization: Bearer lpat_YOUR_TOKEN`。
@@ -99,7 +120,7 @@ https://mcp.lpagent.io/mcp
 
 ### 应用请求连接时
 
-LP Agent 会显示是哪个应用在请求，以及允许后会回到哪里。选择 **Read & trade**（读取和交易）或 **Read only**（只读）和有效期（7、30、60 或 90 天，或在你断开前一直有效），然后点 **允许**。
+LP Agent 会显示是哪个应用在请求，以及允许后会回到哪里。Cursor 和 Grok Bot 的登录方式相同，所以 LP Agent 把它们一起显示为 **Cursor / Grok Bot**。选择 **Read & trade**（读取和交易）或 **Read only**（只读）和有效期（7、30、60 或 90 天，或在你断开前一直有效），然后点 **允许**。
 
 <Warning>
   只有在你刚刚从那个应用发起连接时才允许。如果有人发给你这个页面的链接，请点**取消**：允许的话，对方的应用就能用你的账户。
@@ -107,7 +128,7 @@ LP Agent 会显示是哪个应用在请求，以及允许后会回到哪里。�
 
 ## 访问令牌
 
-用于 Claude Code、Cursor 等需要令牌的应用。在 App 里打开 **Settings > Account > Access tokens**（设置 > 账户 > 访问令牌），点 **New token**（新建令牌）。
+用于 Claude Code、Codex 等需要令牌的应用。在 App 里打开 **Settings > Account > Access tokens**（设置 > 账户 > 访问令牌），点 **New token**（新建令牌）。
 
 | 字段 | 怎么选 |
 | - | - |
@@ -115,7 +136,7 @@ LP Agent 会显示是哪个应用在请求，以及允许后会回到哪里。�
 | **权限** | **Read & trade**（读取和交易）允许 AI 开仓、加仓、减仓、再平衡、领取和复投、修改止盈止损、管理跟单。**Read only**（只读）只能查看余额、仓位、PnL 和跟单设置，不会动用资金。 |
 | **有效期** | 7、30、60 或 90 天，或永久。永久令牌在你撤销前一直有效，除非这台设备只有你在用，否则请选一个期限。 |
 
-点 **Create token**（创建令牌）并复制。令牌以 `lpat_` 开头，**只显示一次**。丢了的话，撤销它再新建一个。令牌弹窗会直接给出已经填好令牌的 Claude Code、Cursor 和其他应用的配置。
+点 **Create token**（创建令牌）并复制。令牌以 `lpat_` 开头，**只显示一次**。丢了的话，撤销它再新建一个。令牌弹窗会直接给出已经填好令牌的 Claude Code、Codex 和其他应用的配置。
 
 <Warning>
   把令牌当作密码。拿到 Read & trade 令牌的人在你撤销之前都能用你的内置钱包交易。不要把它贴到聊天、截图或共享文件里。

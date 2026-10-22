@@ -1,7 +1,7 @@
 ---
 sidebarTitle: "Overview"
 title: "LP Agent MCP"
-description: "Manage your own LP positions by chatting with Claude, ChatGPT, Grok and other AI apps"
+description: "Manage your own LP positions by chatting with Claude, ChatGPT, Grok, Cursor and other AI apps"
 ---
 
 ## What it is
@@ -27,11 +27,11 @@ https://mcp.lpagent.io/mcp
 
 - An LP Agent account with an agent wallet.
 - At least **1 SOL in your agent wallet** to look up pools or put new money in (open a position, add to one, rebalance, start a copy). It counts the wallet's free balance and the value of its open positions; your login wallet does not count. Below that, everything else still works: your positions, PnL, copies and Copy Logs, withdrawing and closing, claiming, TP/SL, and pausing or stopping copies.
-- Claude, ChatGPT or Grok, which sign in; or an access token for Claude Code, Cursor and other apps.
+- Claude, ChatGPT, Grok, Grok Bot or Cursor, which sign in; or an access token for Claude Code, Codex and other apps.
 
 ## Connect your AI app
 
-Claude, ChatGPT and Grok **sign in** to LP Agent: there is no token to copy. Claude Code, Cursor and other apps take an [access token](#access-tokens).
+Claude, ChatGPT, Grok, Grok Bot and Cursor **sign in** to LP Agent: there is no token to copy. Claude Code, Codex and other apps take an [access token](#access-tokens).
 
 The URL is the same for every app:
 
@@ -69,6 +69,32 @@ https://mcp.lpagent.io/mcp
 
     Step by step: [Use LP Agent in Grok](/lp-agent-mcp/grok).
   </Tab>
+  <Tab title="Grok Bot">
+    Copy this and send it in a Grok Bot chat:
+
+    ```text
+    Add LP Agent as a custom connector: https://mcp.lpagent.io/mcp
+    ```
+
+    Grok Bot adds it and opens LP Agent: sign in, choose what Grok Bot can do and press **Allow**.
+
+    Step by step: [Use LP Agent in Grok Bot](/lp-agent-mcp/grok-bot).
+  </Tab>
+  <Tab title="Cursor">
+    Add LP Agent to `~/.cursor/mcp.json`, or to `.cursor/mcp.json` in a project:
+
+    ```json
+    {
+      "mcpServers": {
+        "lpagent": { "url": "https://mcp.lpagent.io/mcp" }
+      }
+    }
+    ```
+
+    Then sign in to LP Agent from Cursor's MCP settings. LP Agent opens in your browser: sign in, choose what Cursor can do and press **Allow**.
+
+    Step by step: [Use LP Agent in Cursor](/lp-agent-mcp/cursor).
+  </Tab>
   <Tab title="Claude Code">
     [Make an access token](#access-tokens), then run in a terminal:
 
@@ -79,18 +105,13 @@ https://mcp.lpagent.io/mcp
 
     Then start Claude Code and ask "What's in my LP Agent account?".
   </Tab>
-  <Tab title="Cursor and others">
-    [Make an access token](#access-tokens). For Cursor, add to `~/.cursor/mcp.json`:
+  <Tab title="Codex and others">
+    [Make an access token](#access-tokens). For Codex, add to `~/.codex/config.toml`:
 
-    ```json
-    {
-      "mcpServers": {
-        "lpagent": {
-          "url": "https://mcp.lpagent.io/mcp",
-          "headers": { "Authorization": "Bearer lpat_YOUR_TOKEN" }
-        }
-      }
-    }
+    ```toml
+    [mcp_servers.lpagent]
+    url = "https://mcp.lpagent.io/mcp"
+    http_headers = { Authorization = "Bearer lpat_YOUR_TOKEN" }
     ```
 
     Any other MCP app that connects by URL and lets you set a request header works the same: the URL above and the header `Authorization: Bearer lpat_YOUR_TOKEN`.
@@ -99,7 +120,7 @@ https://mcp.lpagent.io/mcp
 
 ### When an app asks to connect
 
-LP Agent shows which app is asking and where it sends you back. Choose **Read & trade** or **Read only** and how long it lasts (7, 30, 60 or 90 days, or until you disconnect it), then press **Allow**.
+LP Agent shows which app is asking and where it sends you back. Cursor and Grok Bot sign in the same way, so LP Agent names them together: **Cursor / Grok Bot**. Choose **Read & trade** or **Read only** and how long it lasts (7, 30, 60 or 90 days, or until you disconnect it), then press **Allow**.
 
 <Warning>
   Allow it only if you started the connection in that app just now. If someone sends you a link to this page, press **Cancel**: allowing it would give their app your account.
@@ -107,7 +128,7 @@ LP Agent shows which app is asking and where it sends you back. Choose **Read & 
 
 ## Access tokens
 
-For Claude Code, Cursor and other apps that take a token. In the app, open **Settings > Account > Access tokens** and press **New token**.
+For Claude Code, Codex and other apps that take a token. In the app, open **Settings > Account > Access tokens** and press **New token**.
 
 | Field | What to pick |
 | - | - |
@@ -115,7 +136,7 @@ For Claude Code, Cursor and other apps that take a token. In the app, open **Set
 | **Access** | **Read & trade** lets the AI open, add, withdraw, rebalance, claim and compound, change TP/SL and run your copies. **Read only** lets it see your balances, positions, PnL and copy settings, and nothing moves. |
 | **Expires** | 7, 30, 60 or 90 days, or never. A token that never expires works until you revoke it, so pick a date unless only you use the machine. |
 
-Press **Create token** and copy it. It starts with `lpat_` and is **shown only once**. If you lose it, revoke it and make a new one. The token dialog shows the setup for Claude Code, Cursor and other apps with your token already filled in.
+Press **Create token** and copy it. It starts with `lpat_` and is **shown only once**. If you lose it, revoke it and make a new one. The token dialog shows the setup for Claude Code, Codex and other apps with your token already filled in.
 
 <Warning>
   Treat a token like a password. Anyone who has a Read & trade token can trade from your agent wallet until you revoke it. Never paste it into a chat, a screenshot or a shared file.

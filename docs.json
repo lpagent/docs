@@ -113,7 +113,9 @@
                   "lp-agent-mcp",
                   "lp-agent-mcp/claude",
                   "lp-agent-mcp/chatgpt",
-                  "lp-agent-mcp/grok"
+                  "lp-agent-mcp/grok",
+                  "lp-agent-mcp/grok-bot",
+                  "lp-agent-mcp/cursor"
                 ]
               }
             ]
@@ -262,7 +264,9 @@
                   "zh/lp-agent-mcp",
                   "zh/lp-agent-mcp/claude",
                   "zh/lp-agent-mcp/chatgpt",
-                  "zh/lp-agent-mcp/grok"
+                  "zh/lp-agent-mcp/grok",
+                  "zh/lp-agent-mcp/grok-bot",
+                  "zh/lp-agent-mcp/cursor"
                 ]
               }
             ]
