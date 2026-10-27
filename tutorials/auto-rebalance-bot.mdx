@@ -313,15 +313,15 @@ async function zapIn(poolAddress: string, amountSOL: number): Promise<string> {
   log(`  Zap-In: adding ${amountSOL} SOL to pool ${poolAddress}...`);
 
   const info = await apiCall("GET", `/pools/${poolAddress}/info`);
-  const activeBin = info.data.liquidityViz?.activeBin;
+  const activeBin = info.data.liquidityViz?.activeBin; // the active bin id (a number)
 
-  if (!activeBin) {
+  if (typeof activeBin !== "number") {
     throw new Error("Could not get active bin for pool");
   }
 
-  const fromBinId = activeBin.binId - CONFIG.BIN_RANGE;
-  const toBinId = activeBin.binId + CONFIG.BIN_RANGE;
-  log(`  New range: bin ${fromBinId} to ${toBinId} (active: ${activeBin.binId})`);
+  const fromBinId = activeBin - CONFIG.BIN_RANGE;
+  const toBinId = activeBin + CONFIG.BIN_RANGE;
+  log(`  New range: bin ${fromBinId} to ${toBinId} (active: ${activeBin})`);
 
   const addTx = await apiCall("POST", `/pools/${poolAddress}/add-tx`, {
     stratergy: CONFIG.STRATEGY,

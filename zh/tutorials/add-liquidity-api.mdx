@@ -173,14 +173,14 @@ Discover 会同时返回 Meteora DLMM（`meteora`）和 DAMM V2（`meteora_damm_
 
 ```typescript
 const poolInfoRes = await apiCall("GET", `/pools/${pool.pool}/info`);
-const activeBin = poolInfoRes.data.liquidityViz?.activeBin;
+const activeBin = poolInfoRes.data.liquidityViz?.activeBin; // the active bin id (a number)
 
 // Place liquidity 34 bins on each side of the current price
 const RANGE = 34;
-const fromBinId = activeBin.binId - RANGE;
-const toBinId = activeBin.binId + RANGE;
+const fromBinId = activeBin - RANGE;
+const toBinId = activeBin + RANGE;
 
-console.log(`Active bin: ${activeBin.binId}`);
+console.log(`Active bin: ${activeBin}`);
 console.log(`Your range: bin ${fromBinId} to ${toBinId} (${RANGE * 2 + 1} bins)`);
 ```
 
@@ -408,9 +408,9 @@ function signTx(base64Tx: string): string {
 // ===================== ZAP-IN =====================
 async function zapIn(poolAddress: string, amountSOL: number) {
   const info = await apiCall("GET", `/pools/${poolAddress}/info`);
-  const activeBin = info.data.liquidityViz?.activeBin;
-  const fromBinId = activeBin.binId - 34;
-  const toBinId = activeBin.binId + 34;
+  const activeBin = info.data.liquidityViz?.activeBin; // the active bin id (a number)
+  const fromBinId = activeBin - 34;
+  const toBinId = activeBin + 34;
 
   const addTx = await apiCall("POST", `/pools/${poolAddress}/add-tx`, {
     stratergy: "Spot",
