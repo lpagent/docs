@@ -238,9 +238,9 @@ if (depositSOL <= 0.001) {
 
 // Get the active bin for the new range
 const info = await apiCall("GET", `/pools/${pos.pool}/info`);
-const activeBin = info.data.liquidityViz?.activeBin;
-const fromBinId = activeBin.binId - 34;
-const toBinId = activeBin.binId + 34;
+const activeBin = info.data.liquidityViz?.activeBin; // the active bin id (a number)
+const fromBinId = activeBin - 34;
+const toBinId = activeBin + 34;
 
 const addTx = await apiCall("POST", `/pools/${pos.pool}/add-tx`, {
   stratergy: "Spot",
@@ -397,11 +397,11 @@ async function reDeposit(poolAddress: string, protocol: string, amountSOL: numbe
   let range = {};
   if (protocol !== "meteora_damm_v2") {
     const info = await apiCall("GET", `/pools/${poolAddress}/info`);
-    const activeBin = info.data.liquidityViz?.activeBin;
-    if (!activeBin) throw new Error("Could not get active bin");
+    const activeBin = info.data.liquidityViz?.activeBin; // the active bin id (a number)
+    if (typeof activeBin !== "number") throw new Error("Could not get active bin");
     range = {
-      fromBinId: activeBin.binId - CONFIG.BIN_RANGE,
-      toBinId: activeBin.binId + CONFIG.BIN_RANGE,
+      fromBinId: activeBin - CONFIG.BIN_RANGE,
+      toBinId: activeBin + CONFIG.BIN_RANGE,
     };
   }
 

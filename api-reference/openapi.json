@@ -3266,18 +3266,9 @@
                           "description": "Liquidity visualization data (DLMM pools only)",
                           "properties": {
                             "activeBin": {
-                              "type": "object",
-                              "properties": {
-                                "binId": {
-                                  "type": "integer"
-                                },
-                                "price": {
-                                  "type": "string"
-                                },
-                                "pricePerToken": {
-                                  "type": "string"
-                                }
-                              }
+                              "type": "integer",
+                              "description": "The pool's active bin id, as a plain number (not an object). Build a range around it, e.g. `fromBinId = activeBin - 34`.",
+                              "example": -377
                             },
                             "bins": {
                               "type": "array",
