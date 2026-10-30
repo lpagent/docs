@@ -30,7 +30,7 @@ export const EnterprisePlan = () => {
           style={{ fontSize: "48px", fontWeight: "700" }}
           className="text-[#1a1a1a] dark:text-white"
         >
-          $40
+          $80
         </span>
         <span style={{ fontSize: "18px", color: "#999" }}> /month</span>
       </div>
