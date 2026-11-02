@@ -47,7 +47,7 @@ export const PremiumPlan = () => {
           style={{ fontSize: "48px", fontWeight: "700" }}
           className="text-[#1a1a1a] dark:text-white"
         >
-          $20
+          $40
         </span>
         <span style={{ fontSize: "18px", color: "#888" }}> /month</span>
       </div>
