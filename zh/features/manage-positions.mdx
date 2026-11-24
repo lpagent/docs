@@ -6,14 +6,16 @@ description: "加仓、减仓、Zap Out、领取手续费和复投"
 在你的 [Portfolio](/zh/features/portfolio) 里，打开某个仓位的菜单（三个点）。在池子页面上，在 **Your Positions** 里选中你的某个仓位，右边面板里也有同样的操作：
 
 - **Solana**：**Current**、**Deposit**、**Withdraw**、**Close**、**Claim Fee** 和 **Compound**。
-- **Robinhood Chain**：**Increase**、**Withdraw**、**Claim** 和 **Close**。
+- **Robinhood Chain**、**BNB Chain** 和 **Elysium**：**Increase**、**Withdraw**、**Claim** 和 **Close**。
+
+在 BNB Chain 上，PancakeSwap Infinity 仓位可以减仓、领取和平仓，但给它加仓还是 **Soon**（即将支持）。PancakeSwap V3 仓位所有操作都支持。
 
 在 Solana 上，**Current** 一眼看清这个仓位：**Min price**、**Current** 和 **Max price**，每一端离当前价格有多远，流动性和未领取的手续费，还有 **Close** 和 **Zap out to SOL** 两个按钮。在 DLMM 上，它还会实时画出仓位的各个 bin 和当前活跃 bin 的位置。
 
-| 操作 | Solana DLMM | Solana DAMM v2 | Robinhood Chain |
+| 操作 | Solana DLMM | Solana DAMM v2 | Robinhood Chain、BNB Chain、Elysium |
 | --- | --- | --- | --- |
 | 加仓 | 支持 | 从池子页面操作 | 支持 |
-| 减仓 | 按百分比，也可以在图上选 bin | 按百分比 | 按百分比，以 ETH、USDG 或两者到账 |
+| 减仓 | 按百分比，也可以在图上选 bin | 按百分比 | 按百分比，以这条链的币、你的稳定币或两种代币到账 |
 | Zap Out（一键出池，即平仓） | 支持，带预估 | 支持 | 支持，带预估 |
 | 一键 Zap Out | 支持 | - | - |
 | 领取手续费 | 支持 | 支持 | 支持 |
@@ -26,6 +28,7 @@ description: "加仓、减仓、Zap Out、领取手续费和复投"
 
 - **Solana**：会打开池子页面，并锁定你的价格区间。选 **Zap In** 或 **Both Tokens** 和一个策略，然后按 **Increase Position**。**MAX** 和开新仓位时一样，会先留出兑换缓冲和手续费。
 - **Robinhood Chain**：选 ETH 或 USDG（默认是这个仓位开仓时用的那种）。你投入的资金会按仓位的价格区间拆分。按 **Increase Position**。
+- **BNB Chain** 和 **Elysium**：一样，BNB Chain 上选 BNB、USDT 或 USDC，Elysium 上选 HYPE 或 USDC。
 
 ## 减仓
 
@@ -38,16 +41,16 @@ description: "加仓、减仓、Zap Out、领取手续费和复投"
     - 选择资金怎么到账：两种代币、其中任一种代币，或者 SOL。
     - 按 **Decrease**。
   </Tab>
-  <Tab title="Robinhood Chain">
+  <Tab title="Robinhood Chain、BNB Chain、Elysium">
     - 用滑杆或者 **25%**、**50%**、**75%**、**Max** 选数量。默认是 50%。
-    - 选 **ETH**、**USDG** 或 **Both**（两种代币都进你的钱包，什么都不卖）。默认是这个仓位开仓时用的币种。
+    - 选 **ETH**、**USDG** 或 **Both**（两种代币都进你的钱包，什么都不卖）。在 BNB Chain 上可选 BNB、你的稳定币或两者；在 Elysium 上可选 HYPE、USDC 或两者。默认是这个仓位开仓时用的币种。
     - 每次减仓都会顺便领取全部未领取的手续费。
     - 按 **Withdraw X%**。
   </Tab>
 </Tabs>
 
 <Note>
-  在 Robinhood Chain 上，如果你提取时用的币种和开仓时不一样，LP Agent 之后就没法再按原币种追踪这个仓位的盈亏（PnL），所以 History 里显示的是估算值。
+  在 Robinhood Chain、BNB Chain 和 Elysium 上，如果你提取时用的币种和开仓时不一样，LP Agent 之后就没法再按原币种追踪这个仓位的盈亏（PnL），所以 History 里显示的是估算值。
 </Note>
 
 ## Zap Out（平仓）
@@ -60,14 +63,14 @@ description: "加仓、减仓、Zap Out、领取手续费和复投"
 
 在 Solana DLMM 上还有**一键 Zap Out**：仓位那一行的闪电图标，或者池子页面上的 **Zap out to SOL**。它会直接把 100% 平仓换成 SOL，没有确认步骤，然后打开盈亏分享卡片。在卡片上勾选 **Don't show again**（不再显示），下次就只弹一条带 **Share** 按钮的简短提示。
 
-在 Robinhood Chain 上，默认到账币种是开仓时用的币种（ETH 或 USDG）。如果因为价格变动，有部分代币没能兑换，LP Agent 会在不久后用更大的滑点重试。
+在 Robinhood Chain、BNB Chain 和 Elysium 上，默认到账币种是开仓时用的币种（比如 Robinhood Chain 上的 ETH 或 USDG）。如果因为价格变动，有部分代币没能兑换，LP Agent 会在不久后用更大的滑点重试。
 
 ## 领取手续费
 
 领取还没领的 LP 手续费收益，不动仓位本身。
 
 - **Solana**：表单会按代币列出未领取的手续费，在池子页面上这些数字会实时更新。**Swap claimed fees to SOL**（把领取的手续费换成 SOL）默认勾选，DLMM 和 DAMM v2 都有：按 **Claim Fees as SOL**。取消勾选就按原代币到账，然后按 **Claim Fees**。如果换成 SOL 没成功，手续费照样领到了，你的 agent 会很快重试兑换。
-- **Robinhood Chain**：**Receive as ETH**（或 USDG）默认开启，会把你的手续费兑换成这个币种。关掉它就按原代币到账。按 **Claim fees**。
+- **Robinhood Chain**、**BNB Chain** 和 **Elysium**：**Receive as ETH**（或 USDG；BNB Chain 上是 BNB、USDT 或 USDC；Elysium 上是 HYPE 或 USDC）默认开启，会把你的手续费兑换成这个币种。关掉它就按原代币到账。按 **Claim fees**。
 
 ## 复投（Solana DLMM）
 
@@ -86,3 +89,5 @@ description: "加仓、减仓、Zap Out、领取手续费和复投"
 ## 余额不足提醒
 
 在 Solana 上，如果你的 SOL 余额降到 0.01 SOL 或更少，操作弹窗会提醒你可能付不起交易手续费。先充值一点 SOL。
+
+在 BNB Chain 和 Elysium 上，Gas 用 BNB 或 HYPE 付。BNB Chain 上至少留大约 0.002 BNB。在 Elysium 上，一次操作至少需要 0.005 HYPE。

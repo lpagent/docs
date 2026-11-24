@@ -38,6 +38,8 @@ What you pay depends on **who presses the button**: you, or LP Agent's automatio
 | [Claim SOL](/features/claim-sol) | 0% |
 | Deposits and withdrawals | 0% |
 
+These fees are the same on every network: Solana, Robinhood Chain, BNB Chain and Elysium.
+
 The rule follows the action, not how the position was opened. A position you opened yourself and closed by your stop loss pays 8% of its LP fees. A copied position you close yourself pays 0.1%.
 
 **Example (automation):** a copied position earned 1 SOL in LP fees. When the leader exits and your copy closes, LP Agent takes 0.08 SOL. If the position earned no fees, you pay nothing.
@@ -46,8 +48,8 @@ The rule follows the action, not how the position was opened. A position you ope
 
 ## What the fee pays for
 
-- **The fastest copies.** LP Agent watches the wallets you copy on chain in real time: 90% of copies land within 3.5 seconds of the leader's move. On Solana they land through Jito bundles, for a better landing rate.
-- **Layers of protection, so you don't lose money for nothing.** Token filters (market cap, volume, holders, organic score and a blacklist) skip bad tokens, Meme Protection skips copies with an empty safe side, hooked Uniswap V4 pools are skipped unless you allow them, Fund protection pauses copying when your losses hit your limit, and Take Profit and Stop Loss close positions at your levels. See [Security](/security#protections-on-your-trades).
+- **The fastest copies.** LP Agent watches the wallets you copy on chain in real time: 90% of copies land within 3.5 seconds of the leader's move. On Solana they land through Jito bundles, for a better landing rate. On BNB Chain they go through PancakeSwap MEV Guard, away from front-running bots.
+- **Layers of protection, so you don't lose money for nothing.** Token filters (market cap, volume, holders, organic score and a blacklist) skip bad tokens, Meme Protection skips copies with an empty safe side, hooked Uniswap V4 pools are skipped unless you allow them, tokens that charge a buy, sell or transfer tax are not bought on BNB Chain, Fund protection pauses copying when your losses hit your limit, and Take Profit and Stop Loss close positions at your levels. See [Security](/security#protections-on-your-trades).
 - **Nothing to run.** No bot, server or RPC node to set up or pay for. Copies, [Take Profit and Stop Loss](/features/take-profit-stop-loss), auto rebalance and compounding keep running around the clock, even when your computer is off.
 - **Your keys stay protected.** Your agent wallet's keys live with Turnkey on secure hardware, and the key that automation signs with cannot send your funds anywhere but your own accounts. See [Security](/security).
 - **Pools found for you.** No hunting for pools yourself: [Discover](/features/discover) ranks pools and tokens by fees, volume and price moves, with safety checks, and [Smart LP](/features/smart-lp) shows wallets worth copying.
@@ -62,7 +64,7 @@ The rule follows the action, not how the position was opened. A position you ope
 <Check>No withdrawal fee or lockup</Check>
 
 <Warning>
-  Network costs still apply: Solana transaction fees and position rent, Robinhood Chain gas, swap slippage, and the pool's own trading fees. Meteora also charges a one-time rent when you are the first LP in a price bin. The app shows it before you create the position.
+  Network costs still apply: Solana transaction fees and position rent, gas on Robinhood Chain (ETH), BNB Chain (BNB) and Elysium (HYPE), swap slippage, and the pool's own trading fees. Meteora also charges a one-time rent when you are the first LP in a price bin. The app shows it before you create the position.
 </Warning>
 
 <Tip>

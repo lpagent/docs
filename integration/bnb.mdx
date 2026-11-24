@@ -1,0 +1,61 @@
+---
+title: "BNB Chain Integration"
+description: "PancakeSwap V3 and PancakeSwap Infinity on BNB Chain"
+---
+
+## In the app
+
+BNB Chain runs on your EVM account. Sign in with an EVM wallet (MetaMask, Rabby and others), or with email and pick **Robinhood**, then choose **BNB Chain** in the **Chain** menu at the top of the app. Your agent wallet has the same 0x address on Robinhood Chain, BNB Chain and Elysium, but each network holds its own coins: BNB sent on BNB Chain only shows up on BNB Chain.
+
+<CardGroup cols={2}>
+  <Card title="Fund in BNB, USDT or USDC" icon="coins" href="/features/settings#general">
+    BNB pays gas. Choose **BNB**, **USDT** or **USDC** as your **Base Token** for new positions. With a stablecoin, **Keep BNB** tops up your gas from it automatically.
+  </Card>
+  <Card title="PancakeSwap V3" icon="water" href="/features/create-position">
+    Zap in from one token, pick a range, add, claim fees, withdraw and close, with take profit and stop loss.
+  </Card>
+  <Card title="Copy LP" icon="copy" href="/features/copy-lp">
+    Copy PancakeSwap V3 wallets, scaled to your size, with Max Pool Fee and Smart Token Retention.
+  </Card>
+  <Card title="MEV protection" icon="shield-check" href="/security#protections-on-your-trades">
+    Transactions are sent through PancakeSwap MEV Guard, which keeps them away from front-running bots.
+  </Card>
+</CardGroup>
+
+### PancakeSwap Infinity
+
+You can browse PancakeSwap Infinity pools, see their charts and everyone's positions, and close an Infinity position you hold. Opening or adding to an Infinity position in the app is coming soon, and Infinity positions are not copied yet. PancakeSwap V3 pools already work end to end.
+
+Only concentrated-liquidity pools are supported: PancakeSwap Infinity bin pools, V2 and StableSwap pools are not.
+
+### Copy LP on BNB Chain
+
+- Copies buy in with your Base Token (BNB, USDT or USDC), and gas is always paid in BNB. Keep a little BNB in the agent wallet, or a copy is skipped when the leader opens.
+- Tokens that charge a tax when bought, sold or sent, or that look like a honeypot, are never bought. Selling is never blocked, so you can always get out.
+- **Max Pool Fee** is checked on every open. It is 15% by default and set apart from your Robinhood limit.
+- A leader's open is copied only when the leader's own wallet sent it. Positions opened through a bot contract or a Safe are not copied.
+- If the leader stakes the position in a PancakeSwap farm, your copy still follows it. Your copy itself is not staked.
+- **Smart Token Retention** works on BNB Chain, except for copies funded in USDT or USDC.
+- You can't copy your own agent wallet.
+- We suggest copying with at least **0.3 BNB** of net worth. This is advice, not a hard limit.
+
+Things that differ from Solana:
+
+- Positions are identified by their PancakeSwap token ID, shown as `#1234567`.
+- Loss limit, compound, AI manage, Claim SOL and Fund protection are not available on BNB Chain.
+- [Referral cashback](/referral) is not paid on BNB Chain fees yet.
+- PancakeSwap V3 farm rewards (CAKE) are counted in your PnL. Infinity farm rewards are not yet.
+
+## For developers
+
+<Note>
+  BNB Chain is not in the [Open API](/api-reference/introduction) yet. An unknown `chain` value falls back to `SOL`, so `chain=BNB` returns Solana data, not an error. Don't send it until this page says BNB Chain is supported.
+</Note>
+
+| | |
+| --- | --- |
+| Network | BNB Chain |
+| Chain ID | `56` |
+| Protocols | PancakeSwap V3, PancakeSwap Infinity (CL) |
+| Native currency | BNB (18 decimals) |
+| Explorer | [BscScan](https://bscscan.com) |

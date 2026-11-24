@@ -6,14 +6,16 @@ description: "Increase, decrease, zap out, claim fees and compound"
 Open the menu (three dots) on a position in your [Portfolio](/features/portfolio). On a pool page, select one of your positions in **Your Positions** to get the same actions in the right-hand panel:
 
 - **Solana**: **Current**, **Deposit**, **Withdraw**, **Close**, **Claim Fee** and **Compound**.
-- **Robinhood Chain**: **Increase**, **Withdraw**, **Claim** and **Close**.
+- **Robinhood Chain**, **BNB Chain** and **Elysium**: **Increase**, **Withdraw**, **Claim** and **Close**.
+
+On BNB Chain, PancakeSwap Infinity positions can be withdrawn, claimed and closed, but adding money to them is **Soon**. PancakeSwap V3 positions have every action.
 
 On Solana, **Current** shows the position at a glance: its **Min price**, **Current** and **Max price**, with how far each bound sits from the current price, its liquidity and unclaimed fees, and **Close** and **Zap out to SOL** buttons. On DLMM it also draws the position's bins, live, against the active bin.
 
-| Action | Solana DLMM | Solana DAMM v2 | Robinhood Chain |
+| Action | Solana DLMM | Solana DAMM v2 | Robinhood Chain, BNB Chain, Elysium |
 | --- | --- | --- | --- |
 | Increase | Yes | From the pool page | Yes |
-| Decrease | By %, and by picking bins on the chart | By % | By %, paid out in ETH, USDG or both |
+| Decrease | By %, and by picking bins on the chart | By % | By %, paid out in the chain's coin, your stable coin or both tokens |
 | Zap out (close) | Yes, with estimates | Yes | Yes, with estimates |
 | One-click zap out | Yes | - | - |
 | Claim fees | Yes | Yes | Yes |
@@ -26,6 +28,7 @@ Add more liquidity to the same range.
 
 - **Solana**: opens the pool page with your range locked. Choose **Zap In** or **Both Tokens** and a strategy, then press **Increase Position**. **MAX** works as it does on a new position: it leaves room for the swap buffer and fees.
 - **Robinhood Chain**: pick ETH or USDG (it defaults to what the position was opened with). Your deposit is split to match the position's range. Press **Increase Position**.
+- **BNB Chain** and **Elysium**: the same, with BNB, USDT or USDC on BNB Chain and HYPE or USDC on Elysium.
 
 ## Decrease
 
@@ -38,16 +41,16 @@ Take part of your liquidity out. On the pool page this is the **Withdraw** tab.
     - Choose how to receive your funds: both tokens, either token, or SOL.
     - Press **Decrease**.
   </Tab>
-  <Tab title="Robinhood Chain">
+  <Tab title="Robinhood Chain, BNB Chain, Elysium">
     - Pick an amount with the slider or **25%**, **50%**, **75%**, **Max**. It starts at 50%.
-    - Choose **ETH**, **USDG** or **Both** (both tokens land in your wallet, nothing is sold). The default is the currency the position was opened with.
+    - Choose **ETH**, **USDG** or **Both** (both tokens land in your wallet, nothing is sold). On BNB Chain the choices are BNB, your stable coin or both; on Elysium, HYPE, USDC or both. The default is the currency the position was opened with.
     - Every decrease also collects all unclaimed fees.
     - Press **Withdraw X%**.
   </Tab>
 </Tabs>
 
 <Note>
-  On Robinhood Chain, if you cash out in a different currency than the one you opened with, LP Agent can't track the position's PnL in the original currency afterwards, so History shows an estimate.
+  On Robinhood Chain, BNB Chain and Elysium, if you cash out in a different currency than the one you opened with, LP Agent can't track the position's PnL in the original currency afterwards, so History shows an estimate.
 </Note>
 
 ## Zap out (close)
@@ -60,14 +63,14 @@ Close the whole position and receive one token.
 
 On Solana DLMM there is also a **one-click zap out**: the lightning icon on a position row, or **Zap out to SOL** on the pool page. It closes 100% straight into SOL without a confirm step, then opens the PnL share card. Tick **Don't show again** on that card to get a short notice with a **Share** button instead next time.
 
-On Robinhood Chain, the default payout is the currency the position was opened with (ETH or USDG). If some tokens could not be swapped because the price moved, LP Agent retries with more slippage shortly after.
+On Robinhood Chain, BNB Chain and Elysium, the default payout is the currency the position was opened with (for example ETH or USDG on Robinhood Chain). If some tokens could not be swapped because the price moved, LP Agent retries with more slippage shortly after.
 
 ## Claim fees
 
 Collect your unclaimed LP fees without touching the position.
 
 - **Solana**: the form lists your unclaimed fees per token. On the pool page the numbers update live. **Swap claimed fees to SOL** is ticked by default, on DLMM and DAMM v2: press **Claim Fees as SOL**. Untick it to keep the fee tokens as they are, then press **Claim Fees**. If the swap to SOL does not go through, your fees are still claimed and your agent retries the swap shortly.
-- **Robinhood Chain**: **Receive as ETH** (or USDG) is on by default and swaps your fees into that currency. Turn it off to receive the tokens as they are. Press **Claim fees**.
+- **Robinhood Chain**, **BNB Chain** and **Elysium**: **Receive as ETH** (or USDG; BNB, USDT or USDC on BNB Chain; HYPE or USDC on Elysium) is on by default and swaps your fees into that currency. Turn it off to receive the tokens as they are. Press **Claim fees**.
 
 ## Compound (Solana DLMM)
 
@@ -86,3 +89,5 @@ Every position and pool has a **Report** option. Describe what looks wrong and o
 ## Low balance warning
 
 On Solana, if your SOL balance drops to 0.01 SOL or less, the action dialogs warn you that you may not be able to pay the transaction fee. Deposit a little SOL first.
+
+On BNB Chain and Elysium, gas is paid in BNB or HYPE. Keep at least about 0.002 BNB on BNB Chain. On Elysium an action needs at least 0.005 HYPE.

@@ -1,0 +1,86 @@
+---
+title: "Elysium Integration"
+description: "Uniswap V3 and V4 on Elysium: in the app and through the LP Agent API"
+---
+
+## In the app
+
+Elysium is Kinetiq's network built on HyperEVM, with HYPE as its gas coin. It runs on your EVM account: sign in with an EVM wallet (MetaMask, Rabby and others), or with email and pick **Robinhood**, then choose **Elysium** in the **Chain** menu at the top of the app. Your agent wallet has the same 0x address on Robinhood Chain, BNB Chain and Elysium, but each network holds its own coins: HYPE sent on Elysium only shows up on Elysium.
+
+<CardGroup cols={2}>
+  <Card title="Fund in HYPE or USDC" icon="coins" href="/features/settings#general">
+    HYPE pays gas. Choose **HYPE** or **USDC** as your **Base Token** for new positions. With USDC, **Keep HYPE** tops up your gas from it automatically.
+  </Card>
+  <Card title="Uniswap V3 and V4" icon="water" href="/features/create-position">
+    Zap in from one token, pick a range, add, claim fees, withdraw and close, with take profit and stop loss.
+  </Card>
+  <Card title="Copy LP" icon="copy" href="/features/copy-lp">
+    Copy Uniswap V3 and V4 wallets on Elysium, scaled to your size, with Max Pool Fee and Smart Token Retention.
+  </Card>
+  <Card title="Discover and pools" icon="compass" href="/features/discover">
+    Elysium tokens and pools ranked live, with the smart LPs moving in.
+  </Card>
+</CardGroup>
+
+### Copy LP on Elysium
+
+- Copies buy in with your Base Token (HYPE or USDC), and gas is always paid in HYPE. Keep some HYPE in the agent wallet (at least 0.05 HYPE), or a copy is skipped when the leader opens.
+- **Max Pool Fee** is its own limit for your Elysium copies, apart from your Robinhood one.
+- A leader's open is copied only when the leader's own wallet sent it. Positions opened through a Safe are not copied.
+- You can't copy your own agent wallet.
+- We suggest copying with at least **5 HYPE** of net worth. This is advice, not a hard limit.
+
+Things that differ from Solana:
+
+- Positions are identified by their Uniswap token ID, shown as `#1234567`.
+- Discover has no token audit source on Elysium yet: you see the checks we do have, not a full audit. Pools under $1,000 of liquidity are hidden from Discover.
+- Loss limit, compound, AI manage, Claim SOL and Fund protection are not available on Elysium.
+- [Referral cashback](/referral) is not paid on Elysium fees yet.
+- When you move funds out of an Elysium agent wallet to another network, HYPE is swapped to USDC first.
+
+### What is indexed
+
+LP Agent reads Uniswap V3 and V4 positions held as position NFTs. Liquidity a V4 hook holds for itself (for example launchpad pools that keep the liquidity inside the hook) has no position NFT, so it is not shown. Uniswap V2 pools are not indexed.
+
+The rest of this page is for developers using the API.
+
+## For developers
+
+The Open API serves Elysium through the same endpoints as Solana and Robinhood Chain: add `chain=ELYSIUM` to the request.
+
+| | |
+| --- | --- |
+| Network | Elysium |
+| Chain ID | `99901` |
+| Protocols | Uniswap V3 (`uniswap_v3`), Uniswap V4 (`uniswap_v4`) |
+| Native currency | HYPE (18 decimals) |
+| Explorer | [Elysium Explorer](https://elysium.kinetiq.xyz/explorer) |
+| API value | `chain=ELYSIUM` |
+
+```bash
+curl -H "x-api-key: $LPAGENT_API_KEY" \
+  "https://api.lpagent.io/open-api/v1/lp-positions/open?owner=0xYourWallet&chain=ELYSIUM"
+```
+
+<Warning>
+  Always send `chain=ELYSIUM` for Elysium data. Without it the API reads Solana (or Robinhood Chain for a `0x` pool ID), and an unknown `chain` value also falls back to `SOL` instead of returning an error.
+</Warning>
+
+### Endpoint support
+
+| Method | Endpoint | Elysium |
+| --- | --- | --- |
+| `GET` | `/lp-positions/open` | Yes |
+| `GET` | `/lp-positions/historical` | Yes |
+| `GET` | `/lp-positions/overview` | Yes |
+| `GET` | `/lp-positions/logs` | Yes |
+| `GET` | `/lp-positions/position` | Yes |
+| `GET` | `/lp-positions/revenue/{owner}` | Yes |
+| `GET` | `/token/balance` | Yes |
+| `GET` | `/pools/{poolId}/positions` | Yes |
+| `GET` | `/pools/{poolId}/onchain-stats` | Yes |
+| `GET` | `/pools/{poolId}/top-lpers` | Yes |
+| `GET` | `/pools/discover` | Not yet |
+| `POST` | Transaction endpoints (`add-tx`, `decrease-tx`, `claim-fee-tx` and their landing calls) | Solana only |
+
+Responses follow the Robinhood Chain conventions, for example a position ID is the position-manager address and token ID joined by a hyphen. See [Robinhood Chain Integration](/integration/robinhood#response-differences-to-expect) for the details.

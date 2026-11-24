@@ -3,7 +3,7 @@ title: "Take Profit & Stop Loss"
 description: "Close a position automatically when it is up or down by the percentage you choose"
 ---
 
-Take profit (TP) and stop loss (SL) close a position for you when its PnL reaches your threshold. They work on both networks and keep watching while you are offline.
+Take profit (TP) and stop loss (SL) close a position for you when its PnL reaches your threshold. They work on all four networks (Solana, Robinhood Chain, BNB Chain and Elysium) and keep watching while you are offline.
 
 ## Set TP/SL on a position
 
@@ -11,7 +11,7 @@ In your [Portfolio](/features/portfolio), click the **Settings** badge on an ope
 
 | Option | What it does |
 | --- | --- |
-| **TP/SL Currency** | Measure PnL in SOL or USD (Solana), or ETH or USD (Robinhood Chain). |
+| **TP/SL Currency** | Measure PnL in the chain's coin or in USD: SOL (Solana), ETH (Robinhood Chain), BNB (BNB Chain) or HYPE (Elysium). |
 | **Take Profit** | Close the position when it is up this many percent. |
 | **Stop Loss** | Close the position when it is down this many percent. |
 
@@ -29,7 +29,7 @@ Go to **Settings > General > Auto TP/SL**.
 
 - Off by default. When it is off, you set TP/SL on each position yourself.
 - When it is on, every **new** position gets the defaults below:
-  - **Currency** (SOL/ETH or USD)
+  - **Currency** (the chain's coin or USD)
   - **Take Profit**: 10% by default
   - **Stop Loss**: 10% by default
 - It does not change positions you already have.
@@ -40,7 +40,7 @@ Go to **Settings > General > Auto TP/SL**.
 
 ## What happens when it triggers
 
-1. LP Agent closes the position from your agent wallet and swaps it back (SOL on Solana; the currency you opened with on Robinhood Chain).
+1. LP Agent closes the position from your agent wallet and swaps it back (SOL on Solana; the currency you opened with on Robinhood Chain, BNB Chain and Elysium).
 2. The position moves to **Historical positions** with its final PnL.
 3. If you turned on notifications, you get a **Take profit hit** or **Stop loss hit** push with the result. See [Notifications](/features/notifications).
 4. The position's **Logs** show each step, such as take profit queued and close success.

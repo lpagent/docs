@@ -5,6 +5,8 @@ description: "Funding, auto TP/SL, slippage, token filters, notifications, sound
 
 Open **Settings** from the account panel (click your address in the header). It has four tabs: **General**, **Swap**, **Security** and **Account**. Press **Save Changes** when you are done.
 
+On an EVM account, the settings shown are for the network picked in the header's **Chain** menu (Robinhood Chain, BNB Chain or Elysium). Funding, gas and the copy guards are set per network.
+
 The app language is not in Settings. It sits at the bottom of the account panel: see [Language](#language).
 
 ## General
@@ -16,9 +18,11 @@ The app language is not in Settings. It sits at the bottom of the account panel:
 
 | Setting | What it does |
 | --- | --- |
-| **Base Token** (Robinhood Chain) | Fund new positions, including copies, with **ETH** or **USDG**. Existing positions don't change. |
-| **Wallet balances** (Robinhood Chain) | Your capital (what funds positions) and your gas (ETH). |
+| **Base Token** (Robinhood Chain, BNB Chain, Elysium) | Fund new positions, including copies, with **ETH** or **USDG** on Robinhood Chain, **BNB** (default), **USDT** or **USDC** on BNB Chain, and **HYPE** (default) or **USDC** on Elysium. Existing positions don't change. |
+| **Wallet balances** (Robinhood Chain, BNB Chain, Elysium) | Your capital (what funds positions) and your gas (ETH, BNB or HYPE). |
 | **Keep ETH** (Robinhood Chain, when Base Token is USDG) | Keeps ETH topped up for gas. When ETH falls below **Refill below** (default 0.002 ETH), enough USDG is swapped to bring it back to **Refill up to** (default 0.008 ETH). |
+| **Keep BNB** (BNB Chain, when Base Token is USDT or USDC) | Keeps BNB topped up for gas. When BNB falls below **Refill below** (default 0.005 BNB), enough of your stable coin is swapped to bring it back to **Refill up to** (default 0.015 BNB). |
+| **Keep HYPE** (Elysium, when Base Token is USDC) | Keeps HYPE topped up for gas. When HYPE falls below **Refill below** (default 0.08 HYPE), enough USDC is swapped to bring it back to **Refill up to** (default 0.15 HYPE). |
 | **Auto TP/SL** | Off by default. When on, every new position gets the default take profit and stop loss below it (10% / 10%). Copies use their own exit rules instead. See [Take Profit & Stop Loss](/features/take-profit-stop-loss). |
 | **Manage Manual Position** | Lets LP Agent manage positions you open outside LP Agent, for example directly on Meteora, so you can use TP/SL on them. On by default for new accounts. |
 | **Realtime Portfolio** (Solana) | Stream open positions live instead of refreshing every 10 seconds. Saved on this device. |
@@ -36,6 +40,8 @@ The app language is not in Settings. It sits at the bottom of the account panel:
 | --- | --- |
 | **Slippage** | The most the price may move against you on a swap, in %. Applies to every swap your agent makes: zap ins, copies, closes and swap backs. A warning shows above 7%. |
 | **Method** (Solana) | Which swap route to prefer: **OKX** (default) or **Jupiter Ultra**. |
+
+On BNB Chain, swaps go through OKX for the best price, and transactions are sent through PancakeSwap's MEV Guard to protect them from front-running.
 
 <Tip>
   If copies fail with **Price moved**, the fix in Copy Logs opens this tab with a suggested slippage. Volatile tokens usually need more room.
@@ -56,7 +62,10 @@ These filters apply before any position is opened or copied. A token that fails 
 | **Minimum Market Cap** | $500,000 |
 | **Minimum 24h Volume** | $100,000 |
 | **Minimum Holders** | 100. Set 0 for no floor. |
+| **Max Pool Fee** (Robinhood Chain, BNB Chain, Elysium) | 15% for buys and sells. A copy is skipped when the pool charges this much or more each time its token is bought or sold. Each network has its own limit. |
 | **Blacklist** | Tokens you never want to LP or copy. Press **Manage**, paste the token address and press **Add**. Each network has its own list. |
+
+On BNB Chain there is also a fixed guard you can't turn off: LP Agent never buys a token that takes a tax on buys, sells or transfers, or that is flagged as a honeypot (a token you can buy but not sell). Selling is never refused.
 
 ## Account
 

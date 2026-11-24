@@ -3,7 +3,7 @@ title: "止盈与止损"
 description: "仓位涨到或跌到你选的百分比时，自动平仓"
 ---
 
-止盈（TP）和止损（SL）会在仓位的盈亏（PnL）达到你设的阈值时帮你平仓。两个网络都支持，你不在线时也会一直盯着。
+止盈（TP）和止损（SL）会在仓位的盈亏（PnL）达到你设的阈值时帮你平仓。四个网络（Solana、Robinhood Chain、BNB Chain 和 Elysium）都支持，你不在线时也会一直盯着。
 
 ## 给仓位设置 TP/SL
 
@@ -11,7 +11,7 @@ description: "仓位涨到或跌到你选的百分比时，自动平仓"
 
 | 选项 | 作用 |
 | --- | --- |
-| **TP/SL Currency** | 用 SOL 或 USD（Solana），或者 ETH 或 USD（Robinhood Chain）来算盈亏。 |
+| **TP/SL Currency** | 用这条链的币或 USD 来算盈亏：SOL（Solana）、ETH（Robinhood Chain）、BNB（BNB Chain）或 HYPE（Elysium）。 |
 | **Take Profit** | 仓位涨了这么多百分比时平仓。 |
 | **Stop Loss** | 仓位跌了这么多百分比时平仓。 |
 
@@ -29,7 +29,7 @@ TP 和 SL 适用于你代理钱包（agent wallet）里的仓位。放在登录�
 
 - 默认关闭。关闭时，你要自己给每个仓位设置 TP/SL。
 - 打开后，每个**新**仓位都会用下面的默认值：
-  - **Currency**（SOL/ETH 或 USD）
+  - **Currency**（这条链的币或 USD）
   - **Take Profit**：默认 10%
   - **Stop Loss**：默认 10%
 - 不会改动你已经有的仓位。
@@ -40,7 +40,7 @@ TP 和 SL 适用于你代理钱包（agent wallet）里的仓位。放在登录�
 
 ## 触发后会发生什么
 
-1. LP Agent 从你的代理钱包平仓，并兑换回来（Solana 上换回 SOL；Robinhood Chain 上换回开仓时用的币种）。
+1. LP Agent 从你的代理钱包平仓，并兑换回来（Solana 上换回 SOL；Robinhood Chain、BNB Chain 和 Elysium 上换回开仓时用的币种）。
 2. 仓位移到 **Historical positions**（历史仓位），带上最终盈亏。
 3. 如果你开了通知，会收到一条 **Take profit hit** 或 **Stop loss hit** 推送通知，附上结果。详见[通知](/zh/features/notifications)。
 4. 仓位的 **Logs** 会显示每一步，比如 take profit queued 和 close success。

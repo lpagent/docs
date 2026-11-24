@@ -1,10 +1,11 @@
 ---
-title: "Robinhood Chain 集成" description: "Robinhood Chain 上的 Uniswap V3 和 V4：在 App 里用，以及通过 LP Agent API 用"
+title: "Robinhood Chain 集成"
+description: "Robinhood Chain 上的 Uniswap V3 和 V4：在 App 里用，以及通过 LP Agent API 用"
 ---
 
 ## 在 App 里
 
-用 EVM 钱包（MetaMask、Rabby 等）登录，或者用邮箱注册时选 **Robinhood**，你的账户就会跑在 Robinhood Chain 上。
+用 EVM 钱包（MetaMask、Rabby 等）登录，或者用邮箱注册时选 **Robinhood**，你的账户就会跑在 Robinhood Chain 上。同一个 EVM 账户也能在 [BNB Chain](/zh/integration/bnb) 和 [Elysium](/zh/integration/elysium) 上用：用应用顶部的 **Chain** 菜单切换。
 
 <CardGroup cols={2}>
   <Card title="用 ETH 或 USDG 出资" icon="coins" href="/zh/features/settings">
@@ -27,6 +28,7 @@ title: "Robinhood Chain 集成" description: "Robinhood Chain 上的 Uniswap V3 
 - 每个跟单都会留一点 ETH（至少 0.001 ETH），用来付它自己退出时的费用。WETH 不能付 Gas。
 - 如果开仓加平仓的 Gas 超过仓位大小的 3%，自动跟单会被跳过，标为 **Too small for gas**。我们建议净资产至少 **0.08 ETH** 再跟单。详见 [Robinhood Chain 上的 Copy LP](/zh/tutorials/copy-robinhood-best-practices)。
 - Claim SOL、资金保护和复投只支持 Solana。
+- **Max Pool Fee** 按网络分开设置：你在 Robinhood 上的上限不会改动 BNB Chain 或 Elysium 的上限。
 
 本页剩下的内容是给用 API 的开发者看的。
 

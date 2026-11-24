@@ -1,0 +1,61 @@
+---
+title: "BNB Chain 集成"
+description: "BNB Chain 上的 PancakeSwap V3 和 PancakeSwap Infinity"
+---
+
+## 在 App 里
+
+BNB Chain 跑在你的 EVM 账户上。用 EVM 钱包（MetaMask、Rabby 等）登录，或者用邮箱登录并选 **Robinhood**，然后在应用顶部的 **Chain** 菜单里选 **BNB Chain**。你的代理钱包在 Robinhood Chain、BNB Chain 和 Elysium 上是同一个 0x 地址，但每个网络的币各算各的：在 BNB Chain 上转进来的 BNB 只会出现在 BNB Chain 上。
+
+<CardGroup cols={2}>
+  <Card title="用 BNB、USDT 或 USDC 出资" icon="coins" href="/zh/features/settings#general">
+    BNB 用来付 Gas。选 **BNB**、**USDT** 或 **USDC** 作为新仓位的 **Base Token**（基础代币）。用稳定币时，**Keep BNB** 会自动用它帮你补 Gas。
+  </Card>
+  <Card title="PancakeSwap V3" icon="water" href="/zh/features/create-position">
+    用单一代币 Zap In（单币入池），选好价格区间，可以加仓、领取手续费、减仓和平仓，并支持止盈和止损。
+  </Card>
+  <Card title="Copy LP" icon="copy" href="/zh/features/copy-lp">
+    跟单 PancakeSwap V3 钱包，按你的资金规模等比缩放，支持 Max Pool Fee 和 Smart Token Retention。
+  </Card>
+  <Card title="MEV 保护" icon="shield-check" href="/zh/security#交易保护">
+    交易通过 PancakeSwap MEV Guard 发送，避开抢跑机器人。
+  </Card>
+</CardGroup>
+
+### PancakeSwap Infinity
+
+你可以浏览 PancakeSwap Infinity 池子，查看它们的图表和所有人的仓位，也可以平掉你持有的 Infinity 仓位。在 App 里开 Infinity 仓位或给它加仓即将支持，Infinity 仓位目前也还不会被跟单。PancakeSwap V3 池子已经全流程可用。
+
+只支持集中流动性池子：PancakeSwap Infinity 的 bin 池子、V2 和 StableSwap 池子都不支持。
+
+### BNB Chain 上的 Copy LP
+
+- 跟单用你的 Base Token（BNB、USDT 或 USDC）买入，Gas 始终用 BNB 付。代理钱包里要留一点 BNB，否则带单钱包开仓时跟单会被跳过。
+- 买入、卖出或转账时要收税的代币，以及看起来像貔貅盘（honeypot）的代币，永远不会被买入。卖出永远不会被拦，所以你随时都能出来。
+- 每次开仓都会检查 **Max Pool Fee**。默认是 15%，和你在 Robinhood 上的上限分开设置。
+- 只有带单钱包自己发出的开仓才会被跟单。通过机器人合约或 Safe 开的仓位不会被跟单。
+- 如果带单钱包把仓位质押到 PancakeSwap farm，你的跟单仍然会跟着它。你的跟单仓位本身不会被质押。
+- **Smart Token Retention** 在 BNB Chain 上可用，但用 USDT 或 USDC 出资的跟单除外。
+- 你不能跟单你自己的代理钱包。
+- 我们建议净资产至少 **0.3 BNB** 再跟单。这是建议，不是硬性限制。
+
+和 Solana 不一样的地方：
+
+- 仓位用它的 PancakeSwap token ID 标识，显示为 `#1234567`。
+- 亏损上限、复投、AI manage、Claim SOL 和资金保护在 BNB Chain 上不可用。
+- BNB Chain 上的手续费暂时还没有[推荐返现](/zh/referral)。
+- PancakeSwap V3 的 farm 奖励（CAKE）会计入你的盈亏（PnL）。Infinity 的 farm 奖励暂时还没计入。
+
+## 给开发者
+
+<Note>
+  BNB Chain 暂时还不在 [Open API](/zh/api-reference/introduction) 里。无法识别的 `chain` 值会回退到 `SOL`，所以 `chain=BNB` 会返回 Solana 的数据，而不是报错。在本页写明支持 BNB Chain 之前，请不要传这个值。
+</Note>
+
+| | |
+| --- | --- |
+| 网络 | BNB Chain |
+| Chain ID | `56` |
+| 协议 | PancakeSwap V3、PancakeSwap Infinity（CL） |
+| 原生币 | BNB（18 位小数） |
+| 区块浏览器 | [BscScan](https://bscscan.com) |

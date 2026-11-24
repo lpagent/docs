@@ -68,22 +68,22 @@ Never expose API keys or private keys in frontend code, shared prompts, screensh
 
 ## Chain Support
 
-Read endpoints take `chain=SOL` (default) or `chain=ROBINHOOD`. Everything that builds or sends a
-transaction is Solana only.
+Read endpoints take `chain=SOL` (default), `chain=ROBINHOOD` or `chain=ELYSIUM`. Everything that builds or sends a
+transaction is Solana only. BNB Chain is not in the Open API yet: `chain=BNB` falls back to `SOL`.
 
-| Endpoint | Solana (`SOL`) | Robinhood Chain (`ROBINHOOD`) |
-| --- | --- | --- |
-| `GET /lp-positions/open`, `/historical`, `/overview`, `/logs`, `/position` | Yes | Yes |
-| `GET /lp-positions/revenue/{owner}` | Yes | Yes |
-| `GET /token/balance` | Yes | Yes |
-| `GET /pools/discover` | Yes | Yes |
-| `GET /pools/{poolId}/positions`, `/onchain-stats`, `/top-lpers` | Yes | Yes |
-| `GET /pools/{poolId}/info` | Yes | No |
-| `POST /pools/{poolId}/add-tx`, `/pools/landing-add-tx` | Yes | No |
-| `POST /position/zap-out-estimates` | Yes (Meteora DLMM only) | No |
-| `POST /position/decrease-tx`, `/position/landing-decrease-tx` | Yes | No |
-| `POST /position/claim-fee-tx`, `/position/landing-claim-fee-tx` | Yes | No |
-| `POST /rpc`, `/rpc/historical`, `/jito` | Yes | No |
+| Endpoint | Solana (`SOL`) | Robinhood Chain (`ROBINHOOD`) | Elysium (`ELYSIUM`) |
+| --- | --- | --- | --- |
+| `GET /lp-positions/open`, `/historical`, `/overview`, `/logs`, `/position` | Yes | Yes | Yes |
+| `GET /lp-positions/revenue/{owner}` | Yes | Yes | Yes |
+| `GET /token/balance` | Yes | Yes | Yes |
+| `GET /pools/discover` | Yes | Yes | No |
+| `GET /pools/{poolId}/positions`, `/onchain-stats`, `/top-lpers` | Yes | Yes | Yes |
+| `GET /pools/{poolId}/info` | Yes | No | No |
+| `POST /pools/{poolId}/add-tx`, `/pools/landing-add-tx` | Yes | No | No |
+| `POST /position/zap-out-estimates` | Yes (Meteora DLMM only) | No | No |
+| `POST /position/decrease-tx`, `/position/landing-decrease-tx` | Yes | No | No |
+| `POST /position/claim-fee-tx`, `/position/landing-claim-fee-tx` | Yes | No | No |
+| `POST /rpc`, `/rpc/historical`, `/jito` | Yes | No | No |
 
 See [API Reference Introduction](/api-reference/introduction#supported-chains) for how `chain` and
 `platform` behave on each endpoint.

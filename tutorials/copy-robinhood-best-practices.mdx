@@ -14,6 +14,10 @@ description: "How to size a copy on Robinhood Chain so fee income actually clear
 
 This page is the Robinhood Chain companion to [Copy LP Best Practices](/tutorials/copy-lp-best-practices), which covers Solana. The research and risk-management advice there still applies. What changes here is sizing, because an EVM copy cycle costs more to execute.
 
+<Note>
+  On **BNB Chain** and **Elysium** the same ideas apply: an EVM copy cycle, gas in the chain's own coin, and the same 1 hour line for fast wallets. The suggested net worth there is **0.3 BNB** and **5 HYPE**. Keep spare BNB or HYPE for gas, or turn on **Keep BNB** / **Keep HYPE** if you fund with a stable coin. See [BNB Chain](/integration/bnb) and [Elysium](/integration/elysium).
+</Note>
+
 ## Why Sizing Matters More on Robinhood
 
 Copying one of the leader's positions is not a single transaction. LP Agent swaps your ETH into the pool's two tokens, adds liquidity, removes it when the leader exits, then swaps back to ETH. That is four gas-paying transactions per cycle, plus slippage on both swap legs: the swaps use your slippage setting (7% unless you changed it) so the route can fill, and the liquidity legs allow 1%.

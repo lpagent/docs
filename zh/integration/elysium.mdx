@@ -1,0 +1,86 @@
+---
+title: "Elysium 集成"
+description: "Elysium 上的 Uniswap V3 和 V4：在 App 里用，以及通过 LP Agent API 用"
+---
+
+## 在 App 里
+
+Elysium 是 Kinetiq 基于 HyperEVM 打造的网络，用 HYPE 付 Gas。它跑在你的 EVM 账户上：用 EVM 钱包（MetaMask、Rabby 等）登录，或者用邮箱登录并选 **Robinhood**，然后在应用顶部的 **Chain** 菜单里选 **Elysium**。你的代理钱包在 Robinhood Chain、BNB Chain 和 Elysium 上是同一个 0x 地址，但每个网络的币各算各的：在 Elysium 上转进来的 HYPE 只会出现在 Elysium 上。
+
+<CardGroup cols={2}>
+  <Card title="用 HYPE 或 USDC 出资" icon="coins" href="/zh/features/settings#general">
+    HYPE 用来付 Gas。选 **HYPE** 或 **USDC** 作为新仓位的 **Base Token**（基础代币）。用 USDC 时，**Keep HYPE** 会自动用它帮你补 Gas。
+  </Card>
+  <Card title="Uniswap V3 和 V4" icon="water" href="/zh/features/create-position">
+    用单一代币 Zap In（单币入池），选好价格区间，可以加仓、领取手续费、减仓和平仓，并支持止盈和止损。
+  </Card>
+  <Card title="Copy LP" icon="copy" href="/zh/features/copy-lp">
+    跟单 Elysium 上的 Uniswap V3 和 V4 钱包，按你的资金规模等比缩放，支持 Max Pool Fee 和 Smart Token Retention。
+  </Card>
+  <Card title="Discover 和池子" icon="compass" href="/zh/features/discover">
+    Elysium 的代币和池子实时排名，还能看到 smart LP 正在进哪些池子。
+  </Card>
+</CardGroup>
+
+### Elysium 上的 Copy LP
+
+- 跟单用你的 Base Token（HYPE 或 USDC）买入，Gas 始终用 HYPE 付。代理钱包里要留一些 HYPE（至少 0.05 HYPE），否则带单钱包开仓时跟单会被跳过。
+- **Max Pool Fee** 是你 Elysium 跟单单独的上限，和你在 Robinhood 上的上限分开。
+- 只有带单钱包自己发出的开仓才会被跟单。通过 Safe 开的仓位不会被跟单。
+- 你不能跟单你自己的代理钱包。
+- 我们建议净资产至少 **5 HYPE** 再跟单。这是建议，不是硬性限制。
+
+和 Solana 不一样的地方：
+
+- 仓位用它的 Uniswap token ID 标识，显示为 `#1234567`。
+- Discover 在 Elysium 上暂时还没有代币审计数据源：你看到的是我们已有的检查项，不是完整的审计。流动性低于 $1,000 的池子不会在 Discover 里显示。
+- 亏损上限、复投、AI manage、Claim SOL 和资金保护在 Elysium 上不可用。
+- Elysium 上的手续费暂时还没有[推荐返现](/zh/referral)。
+- 把资金从 Elysium 代理钱包转到别的网络时，HYPE 会先换成 USDC。
+
+### 索引了哪些数据
+
+LP Agent 读取以仓位 NFT 形式持有的 Uniswap V3 和 V4 仓位。V4 Hook 自己持有的流动性（比如把流动性留在 Hook 里的 launchpad 池子）没有仓位 NFT，所以不会显示。Uniswap V2 池子没有建立索引。
+
+本页剩下的内容是给用 API 的开发者看的。
+
+## 给开发者
+
+Open API 通过和 Solana、Robinhood Chain 相同的 endpoint 提供 Elysium 数据：在请求里加上 `chain=ELYSIUM`。
+
+| | |
+| --- | --- |
+| 网络 | Elysium |
+| Chain ID | `99901` |
+| 协议 | Uniswap V3（`uniswap_v3`）、Uniswap V4（`uniswap_v4`） |
+| 原生币 | HYPE（18 位小数） |
+| 区块浏览器 | [Elysium Explorer](https://elysium.kinetiq.xyz/explorer) |
+| API 取值 | `chain=ELYSIUM` |
+
+```bash
+curl -H "x-api-key: $LPAGENT_API_KEY" \
+  "https://api.lpagent.io/open-api/v1/lp-positions/open?owner=0xYourWallet&chain=ELYSIUM"
+```
+
+<Warning>
+  读取 Elysium 数据时一定要传 `chain=ELYSIUM`。不传的话，API 会读 Solana（如果池子 ID 是 `0x` 开头则读 Robinhood Chain）；无法识别的 `chain` 值也会回退到 `SOL`，而不是返回错误。
+</Warning>
+
+### Endpoint 支持情况
+
+| Method | Endpoint | Elysium |
+| --- | --- | --- |
+| `GET` | `/lp-positions/open` | 支持 |
+| `GET` | `/lp-positions/historical` | 支持 |
+| `GET` | `/lp-positions/overview` | 支持 |
+| `GET` | `/lp-positions/logs` | 支持 |
+| `GET` | `/lp-positions/position` | 支持 |
+| `GET` | `/lp-positions/revenue/{owner}` | 支持 |
+| `GET` | `/token/balance` | 支持 |
+| `GET` | `/pools/{poolId}/positions` | 支持 |
+| `GET` | `/pools/{poolId}/onchain-stats` | 支持 |
+| `GET` | `/pools/{poolId}/top-lpers` | 支持 |
+| `GET` | `/pools/discover` | 暂不支持 |
+| `POST` | 交易类 endpoint（`add-tx`、`decrease-tx`、`claim-fee-tx` 及它们的上链调用） | 仅 Solana |
+
+响应沿用 Robinhood Chain 的约定，比如仓位 ID 是 position-manager 地址和 token ID 用连字符连起来。详见 [Robinhood Chain 集成](/zh/integration/robinhood#响应上要注意的差异)。

@@ -68,21 +68,21 @@ curl -X GET "https://api.lpagent.io/open-api/v1/pools/discover?chain=SOL&pageSiz
 
 ## 支持的链
 
-读取类接口接受 `chain=SOL`（默认）或 `chain=ROBINHOOD`。所有构建或发送交易的接口都只支持 Solana。
+读取类接口接受 `chain=SOL`（默认）、`chain=ROBINHOOD` 或 `chain=ELYSIUM`。所有构建或发送交易的接口都只支持 Solana。BNB Chain 暂时还不在 Open API 里：`chain=BNB` 会回退到 `SOL`。
 
-| 接口 | Solana（`SOL`） | Robinhood Chain（`ROBINHOOD`） |
-| --- | --- | --- |
-| `GET /lp-positions/open`、`/historical`、`/overview`、`/logs`、`/position` | 支持 | 支持 |
-| `GET /lp-positions/revenue/{owner}` | 支持 | 支持 |
-| `GET /token/balance` | 支持 | 支持 |
-| `GET /pools/discover` | 支持 | 支持 |
-| `GET /pools/{poolId}/positions`、`/onchain-stats`、`/top-lpers` | 支持 | 支持 |
-| `GET /pools/{poolId}/info` | 支持 | 不支持 |
-| `POST /pools/{poolId}/add-tx`、`/pools/landing-add-tx` | 支持 | 不支持 |
-| `POST /position/zap-out-estimates` | 支持（仅 Meteora DLMM） | 不支持 |
-| `POST /position/decrease-tx`、`/position/landing-decrease-tx` | 支持 | 不支持 |
-| `POST /position/claim-fee-tx`、`/position/landing-claim-fee-tx` | 支持 | 不支持 |
-| `POST /rpc`、`/rpc/historical`、`/jito` | 支持 | 不支持 |
+| 接口 | Solana（`SOL`） | Robinhood Chain（`ROBINHOOD`） | Elysium（`ELYSIUM`） |
+| --- | --- | --- | --- |
+| `GET /lp-positions/open`、`/historical`、`/overview`、`/logs`、`/position` | 支持 | 支持 | 支持 |
+| `GET /lp-positions/revenue/{owner}` | 支持 | 支持 | 支持 |
+| `GET /token/balance` | 支持 | 支持 | 支持 |
+| `GET /pools/discover` | 支持 | 支持 | 不支持 |
+| `GET /pools/{poolId}/positions`、`/onchain-stats`、`/top-lpers` | 支持 | 支持 | 支持 |
+| `GET /pools/{poolId}/info` | 支持 | 不支持 | 不支持 |
+| `POST /pools/{poolId}/add-tx`、`/pools/landing-add-tx` | 支持 | 不支持 | 不支持 |
+| `POST /position/zap-out-estimates` | 支持（仅 Meteora DLMM） | 不支持 | 不支持 |
+| `POST /position/decrease-tx`、`/position/landing-decrease-tx` | 支持 | 不支持 | 不支持 |
+| `POST /position/claim-fee-tx`、`/position/landing-claim-fee-tx` | 支持 | 不支持 | 不支持 |
+| `POST /rpc`、`/rpc/historical`、`/jito` | 支持 | 不支持 | 不支持 |
 
 `chain` 和 `platform` 在每个接口上的具体行为，见 [API 参考简介](/zh/api-reference/introduction)。
 

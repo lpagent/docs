@@ -25,6 +25,9 @@ description: ""
 | ----- | ------- | -------- |
 | `SOL` | Solana | Meteora（DLMM、DAMM v2） |
 | `ROBINHOOD` | Robinhood Chain（EVM，chain ID `4663`） | Uniswap V3、Uniswap V4 |
+| `ELYSIUM` | Elysium（EVM，chain ID `99901`） | Uniswap V3、Uniswap V4（只读） |
+
+BNB Chain 暂时还不在 Open API 里。`chain=BNB` 不被接受，和其他无法识别的值一样，会回退到 `SOL`。
 
 无法识别的值会回退到 `SOL`，而不是返回错误。只有 `/pools/discover` 例外：无法识别的值不会匹配到任何池子。
 
@@ -44,11 +47,13 @@ description: ""
 | `GET` | `/pools/{poolId}/onchain-stats` |
 | `GET` | `/pools/{poolId}/top-lpers` |
 
+除了 `/pools/discover`，`ELYSIUM` 在以上所有接口上都可用。读取 Elysium 数据时一定要传 `chain=ELYSIUM`。
+
 在 `/pools/{poolId}/onchain-stats` 和 `/pools/{poolId}/top-lpers` 上，`chain` 是可选的：不传时会根据池子 ID 推断（`0x` 开头的 ID 是 Robinhood Chain，其他都是 Solana）。
 
 所有按协议筛选的接口都用 `platform` 参数，值是逗号分隔的列表，例如 `uniswap_v3,uniswap_v4`。旧的参数名 `protocol`（overview、revenue）和 `type`（discover）仍然可用。
 
-其他接口都只支持 Solana。其余的 `/pools/{poolId}/*` 路由读取的是 Meteora 池子状态，交易构建、Jito 和 RPC 路由都是 Solana 专用的。响应上的差异和当前的数据限制，见 [Robinhood Chain 集成](/zh/integration/robinhood)。
+其他接口都只支持 Solana。其余的 `/pools/{poolId}/*` 路由读取的是 Meteora 池子状态，交易构建、Jito 和 RPC 路由都是 Solana 专用的。响应上的差异和当前的数据限制，见 [Robinhood Chain 集成](/zh/integration/robinhood)和 [Elysium 集成](/zh/integration/elysium)。
 
 ## Premium 接口
 

@@ -77,18 +77,20 @@ No pool for your token yet? You can [create one](/features/pools#create-a-pool).
       DAMM v2 pools use a simpler form: type an amount of SOL and press **Create Position**. There is no strategy or range to set; the SOL is split by the pool's ratio.
     </Note>
   </Tab>
-  <Tab title="Robinhood Chain (Uniswap)">
+  <Tab title="Robinhood Chain, BNB Chain, Elysium">
     <Frame>
       ![Zap In panel](/images/app/rh-zap-in-panel.jpg)
       <em>Zap In on a Uniswap V3 pool</em>
     </Frame>
 
+    The form is the same on all three networks: Uniswap V3 and V4 on Robinhood Chain and Elysium, PancakeSwap V3 on BNB Chain. On BNB Chain, opening a PancakeSwap Infinity position is **Soon**: you can read the pool, its chart and its positions for now.
+
     ### 1. Deposit
 
-    - **Zap In** (default): pay in **ETH** or **USDG**, and LP Agent splits it across the pair. The default is your **Base Token** from Settings. You never need WETH; it shows as ETH. When you pay in ETH, a little is kept back for gas.
+    - **Zap In** (default): pay in **ETH** or **USDG** on Robinhood Chain, **BNB**, **USDT** or **USDC** on BNB Chain, or **HYPE** or **USDC** on Elysium, and LP Agent splits it across the pair. The default is your **Base Token** from Settings. You never need WETH (or WBNB, WHYPE); it shows as the chain's coin. When you pay in the chain's coin, a little is kept back for gas.
     - **Both Tokens**: deposit both tokens as they are, with no swap. Anything that doesn't fit your range comes back to you.
 
-    Use **HALF**, **MAX** or the ETH presets (**0.01**, **0.05**, **0.1**, **0.5 ETH**). The sliders icon lets you edit your presets.
+    Use **HALF**, **MAX** or the presets: **0.01**, **0.05**, **0.1**, **0.5 ETH** on Robinhood Chain, **0.02**, **0.1**, **0.2**, **1 BNB** on BNB Chain, **0.5**, **2**, **5**, **10 HYPE** on Elysium. The sliders icon lets you edit your presets.
 
     ### 2. Price Range
 

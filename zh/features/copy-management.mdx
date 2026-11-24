@@ -3,7 +3,7 @@ title: "管理你的跟单"
 description: "Copied Wallets、Analysis、Copy Logs，以及会暂停跟单的保护机制"
 ---
 
-顶部菜单里的 **Copy LP** 页面有三个标签页：**Copied Wallets**（已跟单钱包）、**Analysis**（分析）和 **Copy Logs**（跟单日志）。
+顶部菜单里的 **Copy LP** 页面有三个标签页：**Copied Wallets**（已跟单钱包）、**Analysis**（分析）和 **Copy Logs**（跟单日志）。在 EVM 账户上，这个页面显示你在顶部 **Chain** 菜单里选的网络（Robinhood Chain、BNB Chain 或 Elysium）。
 
 ## Copied Wallets
 
@@ -84,9 +84,9 @@ Copy Logs 记录最近 7 天里有动静的每一次跟单：开了的、平了�
 | 原因 | 按钮 |
 | --- | --- |
 | Price moved（价格变动） | **Raise slippage**（打开 Settings > Swap 并给出建议值） |
-| No ETH for gas / Not enough SOL or ETH（没有 ETH 付 Gas / SOL 或 ETH 不足） | **Top up SOL/ETH** |
+| No gas / Not enough of the chain's coin（没有 Gas / 这条链的币不足：SOL、ETH、BNB 或 HYPE） | **Top up**（充值这种币） |
 | Hooked pool not allowed（不允许带 Hook 的池子） | **Allow this pool** |
-| Tokens left in wallet（钱包里有剩余代币） | **Swap to SOL/ETH** |
+| Tokens left in wallet（钱包里有剩余代币） | **Swap to**（换成这条链的币） |
 | Loss limit reached（达到亏损上限） | **Edit limit** |
 | Copy size is $0 / Too small for gas（跟单金额为 $0 / 金额太小，不够付 Gas） | **Edit copy size** |
 | Strategy not in your settings / Meme protection（策略不在你的设置里 / Meme 保护） | **Edit copy settings** |
@@ -94,9 +94,11 @@ Copy Logs 记录最近 7 天里有动静的每一次跟单：开了的、平了�
 | Token failed safety check / Token below quality floor（代币没通过安全检查 / 代币低于质量下限） | **Edit filters** |
 | Rug-risk leader / Leader's own token launch（有 Rug 风险的带单钱包 / 带单钱包自己发的币） | 无：为了保护你而跳过 |
 
+在 BNB Chain 和 Elysium 上，有几个修复按钮暂时还没有。这时这一行会直接写明，比如 "The fix for this is not on BNB Chain yet."（这个修复在 BNB Chain 上暂时还没有）。
+
 对于 **Meme protection**，修复面板还会说明：如果这个带单钱包经常把代币撤出再加回去，为它开启 Smart Token Retention 就能让这些加回通过。见 [Meme Protection](/zh/features/copy-settings)。
 
-开启 Smart Token Retention 时，卖掉被保留的代币就是这次跟单的换回（swap back）。如果卖不掉，这次跟单会显示 **Tokens left in wallet**，并带 **Swap to SOL** 按钮。
+开启 Smart Token Retention 时，卖掉被保留的代币就是这次跟单的换回（swap back）。如果卖不掉，这次跟单会显示 **Tokens left in wallet**，并带 **Swap to SOL** 按钮（或换成这条链的币）。
 
 如果你的代理钱包资金不够，Copy Logs 顶部会有一个横幅，告诉你现在有多少、上一次跟单需要多少，以及有多少跟单没开出来。
 
@@ -119,7 +121,7 @@ Copy Logs 记录最近 7 天里有动静的每一次跟单：开了的、平了�
 
 当你跟单仓位的亏损达到上限时，资金保护会暂停新的跟单。
 
-- Solana 账户默认开启，上限为 **净资产的 20%**。
+- Solana 账户默认开启，上限为 **净资产的 20%**。BNB Chain 和 Elysium 没有亏损上限。
 - 按 **Edit** 修改 **Max loss from peak**（距峰值最大亏损）。保存时，这个百分比会按当天的净资产换算成一个固定的 SOL 数量，计数重新开始。
 - 亏损 **只计算已平仓的跟单仓位**，从设置上限以来的峰值开始算。
 - 达到上限时，横幅显示 **Stopped**：新的开仓、加仓、复投和再平衡都会被拦，但 **退出仍会跟随你的带单钱包**。Copy Logs 显示 **Loss limit reached**。

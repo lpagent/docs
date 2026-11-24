@@ -27,6 +27,10 @@ integrations need no change.
 | ----- | ------- | -------- |
 | `SOL` | Solana | Meteora (DLMM, DAMM v2) |
 | `ROBINHOOD` | Robinhood Chain (EVM, chain ID `4663`) | Uniswap V3, Uniswap V4 |
+| `ELYSIUM` | Elysium (EVM, chain ID `99901`) | Uniswap V3, Uniswap V4 (read-only) |
+
+BNB Chain is not in the Open API yet. `chain=BNB` is not accepted, and like any unrecognised
+value it falls back to `SOL`.
 
 An unrecognised value falls back to `SOL` rather than returning an error, except on
 `/pools/discover`, where it matches no pools.
@@ -47,6 +51,9 @@ These endpoints are chain-aware:
 | `GET` | `/pools/{poolId}/onchain-stats` |
 | `GET` | `/pools/{poolId}/top-lpers` |
 
+`ELYSIUM` works on all of these except `/pools/discover`. Always pass `chain=ELYSIUM` for
+Elysium data.
+
 On `/pools/{poolId}/onchain-stats` and `/pools/{poolId}/top-lpers`, `chain` is optional: when
 omitted it is inferred from the pool ID (`0x` IDs are Robinhood Chain, anything else Solana).
 
@@ -56,8 +63,8 @@ are still accepted.
 
 Every other endpoint is Solana only. The remaining `/pools/{poolId}/*` routes read Meteora
 pool state, and the transaction-building, Jito, and RPC routes are Solana specific. See
-[Robinhood Chain Integration](/integration/robinhood) for the response differences and
-current data limitations.
+[Robinhood Chain Integration](/integration/robinhood) and [Elysium Integration](/integration/elysium)
+for the response differences and current data limitations.
 
 ## Premium endpoints
 

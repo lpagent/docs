@@ -77,18 +77,20 @@ description: "用单一代币 Zap In 进池子，选好价格区间和策略"
       DAMM v2 池子的表单更简单：输入 SOL 数量，按 **Create Position**。没有策略和区间要设；SOL 会按池子的比例拆分。
     </Note>
   </Tab>
-  <Tab title="Robinhood Chain（Uniswap）">
+  <Tab title="Robinhood Chain、BNB Chain、Elysium">
     <Frame>
       ![Zap In 面板](/images/app/rh-zap-in-panel.jpg)
       <em>Uniswap V3 池子上的 Zap In</em>
     </Frame>
 
+    三个网络上的表单都一样：Robinhood Chain 和 Elysium 上是 Uniswap V3 和 V4，BNB Chain 上是 PancakeSwap V3。在 BNB Chain 上，开 PancakeSwap Infinity 仓位还是 **Soon**（即将支持）：目前可以查看池子、它的图表和它的仓位。
+
     ### 1. 投入资金
 
-    - **Zap In**（默认）：用 **ETH** 或 **USDG** 付款，LP Agent 帮你拆成交易对的两种代币。默认用你在 Settings 里设的 **Base Token**（基础代币）。你永远不需要 WETH，它会显示成 ETH。用 ETH 付款时，会留一点付 Gas。
+    - **Zap In**（默认）：Robinhood Chain 上用 **ETH** 或 **USDG** 付款，BNB Chain 上用 **BNB**、**USDT** 或 **USDC**，Elysium 上用 **HYPE** 或 **USDC**，LP Agent 帮你拆成交易对的两种代币。默认用你在 Settings 里设的 **Base Token**（基础代币）。你永远不需要 WETH（或 WBNB、WHYPE），它会显示成这条链的币。用这条链的币付款时，会留一点付 Gas。
     - **Both Tokens**：两种代币原样存入，不做兑换。放不进你区间的部分会退回给你。
 
-    用 **HALF**、**MAX** 或 ETH 预设（**0.01**、**0.05**、**0.1**、**0.5 ETH**）。滑杆图标可以编辑你的预设。
+    用 **HALF**、**MAX** 或预设：Robinhood Chain 上是 **0.01**、**0.05**、**0.1**、**0.5 ETH**，BNB Chain 上是 **0.02**、**0.1**、**0.2**、**1 BNB**，Elysium 上是 **0.5**、**2**、**5**、**10 HYPE**。滑杆图标可以编辑你的预设。
 
     ### 2. 价格区间
 

@@ -3,9 +3,9 @@ title: "集成概览"
 description: "LP Agent 支持的协议和网络"
 ---
 
-## 支持的协议
+## 支持的网络
 
-LP Agent 在两个网络上支持四种池子类型：
+LP Agent 支持四个网络：
 
 <CardGroup cols={2}>
   <Card href="/zh/integration/meteora">
@@ -30,24 +30,46 @@ LP Agent 在两个网络上支持四种池子类型：
       Robinhood Chain（EVM，chain ID 4663）上的 **Uniswap V3** 和 **Uniswap V4** 集中流动性，包括代币化股票池。用 ETH 或 USDG 投入。
     </div>
   </Card>
+
+  <Card href="/zh/integration/bnb">
+    <div className="flex items-center gap-2">
+      <h3 className="text-xl font-semibold">BNB Chain 上的 PancakeSwap</h3>
+    </div>
+    <div className="mt-3">
+      BNB Chain（EVM，chain ID 56）上的 **PancakeSwap V3** 和 **PancakeSwap Infinity** 池子。用 BNB、USDT 或 USDC 投入。
+    </div>
+  </Card>
+
+  <Card href="/zh/integration/elysium">
+    <div className="flex items-center gap-2">
+      <h3 className="text-xl font-semibold">Elysium 上的 Uniswap</h3>
+    </div>
+    <div className="mt-3">
+      Elysium（Kinetiq 在 HyperEVM 上的网络，chain ID 99901）上的 **Uniswap V3** 和 **Uniswap V4** 池子。用 HYPE 或 USDC 投入。
+    </div>
+  </Card>
 </CardGroup>
+
+Robinhood Chain、BNB Chain 和 Elysium 共用一个 EVM 账户：同一个代理钱包地址在三个网络上都能用。在应用顶部的 **Chain** 菜单里选择网络。
 
 ## 哪里支持什么
 
-| 功能 | Meteora DLMM | Meteora DAMM v2 | Uniswap V3 | Uniswap V4 |
+| 功能 | Solana | Robinhood Chain | BNB Chain | Elysium |
 | --- | --- | --- | --- | --- |
-| [Smart LP](/zh/features/smart-lp) 排行榜 | 支持 | - | 支持 | 支持 |
-| [Copy LP](/zh/features/copy-lp) | 支持 | 支持 | 支持 | 支持（带 Hook 的池子需要自己开启） |
-| 用单一代币 [Zap In](/zh/features/create-position)（单币入池） | 支持 | 支持 | 支持 | 支持 |
-| 策略（Spot、Curve、Bid-Ask） | 支持 | - | - | - |
+| [Discover](/zh/features/discover)、[Pools](/zh/features/pools)、[Portfolio](/zh/features/portfolio) | 支持 | 支持 | 支持 | 支持 |
+| [Smart LP](/zh/features/smart-lp) 排行榜 | 支持（DLMM） | 支持 | 支持 | 支持 |
+| [Copy LP](/zh/features/copy-lp) | DLMM、DAMM v2 | V3、V4（带 Hook 的池子需要自己开启） | PancakeSwap V3 | V3、V4 |
+| 用单一代币 [Zap In](/zh/features/create-position)（单币入池） | 支持 | 支持 | PancakeSwap V3（Infinity 即将支持） | 支持 |
+| 策略（Spot、Curve、Bid-Ask） | DLMM | - | - | - |
 | [止盈 / 止损](/zh/features/take-profit-stop-loss) | 支持 | 支持 | 支持 | 支持 |
 | 领取手续费 | 支持 | 支持 | 支持 | 支持 |
-| 复投（Compound） | 支持 | - | - | - |
-| 一键 Zap Out（一键出池） | 支持 | - | - | - |
-| [资金保护](/zh/features/copy-management) | 支持 | 支持 | - | - |
-| [Claim SOL](/zh/features/claim-sol) | 支持 | 支持 | - | - |
-| [Open API](/zh/api-reference/introduction) | 读取数据和构建交易 | 读取数据和构建交易 | 读取数据 | 读取数据 |
+| 复投（Compound） | DLMM | - | - | - |
+| [资金保护](/zh/features/copy-management) | 支持 | - | - | - |
+| [Claim SOL](/zh/features/claim-sol) | 支持 | - | - | - |
+| [推荐返现](/zh/referral) | 支持 | 支持 | - | - |
+| 出资币种 | SOL | ETH 或 USDG | BNB、USDT 或 USDC | HYPE 或 USDC |
+| [Open API](/zh/api-reference/introduction) | 读取数据和构建交易 | 读取数据 | - | 读取数据 |
 
 ## 给开发者
 
-[LP Agent Open API](/zh/api-reference/introduction) 提供两个网络的池子、仓位和钱包数据。传 `chain=ROBINHOOD` 读取 Robinhood Chain 的数据；默认是 `SOL`。通过 API 构建 Zap In、Zap Out 和领取交易，目前在 Solana 上可用。Robinhood 的具体细节见 [Robinhood Chain 集成](/zh/integration/robinhood)。
+[LP Agent Open API](/zh/api-reference/introduction) 提供 Solana、Robinhood Chain 和 Elysium 的池子、仓位和钱包数据。传 `chain=ROBINHOOD` 或 `chain=ELYSIUM` 读取 EVM 数据；默认是 `SOL`。通过 API 构建 Zap In、Zap Out 和领取交易，目前在 Solana 上可用。BNB Chain 暂时还不在 Open API 里。各网络的具体细节见 [Robinhood Chain](/zh/integration/robinhood)、[BNB Chain](/zh/integration/bnb) 和 [Elysium](/zh/integration/elysium)。

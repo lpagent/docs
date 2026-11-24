@@ -20,15 +20,17 @@ A quick browser check runs before your wallet is asked to sign. It normally pass
   Always sign in with the wallet or email you signed up with. Your agent wallet is not a sign-in wallet: if you import it into Phantom or another wallet and sign in with it, LP Agent opens a new, separate account with its own empty agent wallet. Your positions and funds stay in your original account.
 </Note>
 
-### One network per account
+### Solana or EVM account
 
-Your account is tied to one network:
+Your account is either a Solana account or an EVM account:
 
 - Sign in with a **Solana** wallet for Meteora DLMM and DAMM v2 pools.
-- Sign in with an **EVM** wallet (0x address) for Uniswap V3 and V4 pools on Robinhood Chain.
-- A new **email** account asks you to pick **Solana** or **Robinhood** once.
+- Sign in with an **EVM** wallet (0x address) for Uniswap V3 and V4 pools on Robinhood Chain, PancakeSwap pools on BNB Chain, and Uniswap V3 and V4 pools on Elysium.
+- A new **email** account asks you to pick **Solana** or **Robinhood** once. Pick **Robinhood** for an EVM account: it also covers BNB Chain and Elysium.
 
-You can still browse pools and wallets on the other network, but you can only open or copy positions on your account's network.
+An EVM account has one agent wallet address on all three EVM networks. Switch network with the **Chain** menu at the top of the app. Each network keeps its own balance: ETH on Robinhood Chain, BNB on BNB Chain and HYPE on Elysium are separate coins, even at the same address.
+
+You can still browse pools and wallets on Solana from an EVM account and the other way round, but you can only open or copy positions on your account's networks.
 
 ### Accounts created before the wallet upgrade
 
@@ -67,7 +69,7 @@ The panel shows:
 - **Deposit**, **Withdraw** and **Settings**.
 - **Finish setup**: steps you have not done yet. It disappears once they are done. See [Finish setup](#finish-setup).
 - **Reports**: your three latest reports and where they are at, with **See all**. See [Reports](#reports).
-- **Assets**: your tokens with their value, and the total in dollars and in SOL or ETH. Small balances under $1 are folded behind **Show all**. Tap a token to swap it.
+- **Assets**: your tokens with their value, and the total in dollars and in the network's own coin (SOL, ETH, BNB or HYPE). Small balances under $1 are folded behind **Show all**. Tap a token to swap it.
 - **Get API Key**, **Docs**, **Language**, **Disconnect**, and links to our Discord and X.
 
 When something in the panel needs a look, an **amber dot** appears on your wallet button in the header: a setup step, or an update on one of your reports. LP Agent does not show popups for these.
@@ -131,6 +133,8 @@ Press **Deposit** in the header or in the Account panel.
 | --- | --- | --- |
 | Solana | SOL | Minimum 0.001 SOL. |
 | Robinhood Chain | ETH | ETH pays gas. To fund positions in USDG, deposit USDG with **Receive** and set **Base Token** to USDG in Settings. |
+| BNB Chain | BNB | BNB pays gas. To fund positions in USDT or USDC, deposit it with **Receive** on BNB Chain and set **Base Token** in Settings. |
+| Elysium | HYPE | HYPE pays gas. To fund positions in USDC, deposit it with **Receive** on Elysium and set **Base Token** in Settings. |
 
 Email sign-ins only have **Receive**. There is no card or bank purchase in the app: buy crypto elsewhere and send it in.
 

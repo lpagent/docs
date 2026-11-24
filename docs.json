@@ -66,7 +66,9 @@
                 "pages": [
                   "integration/overview",
                   "integration/meteora",
-                  "integration/robinhood"
+                  "integration/robinhood",
+                  "integration/bnb",
+                  "integration/elysium"
                 ]
               },
               {
@@ -217,7 +219,9 @@
                 "pages": [
                   "zh/integration/overview",
                   "zh/integration/meteora",
-                  "zh/integration/robinhood"
+                  "zh/integration/robinhood",
+                  "zh/integration/bnb",
+                  "zh/integration/elysium"
                 ]
               },
               {

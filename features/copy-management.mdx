@@ -3,7 +3,7 @@ title: "Managing Your Copies"
 description: "Copied Wallets, Analysis, Copy Logs and the protections that pause copying"
 ---
 
-The **Copy LP** page in the top menu has three tabs: **Copied Wallets**, **Analysis** and **Copy Logs**.
+The **Copy LP** page in the top menu has three tabs: **Copied Wallets**, **Analysis** and **Copy Logs**. On an EVM account, the page shows the network picked in the header's **Chain** menu (Robinhood Chain, BNB Chain or Elysium).
 
 ## Copied Wallets
 
@@ -84,9 +84,9 @@ Most reasons come with a button that takes you straight to the fix:
 | Reason | Button |
 | --- | --- |
 | Price moved | **Raise slippage** (opens Settings > Swap with a suggested value) |
-| No ETH for gas / Not enough SOL or ETH | **Top up SOL/ETH** |
+| No gas / Not enough of the chain's coin (SOL, ETH, BNB or HYPE) | **Top up** that coin |
 | Hooked pool not allowed | **Allow this pool** |
-| Tokens left in wallet | **Swap to SOL/ETH** |
+| Tokens left in wallet | **Swap to** the chain's coin |
 | Loss limit reached | **Edit limit** |
 | Copy size is $0 / Too small for gas | **Edit copy size** |
 | Strategy not in your settings / Meme protection | **Edit copy settings** |
@@ -94,9 +94,11 @@ Most reasons come with a button that takes you straight to the fix:
 | Token failed safety check / Token below quality floor | **Edit filters** |
 | Rug-risk leader / Leader's own token launch | None: skipped to keep you safe |
 
+On BNB Chain and Elysium, a few fixes are not there yet. The row then says so, for example "The fix for this is not on BNB Chain yet."
+
 For **Meme protection**, the fix panel also explains that if the leader often pulls a token out and puts it back, turning on Smart Token Retention for that leader lets those re-adds through. See [Meme Protection](/features/copy-settings#meme-protection).
 
-With Smart Token Retention on, selling a kept token is the copy's swap back. If that sale fails, the copy shows **Tokens left in wallet** with **Swap to SOL**.
+With Smart Token Retention on, selling a kept token is the copy's swap back. If that sale fails, the copy shows **Tokens left in wallet** with **Swap to SOL** (or the chain's coin).
 
 If your agent wallet is short on funds, a banner at the top of Copy Logs says how much you have, what the last copy needed, and how many copies did not open.
 
@@ -119,7 +121,7 @@ Something looks off? Expand the row and press **Something off? Report this copy*
 
 Fund protection pauses new copies when your losses from copied positions reach a limit.
 
-- It is on by default for Solana accounts, at **20% of net worth**.
+- It is on by default for Solana accounts, at **20% of net worth**. BNB Chain and Elysium have no loss limit.
 - Press **Edit** to change the **Max loss from peak**. On save, the percentage becomes a fixed SOL amount from your net worth that day, and the count restarts.
 - Losses count **closed copy positions only**, measured from their peak since the limit was set.
 - When the limit is hit, the banner reads **Stopped**: new opens, adds, compounds and rebalances are blocked, while **exits still follow your leaders**. Copy Logs shows **Loss limit reached**.

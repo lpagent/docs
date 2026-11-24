@@ -24,12 +24,13 @@ description: "你的代理钱包如何受到保护，以及自动化能做什么
     - 禁止直接把代币转出
     - 禁止代币授权和权限变更
   </Card>
-  <Card title="Robinhood Chain" icon="link">
-    - Uniswap V3 和 V4 的仓位操作
+  <Card title="Robinhood Chain、BNB Chain、Elysium" icon="link">
+    - Uniswap V3 和 V4 的仓位操作（BNB Chain 上是 PancakeSwap）
     - 通过已批准的兑换路由进行兑换（swap）
-    - 代币授权只能给 Uniswap 和已批准的兑换路由
-    - ETH 的包装和解包（wrap / unwrap）
+    - 代币授权只能给 Uniswap（BNB Chain 上是 PancakeSwap）和已批准的兑换路由
+    - 这条链的币（ETH、BNB 或 HYPE）的包装和解包（wrap / unwrap）
     - 支付 LP Agent 平台手续费
+    - 每条链的规则只绑定在这条链上，用的是它自己的合约
   </Card>
 </CardGroup>
 
@@ -40,8 +41,10 @@ description: "你的代理钱包如何受到保护，以及自动化能做什么
 在密钥规则之外，LP Agent 还加了几道由你自己控制的防护：
 
 - **Token filters**（代币过滤），位于 **Settings > Security**：最低市值、24h 交易量和持币地址数，Solana 上还有 Jupiter organic score 下限，以及代币黑名单。不达标的代币会被跳过。详见[设置](/zh/features/settings)。
-- 跟单的 **Meme Protection**（Meme 保护）会跳过可信一侧代币（SOL、USDC、USDT、ETH、WETH 或 USDG）几乎为空的仓位。
+- 跟单的 **Meme Protection**（Meme 保护）会跳过可信一侧代币（比如 SOL、USDC、USDT、ETH、WETH、USDG、BNB、WBNB 或 HYPE）几乎为空的仓位。
 - **带 Hook 的 Uniswap V4 池子**默认不跟单，除非你允许。
+- **Max Pool Fee**（Robinhood Chain、BNB Chain、Elysium）会跳过那些每次买入或卖出代币都要抽一大笔的池子，不往里跟单。
+- 在 **BNB Chain** 上，LP Agent 永远不会买入在买入、卖出或转账时收税的代币，也不会买入被标记为貔貅盘（honeypot）的代币。交易通过 PancakeSwap 的 MEV Guard 发送。
 - **Fund protection**（资金保护，仅 Solana）会在你的跟单亏损达到你设定的上限时暂停跟单。
 - **止盈和止损**会在你设定的阈值处平仓。
 

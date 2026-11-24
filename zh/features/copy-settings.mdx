@@ -7,7 +7,7 @@ description: "跟单弹窗里的每个选项，一步一步讲清楚"
 
 - **Copying on / off**（右上角）：关掉后仍然关注这个钱包，但什么都不跟。它会移到你列表里的 **Paused**。
 - **Copy**（新跟单）或 **Update Copy**（已有跟单）会一次保存所有步骤。底部会显示你有几处未保存的修改。
-- 步骤下方的框显示我们建议的跟单净资产：Solana 上 **5 SOL**，Robinhood Chain 上 **0.08 ETH**。这只是建议，不会拦住任何操作。
+- 步骤下方的框显示我们建议的跟单净资产：Solana 上 **5 SOL**，Robinhood Chain 上 **0.08 ETH**，BNB Chain 上 **0.3 BNB**，Elysium 上 **5 HYPE**。这只是建议，不会拦住任何操作。
 
 ## 第 1 步：Sizing（仓位规模）
 
@@ -22,7 +22,7 @@ description: "跟单弹窗里的每个选项，一步一步讲清楚"
 | **Copy Percentage** | 1% 到 10000% 之间的整数。超过 100% 时你的仓位会比带单钱包的更大。 |
 | **Suggested** + **Apply** | 你的净资产除以带单钱包的净资产。按这个比例跟单，每个仓位在你钱包里的占比就和在它钱包里的占比一样。 |
 | **Max Increase Amount per Tx** | 每次跟单开仓和每次跟单加仓的可选上限，单位是你的 TP/SL 币种。留空表示不设上限。 |
-| **Funding currency**（Robinhood Chain） | 显示新跟单用 ETH 还是 USDG 出资，以及你用来付 Gas 的 ETH。在 Settings 里修改。 |
+| **Funding currency**（Robinhood Chain、BNB Chain、Elysium） | 显示新跟单用什么币买入（ETH 或 USDG；BNB、USDT 或 USDC；HYPE 或 USDC），以及你用这条链的币付 Gas 的余额。在 Settings 里修改。在 BNB Chain 和 Elysium 上还会显示你的代理钱包地址，方便你在这个网络上转入资金。 |
 
 Copy Percentage 和 Max 至少填一个，也可以两个都填。只填 Max 时，每次跟单都和带单钱包的金额一样，但不超过 Max。如果开仓就被 Max 截短，带单钱包之后往这个仓位加仓时，会按开仓实际拿到的那个更小的比例跟。见[仓位规模怎么算](/zh/features/copy-lp)。
 
@@ -30,7 +30,7 @@ Copy Percentage 和 Max 至少填一个，也可以两个都填。只填 Max 时
   Max 设为 **0** 会什么都跟不到，所以现在保存不了。想不设上限跟单，就把这一栏留空。以前保存为 0 的跟单，会在这一栏下面显示一行红字提示。
 </Warning>
 
-**快进快出的钱包：** 如果带单钱包平均持仓少于 18 分钟（Solana）或 1 小时（Robinhood Chain），弹窗会显示 **High-frequency**（高频）警告。每换一次仓，你都要付一次兑换进场、一次兑换回来和网络手续费，不管这笔交易赚没赚。在 Solana 上，如果这个钱包还经常在退出后一分钟内把同一个代币加回来，警告里会写出有多频繁，并提供 **Turn on Smart Token Retention**（开启智能代币保留）按钮。
+**快进快出的钱包：** 如果带单钱包平均持仓少于 18 分钟（Solana）或 1 小时（Robinhood Chain、BNB Chain、Elysium），弹窗会显示 **High-frequency**（高频）警告。每换一次仓，你都要付一次兑换进场、一次兑换回来和网络手续费，不管这笔交易赚没赚。在 Solana 上，如果这个钱包还经常在退出后一分钟内把同一个代币加回来，警告里会写出有多频繁，并提供 **Turn on Smart Token Retention**（开启智能代币保留）按钮。
 
 ## 第 2 步：Exit rules（退出规则）
 
@@ -38,7 +38,7 @@ Copy Percentage 和 Max 至少填一个，也可以两个都填。只填 Max 时
 
 | 选项 | 作用 |
 | --- | --- |
-| **TP/SL Currency** | 用 SOL/ETH 还是 USD 衡量盈亏。同时决定第 1 步里 Max 的单位。 |
+| **TP/SL Currency** | 用这条链的币（SOL、ETH、BNB 或 HYPE）还是 USD 衡量盈亏。同时决定第 1 步里 Max 的单位。 |
 | **Take Profit** | 跟单涨了这么多百分比时平仓。 |
 | **Stop Loss** | 跟单跌了这么多百分比时平仓。 |
 
@@ -60,7 +60,7 @@ TP/SL 会在每个跟单仓位开仓时保存到这个仓位上。之后就算�
     - **DLMM**：把流动性放在价格 bin 里的 Meteora 池子。选择要跟哪些 **Strategies**（策略）：**Spot**（均匀分布）、**Curve**（集中在当前价格附近）、**BidAsk**（集中在两端）和 **Custom**（其他任何形状）。如果带单仓位用的是你取消勾选的策略，就会被跳过。
     - **DAMM V2**：把流动性分布在一个价格区间上的 Meteora 池子。所有 DAMM V2 仓位都会被跟。
   </Tab>
-  <Tab title="Robinhood Chain">
+  <Tab title="Robinhood Chain、Elysium">
     <Frame>
       ![Robinhood Chain 上的跟单范围](/images/app/rh-copy-settings-what-to-copy.jpg)
       <em>Uniswap V3、Uniswap V4 和带 Hook 池子的规则</em>
@@ -73,6 +73,12 @@ TP/SL 会在每个跟单仓位开仓时保存到这个仓位上。之后就算�
       - **Specific pools**：只跟你添加的池子。搜索代币或粘贴池子 ID（0x 加 64 个字符）。弹窗会列出这个带单钱包用过的带 Hook 池子。Hook 完全不碰流动性的池子会显示 **No LP hook, copies anyway**。最多 50 个池子。
 
     Hook 规则只作用于开仓和添加流动性。退出永远不会被拦。
+
+    Elysium 上也是这两张卡片，带 Hook 池子的规则也一样。
+  </Tab>
+  <Tab title="BNB Chain">
+    - **PancakeSwap V3**：标准的 PancakeSwap 池子。所有 V3 仓位都会被跟。
+    - **PancakeSwap Infinity CL**：PancakeSwap 较新的池子，其中有些带 Hook。暂时还不会被跟单：卡片上显示 **Soon**。
   </Tab>
 </Tabs>
 
@@ -87,18 +93,18 @@ TP/SL 会在每个跟单仓位开仓时保存到这个仓位上。之后就算�
 
 ### Meme Protection
 
-**Meme Protection**（Meme 保护）在两个网络上都默认开启。跟单开仓或加仓时，如果可信的那一边（Solana 上是 SOL、USDC、USDT；Robinhood Chain 上是 ETH、WETH、USDG）几乎为空，也就是你的跟单存入的金额有超过 95% 会落在另一种代币上，这次跟单会被跳过。两种代币都可信、或者都不可信的池子不做这项检查。
+**Meme Protection**（Meme 保护）在每个网络上都默认开启。跟单开仓或加仓时，如果可信的那一边（Solana 上是 SOL、USDC、USDT；Robinhood Chain 上是 ETH、WETH、USDG；BNB Chain 上是 BNB、WBNB、USDT、USDC；Elysium 上是 HYPE、WHYPE）几乎为空，也就是你的跟单存入的金额有超过 95% 会落在另一种代币上，这次跟单会被跳过。两种代币都可信、或者都不可信的池子不做这项检查。
 
 被 Meme Protection 拒绝算作跳过，不算失败，也不会重试。Copy Logs（跟单日志）里的原因显示为 **Meme protection**，展开这一行会告诉你怎样才能让下一次通过。
 
 有些带单钱包会把一个代币撤出来，过一会儿再只用这个代币加回去。没开 Smart Token Retention 时，带单钱包撤出时你的跟单就把代币卖了，所以加回时几乎全是 meme 代币，会被 Meme Protection 跳过。结果你的跟单仓位比带单钱包少。想跟上这类加回，有两种办法：
 
-- **开启 Smart Token Retention**（Solana，DLMM，见下文）。你的跟单会留着撤出的代币。如果带单钱包在你设的保留时长内把它加回来，你的跟单就把留着的代币加回去，Meme Protection 会放行这次加回。
+- **开启 Smart Token Retention**（见下文）。你的跟单会留着撤出的代币。如果带单钱包在你设的保留时长内把它加回来，你的跟单就把留着的代币加回去，Meme Protection 会放行这次加回。
 - **为这个带单钱包关掉 Meme Protection**。之后每次跟单都会执行，包括几乎全是 meme 代币的那些。
 
-### Smart Token Retention（Solana，DLMM）
+### Smart Token Retention
 
-默认关闭。带单钱包经常撤出流动性或平仓，一分钟后又把同一个代币加回来。正常情况下，你的跟单会在退出时卖掉这个代币，再在加回时重新买入。开启 **Smart Token Retention**（智能代币保留）后，你的跟单会 **把代币保留一小段时间**，如果同一个带单钱包把它加回来，就直接复用。这样省掉一次卖出和一次买入。DAMM V2 的退出仍然会马上卖掉代币。
+适用于 Solana 的 DLMM 跟单，以及 Robinhood Chain、BNB Chain 和 Elysium 上用这条链的币（ETH、BNB 或 HYPE）出资的跟单。用稳定币出资的跟单不能用。默认关闭。带单钱包经常撤出流动性或平仓，一分钟后又把同一个代币加回来。正常情况下，你的跟单会在退出时卖掉这个代币，再在加回时重新买入。开启 **Smart Token Retention**（智能代币保留）后，你的跟单会 **把代币保留一小段时间**，如果同一个带单钱包把它加回来，就直接复用。这样省掉一次卖出和一次买入。DAMM V2 的退出仍然会马上卖掉代币。
 
 | 选项 | 可选值 |
 | --- | --- |
@@ -111,7 +117,7 @@ TP/SL 会在每个跟单仓位开仓时保存到这个仓位上。之后就算�
   大多数退出之后并不会再加回来。代币卖出之前价格可能下跌，这部分亏损由你承担。关闭保留功能、暂停或停止跟单，都会卖掉所有被保留的代币。
 </Warning>
 
-被保留的代币在 Copy Logs 里显示为 **Holding**，带倒计时和 **Sell now** 按钮。卖掉被保留的代币，就是这次跟单的换回（swap back）。如果卖不掉，这次跟单会显示 **Tokens left in wallet**（钱包里有剩余代币），并带 **Swap to SOL** 按钮。
+被保留的代币在 Copy Logs 里显示为 **Holding**，带倒计时和 **Sell now** 按钮。卖掉被保留的代币，就是这次跟单的换回（swap back）。如果卖不掉，这次跟单会显示 **Tokens left in wallet**（钱包里有剩余代币），并带 **Swap to SOL** 按钮（或换成这条链的币）。
 
 ## 第 5 步：Label（标签）
 
@@ -123,7 +129,8 @@ TP/SL 会在每个跟单仓位开仓时保存到这个仓位上。之后就算�
 
 - **Settings > Security**：最低市值、最低 24h 交易量、最低持有人数、Jupiter organic score（Solana）以及你的代币 **Blacklist**（黑名单）。任何一项不通过的代币都会被跳过。
 - **Settings > Swap > Slippage**：用于代理（agent）替你做的每一次兑换，包括跟单和换回（swap back）。
-- **Settings > General > Base Token** 和 **Keep ETH**（Robinhood Chain）：用 ETH 或 USDG 为跟单出资，并让 ETH 保持充足用来付 Gas。
+- **Settings > General > Base Token** 和 **Keep ETH** / **Keep BNB** / **Keep HYPE**（Robinhood Chain、BNB Chain、Elysium）：用什么币为跟单出资，以及用稳定币出资时自动补足 Gas。
+- **Settings > Security > Max Pool Fee**（Robinhood Chain、BNB Chain、Elysium）：每次买入或卖出代币时，池子收取的费用达到或超过这个比例就跳过。默认 15%。每个网络各有自己的上限。
 
 <Note>
   在 Robinhood Chain 上，如果开仓加平仓的 Gas 超过跟单金额的 3%，自动跟单会被跳过，显示为 **Too small for gas**。
