@@ -20,15 +20,17 @@ description: "登录方式、代理钱包、账户面板、反馈记录、充值
   请始终用你注册时的钱包或邮箱登录。代理钱包不是登录钱包：如果你把它导入 Phantom 或其他钱包，再用它登录，LP Agent 会为它开一个全新的、独立的账户，里面是一个空的代理钱包。你的仓位和资金仍然在原来的账户里。
 </Note>
 
-### 一个账户对应一个网络
+### Solana 账户或 EVM 账户
 
-你的账户绑定一个网络：
+你的账户要么是 Solana 账户，要么是 EVM 账户：
 
 - 用 **Solana** 钱包登录，玩 Meteora DLMM 和 DAMM v2 池子。
-- 用 **EVM** 钱包（0x 地址）登录，玩 Robinhood Chain 上的 Uniswap V3 和 V4 池子。
-- 新的**邮箱**账户会让你选一次 **Solana** 或 **Robinhood**。
+- 用 **EVM** 钱包（0x 地址）登录，玩 Robinhood Chain 上的 Uniswap V3 和 V4 池子、BNB Chain 上的 PancakeSwap 池子，以及 Elysium 上的 Uniswap V3 和 V4 池子。
+- 新的**邮箱**账户会让你选一次 **Solana** 或 **Robinhood**。想要 EVM 账户就选 **Robinhood**：它同时包含 BNB Chain 和 Elysium。
 
-你仍然可以浏览另一个网络上的池子和钱包，但只能在你账户所属的网络上开仓或跟单。
+EVM 账户在三个 EVM 网络上用同一个代理钱包地址。用应用顶部的 **Chain** 菜单切换网络。每个网络的余额各算各的：Robinhood Chain 上的 ETH、BNB Chain 上的 BNB 和 Elysium 上的 HYPE 是不同的币，即使地址一样。
+
+用 EVM 账户也能浏览 Solana 上的池子和钱包，反过来也一样，但只能在你账户所属的网络上开仓或跟单。
 
 ### 钱包升级前创建的账户
 
@@ -67,7 +69,7 @@ LP Agent 在 2026 年 9 月迁移到了新的钱包基础设施。大多数老�
 - **Deposit**（充值）、**Withdraw**（提现）和 **Settings**（设置）。
 - **Finish setup**（完成设置）：你还没完成的设置步骤。全部完成后就不再显示。详见下方“完成设置”。
 - **Reports**（反馈记录）：你最近的三条反馈及其进度，可以点 **See all**（查看全部）。详见下方“反馈记录”。
-- **Assets**（资产）：你的代币及其价值，以及按美元和 SOL 或 ETH 计算的总额。低于 $1 的小额余额会折叠在 **Show all** 后面。点一下代币就能兑换它。
+- **Assets**（资产）：你的代币及其价值，以及按美元和该网络自己的币（SOL、ETH、BNB 或 HYPE）计算的总额。低于 $1 的小额余额会折叠在 **Show all** 后面。点一下代币就能兑换它。
 - **Get API Key**、**Docs**、**Language**（语言）、**Disconnect**，以及我们的 Discord 和 X 链接。
 
 面板里有需要你查看的内容时，顶部栏的钱包按钮上会出现一个**黄点**：可能是还没完成的设置步骤，也可能是你的反馈有了新进度。LP Agent 不会为这些弹窗打扰你。
@@ -131,6 +133,8 @@ LP Agent 在 2026 年 9 月迁移到了新的钱包基础设施。大多数老�
 | --- | --- | --- |
 | Solana | SOL | 最低 0.001 SOL。 |
 | Robinhood Chain | ETH | ETH 用来付 Gas。想用 USDG 开仓，就通过 **Receive** 充值 USDG，并在 Settings 里把 **Base Token** 设为 USDG。 |
+| BNB Chain | BNB | BNB 用来付 Gas。想用 USDT 或 USDC 开仓，就在 BNB Chain 上通过 **Receive** 充值，并在 Settings 里设置 **Base Token**。 |
+| Elysium | HYPE | HYPE 用来付 Gas。想用 USDC 开仓，就在 Elysium 上通过 **Receive** 充值，并在 Settings 里设置 **Base Token**。 |
 
 邮箱登录的账户只有 **Receive**。应用内不支持银行卡或银行买币：请在别处买好加密货币再转进来。
 

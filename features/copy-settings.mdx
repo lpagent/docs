@@ -7,7 +7,7 @@ The copy dialog opens when you press **Copy LP** on a wallet's portfolio, or cli
 
 - **Copying on / off** (top right): turn it off to keep following the wallet without copying anything. It moves to **Paused** in your list.
 - **Copy** (new) or **Update Copy** (existing) saves every step at once. The footer counts your unsaved changes.
-- The box under the steps shows the net worth we suggest for copying: **5 SOL** on Solana, **0.08 ETH** on Robinhood Chain. It is advice only; nothing is blocked.
+- The box under the steps shows the net worth we suggest for copying: **5 SOL** on Solana, **0.08 ETH** on Robinhood Chain, **0.3 BNB** on BNB Chain, **5 HYPE** on Elysium. It is advice only; nothing is blocked.
 
 ## Step 1: Sizing
 
@@ -22,7 +22,7 @@ The copy dialog opens when you press **Copy LP** on a wallet's portfolio, or cli
 | **Copy Percentage** | Whole number from 1% to 10000%. Above 100% makes your positions bigger than the leader's. |
 | **Suggested** + **Apply** | Your net worth divided by the leader's. Copying at this share keeps each position the same fraction of your wallet as it is of theirs. |
 | **Max Increase Amount per Tx** | Optional cap on each copied open and each copied add, in your TP/SL currency. Leave it empty for no cap. |
-| **Funding currency** (Robinhood Chain) | Shows whether new copies use ETH or USDG, and your ETH for gas. Change it in Settings. |
+| **Funding currency** (Robinhood Chain, BNB Chain, Elysium) | Shows what new copies buy in with (ETH or USDG; BNB, USDT or USDC; HYPE or USDC) and your gas balance in the chain's coin. Change it in Settings. On BNB Chain and Elysium it also shows your agent wallet address, to send funds on that network. |
 
 You need a Copy Percentage, a Max, or both. With only a Max, each copy matches the leader's amount, up to the Max. When the Max cuts an open short, the leader's later adds to that position are copied at the smaller share the open got. See [How sizing works](/features/copy-lp#how-sizing-works).
 
@@ -30,7 +30,7 @@ You need a Copy Percentage, a Max, or both. With only a Max, each copy matches t
   A Max of **0** would copy nothing, so it can't be saved. To copy without a cap, leave the field empty. An older copy still set to 0 shows a red note under the field.
 </Warning>
 
-**Fast wallets:** when the leader holds positions for less than 18 minutes on average (Solana) or 1 hour (Robinhood Chain), the dialog shows a **High-frequency** warning. You pay a swap in, a swap back and network fees on every flip, whether or not the trade worked. On Solana, when that wallet also often adds the same token back within a minute of an exit, the warning says how often and offers **Turn on Smart Token Retention**.
+**Fast wallets:** when the leader holds positions for less than 18 minutes on average (Solana) or 1 hour (Robinhood Chain, BNB Chain, Elysium), the dialog shows a **High-frequency** warning. You pay a swap in, a swap back and network fees on every flip, whether or not the trade worked. On Solana, when that wallet also often adds the same token back within a minute of an exit, the warning says how often and offers **Turn on Smart Token Retention**.
 
 ## Step 2: Exit rules
 
@@ -38,7 +38,7 @@ When your copy closes on its own, before the leader does.
 
 | Option | What it does |
 | --- | --- |
-| **TP/SL Currency** | Measure profit and loss in SOL/ETH or in USD. Also sets the unit of the Max in step 1. |
+| **TP/SL Currency** | Measure profit and loss in the chain's coin (SOL, ETH, BNB or HYPE) or in USD. Also sets the unit of the Max in step 1. |
 | **Take Profit** | Close the copy when it is up this many percent. |
 | **Stop Loss** | Close the copy when it is down this many percent. |
 
@@ -60,7 +60,7 @@ Pick which of the leader's pool types you follow. Untick a type to skip it.
     - **DLMM**: Meteora pools that hold liquidity in price bins. Pick which **Strategies** to copy: **Spot** (even spread), **Curve** (piled near the price), **BidAsk** (at the edges) and **Custom** (anything else). A leader position with a strategy you unticked is skipped.
     - **DAMM V2**: Meteora pools that spread liquidity over one price range. Every DAMM V2 position is copied.
   </Tab>
-  <Tab title="Robinhood Chain">
+  <Tab title="Robinhood Chain, Elysium">
     <Frame>
       ![What to copy on Robinhood Chain](/images/app/rh-copy-settings-what-to-copy.jpg)
       <em>Uniswap V3, Uniswap V4 and the hooked pools rule</em>
@@ -73,6 +73,12 @@ Pick which of the leader's pool types you follow. Untick a type to skip it.
       - **Specific pools**: only the pools you add. Search a token or paste a pool ID (0x plus 64 characters). The dialog lists the hooked pools this leader uses. Pools whose hook never touches liquidity show **No LP hook, copies anyway**. Up to 50 pools.
 
     The hook rule only applies to opens and adds. Exits are never blocked.
+
+    Elysium has the same two cards and the same hooked pools rule.
+  </Tab>
+  <Tab title="BNB Chain">
+    - **PancakeSwap V3**: standard PancakeSwap pools. Every V3 position is copied.
+    - **PancakeSwap Infinity CL**: PancakeSwap's newer pools, some with hooks. Not copied yet: the card shows **Soon**.
   </Tab>
 </Tabs>
 
@@ -87,18 +93,18 @@ Guards that change what LP Agent does with this wallet's trades.
 
 ### Meme Protection
 
-On by default, both networks. Skips a copied open or add when its trusted side (SOL, USDC, USDT on Solana; ETH, WETH, USDG on Robinhood Chain) would be nearly empty, that is, when more than 95% of what your copy deposits would sit in the other token. Pools where both tokens are trusted, or neither is, are not checked.
+On by default, on every network. Skips a copied open or add when its trusted side (SOL, USDC, USDT on Solana; ETH, WETH, USDG on Robinhood Chain; BNB, WBNB, USDT, USDC on BNB Chain; HYPE, WHYPE on Elysium) would be nearly empty, that is, when more than 95% of what your copy deposits would sit in the other token. Pools where both tokens are trusted, or neither is, are not checked.
 
 A Meme Protection refusal is a skip, not a failure: it is not retried. Copy Logs shows the reason **Meme protection**, and the row says what lets the next one through.
 
 Some leaders pull a token out and put it back a moment later as that token alone. Without Smart Token Retention, your copy sells the token when the leader pulls it, so the re-add would be almost all meme token and Meme Protection skips it. Your copy then holds less than the leader. Two ways to follow these re-adds:
 
-- **Turn on Smart Token Retention** (Solana, DLMM, below). Your copy keeps the token it pulled. If the leader adds it back within your hold time, your copy puts the kept token back, and Meme Protection lets that re-add through.
+- **Turn on Smart Token Retention** (below). Your copy keeps the token it pulled. If the leader adds it back within your hold time, your copy puts the kept token back, and Meme Protection lets that re-add through.
 - **Turn Meme Protection off** for this leader. Every copy then goes through, including ones that are almost all meme token.
 
-### Smart Token Retention (Solana, DLMM)
+### Smart Token Retention
 
-Off by default. Leaders often pull liquidity, or close, and add the same token back a minute later. Normally your copy sells the token on exit and buys it again on the re-add. With Smart Token Retention on, your copy **keeps the token for a short time** instead, and reuses it if the same leader adds it back. That skips a sell and a buy. DAMM V2 exits still sell the token right away.
+Works on Solana DLMM copies, and on Robinhood Chain, BNB Chain and Elysium copies funded in the chain's coin (ETH, BNB or HYPE). A copy funded in a stable coin can't use it. Off by default. Leaders often pull liquidity, or close, and add the same token back a minute later. Normally your copy sells the token on exit and buys it again on the re-add. With Smart Token Retention on, your copy **keeps the token for a short time** instead, and reuses it if the same leader adds it back. That skips a sell and a buy. DAMM V2 exits still sell the token right away.
 
 | Option | Choices |
 | --- | --- |
@@ -111,7 +117,7 @@ When this wallet has enough copy history, the card shows how often it added the 
   Most exits are not added back. Until the token is sold, its price can drop and you take that loss. Turning retention off, pausing or stopping the copy sells any kept tokens.
 </Warning>
 
-Kept tokens show as **Holding** in Copy Logs, with a countdown and a **Sell now** button. Selling a kept token is that copy's swap back. If it can't be sold, the copy shows **Tokens left in wallet** with a **Swap to SOL** button.
+Kept tokens show as **Holding** in Copy Logs, with a countdown and a **Sell now** button. Selling a kept token is that copy's swap back. If it can't be sold, the copy shows **Tokens left in wallet** with a **Swap to SOL** button (or the chain's coin).
 
 ## Step 5: Label
 
@@ -123,7 +129,8 @@ These live in [Settings](/features/settings), not in the copy dialog:
 
 - **Settings > Security**: minimum market cap, minimum 24h volume, minimum holders, Jupiter organic score (Solana) and your token **Blacklist**. A token that fails any of them is skipped.
 - **Settings > Swap > Slippage**: used for every swap your agent makes, including copies and swap backs.
-- **Settings > General > Base Token** and **Keep ETH** (Robinhood Chain): fund copies in ETH or USDG, and keep ETH topped up for gas.
+- **Settings > General > Base Token** and **Keep ETH** / **Keep BNB** / **Keep HYPE** (Robinhood Chain, BNB Chain, Elysium): what funds your copies, and keeping gas topped up when you fund with a stable coin.
+- **Settings > Security > Max Pool Fee** (Robinhood Chain, BNB Chain, Elysium): skips pools that charge this much or more each time the token is bought or sold. 15% by default. Each of these networks has its own limit.
 
 <Note>
   On Robinhood Chain, an automatic copy is skipped as **Too small for gas** when the gas to open and close it would be more than 3% of the copy's size.

@@ -12,7 +12,8 @@ description: "Net worth, PnL history and every position, for your wallet or any 
 
 ## Header
 
-- The wallet address, its network, and links to the block explorer and portfolio trackers (Solscan and Jupiter on Solana; Etherscan and DeBank on Robinhood Chain).
+- The wallet address, its network, and links to the block explorer and portfolio trackers (Solscan and Jupiter on Solana; Etherscan and DeBank on Robinhood Chain; BscScan and DeBank on BNB Chain; Elysium Explorer on Elysium).
+- On a 0x wallet, the chain picker shows **EVM** first: Robinhood Chain, BNB Chain and Elysium together, in USD, since it is the same address on each. Pick one network to see it on its own.
 - **Refresh** and when the data was last updated.
 - On someone else's wallet: **Copy LP** to copy it. See [Copy LP](/features/copy-lp).
 - On Solana, a banner when you can claim SOL back from unused token accounts. See [Claim SOL](/features/claim-sol).
@@ -23,7 +24,7 @@ description: "Net worth, PnL history and every position, for your wallet or any 
 
 ## Metrics
 
-The **$** toggle in the header switches every number between the native token (SOL or ETH) and USD.
+The **$** toggle in the header switches every number between the native token (SOL, ETH, BNB or HYPE) and USD. The combined **EVM** view is in USD only.
 
 | Metric | Meaning |
 | --- | --- |
@@ -39,7 +40,7 @@ The **$** toggle in the header switches every number between the native token (S
 ## Profit history
 
 - Switch between **PnL** and **Fee**.
-- Filter by protocol: DLMM or DAMM V2 on Solana; V3 or V4 on Robinhood Chain.
+- Filter by protocol: DLMM or DAMM V2 on Solana; V3 or V4 on Robinhood Chain and Elysium; PancakeSwap V3 or PancakeSwap Infinity on BNB Chain.
 - Group by **Daily**, **Weekly** or **Monthly**, over **7D**, **MTD**, **1M**, **3M**, **1Y**, **YTD** or **ALL**.
 - The calendar icon shows a month view with green and red days. Click a day (or **Share**) to share that day's result as a card.
 
@@ -51,7 +52,7 @@ On a phone, **Table** keeps every column and scrolls sideways. **Card** shows a 
 
 | Column | Meaning |
 | --- | --- |
-| **Position/Pool** | Pair, protocol, strategy and position ID (`#tokenId` on Robinhood Chain). The chart icon shows the price with your range. A badge tells you if it is **Manual** (you opened it, or LP Agent found it in your wallet) or **Auto** (copied from a leader). |
+| **Position/Pool** | Pair, protocol, strategy and position ID (`#tokenId` on Robinhood Chain, BNB Chain and Elysium). The chart icon shows the price with your range. A badge tells you if it is **Manual** (you opened it, or LP Agent found it in your wallet) or **Auto** (copied from a leader). |
 | **Age** | How long it has been open |
 | **Invested** / **Value** | What you put in and what it is worth now. Hover for token amounts. |
 | **Total Fee** | Claimed plus unclaimed fees, and fees as a % of what you invested |
@@ -71,10 +72,10 @@ Press **Filter** to narrow the list. The number on the button shows how many fil
 
 | Filter | What it does |
 | --- | --- |
-| **Type** | The protocol: DLMM or DAMM V2 on Solana; Uniswap V3 or Uniswap V4 on Robinhood Chain. |
+| **Type** | The protocol: DLMM or DAMM V2 on Solana; Uniswap V3 or Uniswap V4 on Robinhood Chain and Elysium; PancakeSwap V3 or PancakeSwap Infinity on BNB Chain. |
 | **Source** | **All positions**, **Auto only** or **Manual only**. Only on your own agent wallet. |
 | **Pool** | One pool this wallet has closed positions in. Search by pair, or paste a pool address. |
-| **PnL** | A minimum and a maximum PnL, in the currency the page shows (USD, SOL or ETH). Both ends are included. |
+| **PnL** | A minimum and a maximum PnL, in the currency the page shows (USD, SOL, ETH, BNB or HYPE). Both ends are included. |
 
 Press **Apply** to use them, or **Reset** to clear them all. The filters are kept in the page link, so a bookmark opens the same filtered list.
 
@@ -86,7 +87,7 @@ Click a position to open its details:
 
 - **Profit And Loss**, **Age**, **Liquidity** (current value next to what the tokens would be worth if you had just held them) and **Fee** (claimed and unclaimed, per token).
 - On Solana DLMM, a **Price Bin** chart of your liquidity per bin and the current price.
-- **History**: every transaction on the position, with links. **Export CSV** downloads it as a spreadsheet file: time (UTC), transaction hash, action, status, each token's amount, price and USD value, and the total in USD and in SOL or ETH. Numbers are written in full, not shortened (no "1.2k").
+- **History**: every transaction on the position, with links. **Export CSV** downloads it as a spreadsheet file: time (UTC), transaction hash, action, status, each token's amount, price and USD value, and the total in USD and in the chain's coin (SOL, ETH, BNB or HYPE). Numbers are written in full, not shortened (no "1.2k").
 - **Logs** (your positions only): what LP Agent did, such as take profit queued or close success.
 - For copied positions, which leader position it was copied from.
 

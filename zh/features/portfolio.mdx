@@ -12,7 +12,8 @@ description: "净资产、盈亏历史和所有仓位，你自己的钱包或任
 
 ## 顶部信息
 
-- 钱包地址、所在网络，以及区块浏览器和资产追踪工具的链接（Solana 上是 Solscan 和 Jupiter；Robinhood Chain 上是 Etherscan 和 DeBank）。
+- 钱包地址、所在网络，以及区块浏览器和资产追踪工具的链接（Solana 上是 Solscan 和 Jupiter；Robinhood Chain 上是 Etherscan 和 DeBank；BNB Chain 上是 BscScan 和 DeBank；Elysium 上是 Elysium Explorer）。
+- 在 0x 钱包上，链选择器第一项是 **EVM**：把 Robinhood Chain、BNB Chain 和 Elysium 合在一起看，单位是 USD，因为三个网络上是同一个地址。选某一个网络就只看它自己。
 - **Refresh**（刷新）和数据最后更新的时间。
 - 在别人的钱包上：按 **Copy LP** 跟单这个钱包。详见 [Copy LP](/zh/features/copy-lp)。
 - 在 Solana 上，如果你能从没用的代币账户里领回 SOL，会显示一个横幅。详见 [Claim SOL](/zh/features/claim-sol)。
@@ -23,7 +24,7 @@ description: "净资产、盈亏历史和所有仓位，你自己的钱包或任
 
 ## 指标
 
-顶栏的 **$** 开关可以把所有数字在原生代币（SOL 或 ETH）和 USD 之间切换。
+顶栏的 **$** 开关可以把所有数字在原生代币（SOL、ETH、BNB 或 HYPE）和 USD 之间切换。合并的 **EVM** 视图只有 USD。
 
 | 指标 | 含义 |
 | --- | --- |
@@ -39,7 +40,7 @@ description: "净资产、盈亏历史和所有仓位，你自己的钱包或任
 ## 收益历史
 
 - 在 **PnL** 和 **Fee** 之间切换。
-- 按协议筛选：Solana 上是 DLMM 或 DAMM V2；Robinhood Chain 上是 V3 或 V4。
+- 按协议筛选：Solana 上是 DLMM 或 DAMM V2；Robinhood Chain 和 Elysium 上是 V3 或 V4；BNB Chain 上是 PancakeSwap V3 或 PancakeSwap Infinity。
 - 按 **Daily**、**Weekly** 或 **Monthly** 分组，时间范围可选 **7D**、**MTD**、**1M**、**3M**、**1Y**、**YTD** 或 **ALL**。
 - 日历图标会打开月视图，每一天用绿色或红色标出。点某一天（或按 **Share**）可以把那天的结果做成卡片分享。
 
@@ -51,7 +52,7 @@ description: "净资产、盈亏历史和所有仓位，你自己的钱包或任
 
 | 列 | 含义 |
 | --- | --- |
-| **Position/Pool** | 交易对、协议、策略和仓位 ID（Robinhood Chain 上是 `#tokenId`）。图表图标会显示价格和你的区间。标签告诉你它是 **Manual**（手动：你自己开的，或者 LP Agent 在你钱包里发现的）还是 **Auto**（自动：从带单钱包跟单来的）。 |
+| **Position/Pool** | 交易对、协议、策略和仓位 ID（Robinhood Chain、BNB Chain 和 Elysium 上是 `#tokenId`）。图表图标会显示价格和你的区间。标签告诉你它是 **Manual**（手动：你自己开的，或者 LP Agent 在你钱包里发现的）还是 **Auto**（自动：从带单钱包跟单来的）。 |
 | **Age** | 开了多久 |
 | **Invested** / **Value** | 你投入了多少，现在值多少。鼠标悬停可以看代币数量。 |
 | **Total Fee** | 已领取加未领取的手续费，以及手续费占你投入的百分比 |
@@ -71,10 +72,10 @@ description: "净资产、盈亏历史和所有仓位，你自己的钱包或任
 
 | 筛选 | 作用 |
 | --- | --- |
-| **Type** | 协议：Solana 上是 DLMM 或 DAMM V2；Robinhood Chain 上是 Uniswap V3 或 Uniswap V4。 |
+| **Type** | 协议：Solana 上是 DLMM 或 DAMM V2；Robinhood Chain 和 Elysium 上是 Uniswap V3 或 Uniswap V4；BNB Chain 上是 PancakeSwap V3 或 PancakeSwap Infinity。 |
 | **Source** | **All positions**、**Auto only** 或 **Manual only**（全部、只看自动、只看手动）。只在你自己的代理钱包上有。 |
 | **Pool** | 这个钱包平过仓的某一个池子。可以按交易对搜索，也可以粘贴池子地址。 |
-| **PnL** | 盈亏的最小值和最大值，单位是页面当前显示的币种（USD、SOL 或 ETH）。两端的值都包含在内。 |
+| **PnL** | 盈亏的最小值和最大值，单位是页面当前显示的币种（USD、SOL、ETH、BNB 或 HYPE）。两端的值都包含在内。 |
 
 按 **Apply** 应用筛选，或按 **Reset** 全部清除。筛选条件会保存在页面链接里，所以收藏这个链接，下次打开还是同样的筛选结果。
 
@@ -86,7 +87,7 @@ description: "净资产、盈亏历史和所有仓位，你自己的钱包或任
 
 - **Profit And Loss**、**Age**、**Liquidity**（当前价值，旁边是如果你一直拿着这些代币不动，现在值多少）和 **Fee**（已领取和未领取，按代币分开列）。
 - 在 Solana DLMM 上，有 **Price Bin** 图表，显示你在每个 bin 的流动性和当前价格。
-- **History**：这个仓位的每一笔交易，带链接。按 **Export CSV** 可以下载成表格文件：时间（UTC）、交易哈希、操作、状态、每个代币的数量、价格和 USD 价值，以及按 USD 和按 SOL 或 ETH 计的总额。数字完整写出，不做缩写（不会写成 "1.2k"）。
+- **History**：这个仓位的每一笔交易，带链接。按 **Export CSV** 可以下载成表格文件：时间（UTC）、交易哈希、操作、状态、每个代币的数量、价格和 USD 价值，以及按 USD 和按这条链的币（SOL、ETH、BNB 或 HYPE）计的总额。数字完整写出，不做缩写（不会写成 "1.2k"）。
 - **Logs**（只有你自己的仓位才有）：LP Agent 做了什么，比如 take profit queued（止盈已排队）或 close success（平仓成功）。
 - 跟单来的仓位会显示它是跟的哪个带单钱包的哪个仓位。
 

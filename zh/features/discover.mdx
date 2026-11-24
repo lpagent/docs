@@ -3,7 +3,7 @@ title: "Discover"
 description: "找到值得做 LP 的代币：按交易量、Fee/TVL、安全性和 smart LP 实时排名，一键打开它的池子"
 ---
 
-LP 亏钱，多半是代币选错了，而不是区间没设好。**Discover**（发现）就是先选代币的地方：它把 Solana 和 Robinhood Chain 上有池子的代币，按交易量怎么变化、池子赚多少手续费、看起来有多安全、有没有 smart LP 在里面来排名。从一个代币可以直接打开它最好的池子；还没有池子的，可以自己创建一个。
+LP 亏钱，多半是代币选错了，而不是区间没设好。**Discover**（发现）就是先选代币的地方：它把 Solana、Robinhood Chain、BNB Chain 和 Elysium 上有池子的代币，按交易量怎么变化、池子赚多少手续费、看起来有多安全、有没有 smart LP 在里面来排名。从一个代币可以直接打开它最好的池子；还没有池子的，可以自己创建一个（Solana 和 Robinhood Chain）。
 
 Discover 是应用的首页：打开 [app.lpagent.io](https://app.lpagent.io/) 或点 logo 就会进入，它也排在菜单第一位。
 
@@ -14,7 +14,9 @@ Discover 是应用的首页：打开 [app.lpagent.io](https://app.lpagent.io/) �
 
 ## 选一个列表
 
-先在左边选链（**Solana** 或 **Robinhood**），再选一个预设。每个预设就是一种排序加一个筛选，之后两者都可以再改。
+先在左边选链（**Solana**、**Robinhood**、**Elysium** 或 **BNB Chain**），再选一个预设。EVM 账户只能看到三条 EVM 链。每个预设就是一种排序加一个筛选，之后两者都可以再改。
+
+在 BNB Chain 和 Elysium 上，代币只来自它们的池子，所以那里没有 **Smart money in** 和 **No Pool** 列表。
 
 | 预设 | 显示什么 |
 | --- | --- |
@@ -61,7 +63,7 @@ Discover 会记住你上次选的链和列表（预设或排序、**Hide risky**
 | **Holders** | 持有人数 |
 | **Impersonation flag** | 这个代号属于一个已登记的代币，但这是另一个合约。这一行会标 **Fake ticker**。 |
 
-打开 **Hide risky** 会隐藏 40 分以下的代币。没有审计数据的代币也会被隐藏，因为它们没有分数可以达标。Robinhood Chain 目前还没有代币审计来源，所以那里的代币只显示能拿到的检查项。
+打开 **Hide risky** 会隐藏 40 分以下的代币。没有审计数据的代币也会被隐藏，因为它们没有分数可以达标。Robinhood Chain 和 Elysium 目前还没有代币审计来源，所以那里的代币只显示能拿到的检查项。在 BNB Chain 上，审计数据来自 GoPlus；GoPlus 还没审计过的代币，显示我们已有的检查项。
 
 ## 筛选
 

@@ -24,12 +24,13 @@ Opening, copying and closing positions for you needs a key that can sign without
     - Direct token transfers out are blocked
     - Token approvals and authority changes are blocked
   </Card>
-  <Card title="Robinhood Chain" icon="link">
-    - Uniswap V3 and V4 position actions
+  <Card title="Robinhood Chain, BNB Chain, Elysium" icon="link">
+    - Uniswap V3 and V4 position actions (PancakeSwap on BNB Chain)
     - Swaps through approved swap routers
-    - Token approvals only to Uniswap and the approved swap routers
-    - Wrapping and unwrapping ETH
+    - Token approvals only to Uniswap (PancakeSwap on BNB Chain) and the approved swap routers
+    - Wrapping and unwrapping the chain's coin (ETH, BNB or HYPE)
     - Paying the LP Agent fee
+    - Each chain's rules are pinned to that chain, with its own contracts
   </Card>
 </CardGroup>
 
@@ -40,8 +41,10 @@ Opening, copying and closing positions for you needs a key that can sign without
 On top of the key rules, LP Agent adds guards you control:
 
 - **Token filters** in **Settings > Security**: minimum market cap, 24h volume and holder count, a Jupiter organic score floor on Solana, and a token blacklist. Tokens that fail are skipped. See [Settings](/features/settings#security).
-- **Meme Protection** on copies skips positions where the trusted side (SOL, USDC, USDT, ETH, WETH or USDG) is nearly empty.
+- **Meme Protection** on copies skips positions where the trusted side (for example SOL, USDC, USDT, ETH, WETH, USDG, BNB, WBNB or HYPE) is nearly empty.
 - **Uniswap V4 hooked pools** are not copied unless you allow them.
+- **Max Pool Fee** (Robinhood Chain, BNB Chain, Elysium) skips copies into pools that take a big cut each time the token is bought or sold.
+- On **BNB Chain**, LP Agent never buys a token with a buy, sell or transfer tax, or one flagged as a honeypot. Transactions go through PancakeSwap's MEV Guard.
 - **Fund protection** (Solana) pauses copying when your copy losses hit the limit you set.
 - **Take profit and stop loss** close positions at the thresholds you choose.
 

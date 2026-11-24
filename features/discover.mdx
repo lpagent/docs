@@ -3,7 +3,7 @@ title: "Discover"
 description: "Find the token worth an LP: tokens ranked live by volume, Fee/TVL, safety and smart LPs, with their pools one click away"
 ---
 
-Most LP losses start with a bad token, not a bad range. **Discover** is where you pick the token first: it ranks the tokens that have pools on Solana and Robinhood Chain by how their volume moves, how much their pools earn, how safe they look and whether smart LPs are in them. From a token you open its best pool, or create one if it has none.
+Most LP losses start with a bad token, not a bad range. **Discover** is where you pick the token first: it ranks the tokens that have pools on Solana, Robinhood Chain, BNB Chain and Elysium by how their volume moves, how much their pools earn, how safe they look and whether smart LPs are in them. From a token you open its best pool, or create one if it has none (Solana and Robinhood Chain).
 
 Discover is the app's home page: [app.lpagent.io](https://app.lpagent.io/) and the logo open it, and it sits first in the menu.
 
@@ -14,7 +14,9 @@ Discover is the app's home page: [app.lpagent.io](https://app.lpagent.io/) and t
 
 ## Pick a list
 
-Pick the chain on the left (**Solana** or **Robinhood**), then a preset. Each preset is a sort plus a filter; you can change either afterwards.
+Pick the chain on the left (**Solana**, **Robinhood**, **Elysium** or **BNB Chain**), then a preset. An EVM account sees only the three EVM chains. Each preset is a sort plus a filter; you can change either afterwards.
+
+On BNB Chain and Elysium, tokens come only from their pools, so there is no **Smart money in** or **No Pool** list there.
 
 | Preset | What it shows |
 | --- | --- |
@@ -61,7 +63,7 @@ Every token gets a safety score out of 100: **Safe** (75 and above), **Caution**
 | **Holders** | Holder count |
 | **Impersonation flag** | The ticker belongs to a registered token but this is a different contract. The row says **Fake ticker**. |
 
-Turn on **Hide risky** to drop tokens scored under 40. Tokens with no audit data are hidden too, because they have no score to pass with. Robinhood Chain has no token audit source yet, so its tokens show the checks that are available.
+Turn on **Hide risky** to drop tokens scored under 40. Tokens with no audit data are hidden too, because they have no score to pass with. Robinhood Chain and Elysium have no token audit source yet, so their tokens show the checks that are available. On BNB Chain the audit comes from GoPlus; a token GoPlus has not audited yet shows the checks we do have.
 
 ## Filters
 

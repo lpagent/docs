@@ -5,6 +5,8 @@ description: "出资币种、自动 TP/SL、滑点、代币筛选、通知、提
 
 点击顶栏里你的地址打开账户面板，再打开 **Settings**（设置）。它有四个标签页：**General**、**Swap**、**Security** 和 **Account**。改完后按 **Save Changes**。
 
+在 EVM 账户上，这里显示的是你在顶部 **Chain** 菜单里选的那个网络（Robinhood Chain、BNB Chain 或 Elysium）的设置。出资、Gas 和跟单保护都按网络分开设置。
+
 应用语言不在 Settings 里，而是在账户面板底部：见下面的“语言”部分。
 
 ## General
@@ -16,9 +18,11 @@ description: "出资币种、自动 TP/SL、滑点、代币筛选、通知、提
 
 | 设置项 | 作用 |
 | --- | --- |
-| **Base Token**（Robinhood Chain） | 用 **ETH** 或 **USDG** 为新仓位（包括跟单）出资。已有仓位不变。 |
-| **Wallet balances**（Robinhood Chain） | 你的本金（用来开仓的钱）和你的 Gas（ETH）。 |
+| **Base Token**（Robinhood Chain、BNB Chain、Elysium） | 为新仓位（包括跟单）出资：Robinhood Chain 上用 **ETH** 或 **USDG**，BNB Chain 上用 **BNB**（默认）、**USDT** 或 **USDC**，Elysium 上用 **HYPE**（默认）或 **USDC**。已有仓位不变。 |
+| **Wallet balances**（Robinhood Chain、BNB Chain、Elysium） | 你的本金（用来开仓的钱）和你的 Gas（ETH、BNB 或 HYPE）。 |
 | **Keep ETH**（Robinhood Chain，Base Token 为 USDG 时） | 让 ETH 保持充足用来付 Gas。ETH 低于 **Refill below**（默认 0.002 ETH）时，会兑换足够的 USDG，把 ETH 补回到 **Refill up to**（默认 0.008 ETH）。 |
+| **Keep BNB**（BNB Chain，Base Token 为 USDT 或 USDC 时） | 让 BNB 保持充足用来付 Gas。BNB 低于 **Refill below**（默认 0.005 BNB）时，会兑换足够的稳定币，把 BNB 补回到 **Refill up to**（默认 0.015 BNB）。 |
+| **Keep HYPE**（Elysium，Base Token 为 USDC 时） | 让 HYPE 保持充足用来付 Gas。HYPE 低于 **Refill below**（默认 0.08 HYPE）时，会兑换足够的 USDC，把 HYPE 补回到 **Refill up to**（默认 0.15 HYPE）。 |
 | **Auto TP/SL** | 默认关闭。开启后，每个新仓位都会用它下面设置的默认止盈和止损（10% / 10%）。跟单改用它自己的退出规则。见[止盈与止损](/zh/features/take-profit-stop-loss)。 |
 | **Manage Manual Position** | 让 LP Agent 管理你在 LP Agent 之外开的仓位，比如直接在 Meteora 上开的，这样你也能给它们用 TP/SL。新账户默认开启。 |
 | **Realtime Portfolio**（Solana） | 实时推送当前仓位，而不是每 10 秒刷新一次。只保存在这台设备上。 |
@@ -36,6 +40,8 @@ description: "出资币种、自动 TP/SL、滑点、代币筛选、通知、提
 | --- | --- |
 | **Slippage** | 兑换（swap）时价格对你不利的最大变动幅度，单位 %。适用于代理（agent）替你做的每一次兑换：Zap In（单币入池）、跟单、平仓和换回（swap back）。超过 7% 会显示警告。 |
 | **Method**（Solana） | 优先使用哪条兑换路由：**OKX**（默认）或 **Jupiter Ultra**。 |
+
+在 BNB Chain 上，兑换走 OKX 以拿到最好的价格，交易通过 PancakeSwap 的 MEV Guard 发送，避开抢跑。
 
 <Tip>
   如果跟单因为 **Price moved** 失败，Copy Logs（跟单日志）里的修复按钮会打开这个标签页，并给出建议滑点。波动大的代币通常需要留更多空间。
@@ -56,7 +62,10 @@ description: "出资币种、自动 TP/SL、滑点、代币筛选、通知、提
 | **Minimum Market Cap** | $500,000 |
 | **Minimum 24h Volume** | $100,000 |
 | **Minimum Holders** | 100。设为 0 表示不设下限。 |
+| **Max Pool Fee**（Robinhood Chain、BNB Chain、Elysium） | 买入和卖出都是 15%。如果池子在每次买入或卖出它的代币时收取的费用达到或超过这个比例，跟单会被跳过。每个网络各有自己的上限。 |
 | **Blacklist** | 你永远不想做 LP 或跟单的代币。按 **Manage**，粘贴代币地址，再按 **Add**。每个网络有自己的名单。 |
+
+在 BNB Chain 上还有一道固定的保护，不能关掉：LP Agent 永远不会买入在买入、卖出或转账时收税的代币，也不会买入被标记为貔貅盘（honeypot，能买不能卖的代币）的代币。卖出永远不会被拦。
 
 ## Account
 

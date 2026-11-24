@@ -14,6 +14,10 @@ description: "在 Robinhood Chain 上怎么设置跟单规模，让 LP 手续费
 
 本页是 [Copy LP 最佳实践](/zh/tutorials/copy-lp-best-practices)（讲 Solana）的 Robinhood Chain 配套篇。那边关于研究带单钱包和风险管理的建议在这里照样适用。这里变的是规模，因为 EVM 上一轮跟单的执行成本更高。
 
+<Note>
+  在 **BNB Chain** 和 **Elysium** 上，同样的思路也适用：都是 EVM 的一轮跟单，Gas 用这条链自己的币付，快进快出钱包的界线也同样是 1 小时。那里建议的净资产是 **0.3 BNB** 和 **5 HYPE**。多留一些 BNB 或 HYPE 付 Gas；如果你用稳定币出资，就打开 **Keep BNB** / **Keep HYPE**。见 [BNB Chain](/zh/integration/bnb) 和 [Elysium](/zh/integration/elysium)。
+</Note>
+
 ## 为什么在 Robinhood 上规模更重要
 
 跟一个带单钱包的仓位，不是一笔交易就完事。LP Agent 先把你的 ETH 兑换成池子里的两种代币，添加流动性，带单钱包退出时再移除流动性，最后兑换回 ETH。一轮下来是四笔要付 Gas 的交易，两次兑换还各有滑点：为了让路由能成交，兑换用的是你的滑点设置（没改过的话是 7%），流动性那两步允许 1%。

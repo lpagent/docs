@@ -3,7 +3,7 @@ title: "快速开始"
 description: "登录、给代理钱包充值，然后开出或跟单你的第一个仓位"
 ---
 
-这篇指南带你从零开始开出第一个仓位。Solana 和 Robinhood Chain 的流程一样，有区别的地方会单独说明。
+这篇指南带你从零开始开出第一个仓位。Solana、Robinhood Chain、BNB Chain 和 Elysium 的流程一样，有区别的地方会单独说明。
 
 ## 1. 登录
 
@@ -23,7 +23,7 @@ description: "登录、给代理钱包充值，然后开出或跟单你的第一
 </Steps>
 
 <Note>
-  一个账户只属于一个网络。玩 Meteora 池子就用 Solana 钱包登录，玩 Robinhood Chain 池子就用 EVM 钱包登录。
+  玩 Meteora 池子就用 Solana 钱包登录，玩 Robinhood Chain、BNB Chain 和 Elysium 就用 EVM 钱包登录。一个 EVM 账户三个网络通用：用应用顶部的 **Chain** 菜单切换。
 </Note>
 
 ## 2. 给代理钱包充值
@@ -42,9 +42,11 @@ description: "登录、给代理钱包充值，然后开出或跟单你的第一
 | --- | --- |
 | Solana | SOL。留一些 SOL 备用，用来付交易手续费和仓位租金。 |
 | Robinhood Chain | ETH。ETH 也用来付 Gas。仓位可以用 ETH 或 USDG 注资（在 **Settings > General > Base Token** 里设置）。 |
+| BNB Chain | BNB。BNB 也用来付 Gas。仓位可以用 BNB、USDT 或 USDC 注资（在 **Settings > General > Base Token** 里设置）。 |
+| Elysium | HYPE。HYPE 也用来付 Gas。仓位可以用 HYPE 或 USDC 注资（在 **Settings > General > Base Token** 里设置）。 |
 
 <Warning>
-  资金别太少。钱包太小的话很难赚回兑换（swap）和 Gas 成本，跟单时尤其如此。经验上，跟单时 Solana 至少用 **5 SOL**，Robinhood Chain 至少用 **0.08 ETH**，跑顺了再慢慢加仓。
+  资金别太少。钱包太小的话很难赚回兑换（swap）和 Gas 成本，跟单时尤其如此。经验上，跟单时 Solana 至少用 **5 SOL**，Robinhood Chain 至少用 **0.08 ETH**，BNB Chain 至少用 **0.3 BNB**，Elysium 至少用 **5 HYPE**，跑顺了再慢慢加仓。
 </Warning>
 
 ## 3. 选择你的 LP 方式
@@ -70,7 +72,7 @@ description: "登录、给代理钱包充值，然后开出或跟单你的第一
         应用一打开就是 **Discover**。选一个预设，比如 **Trending** 或 **Top Fee/TVL**，打开 **Hide risky**，然后在代币上点 **Open pool**，进入它最好的池子。想直接浏览池子？打开 **Pools**，按报价代币、协议和流动性筛选。详见 [Discover](/zh/features/discover)。
       </Step>
       <Step title="Zap In">
-        在池子页面输入金额，选一个价格区间（Meteora DLMM 还要选策略），然后点击 **Create Position**（Solana）或 **Zap In**（Robinhood Chain）。
+        在池子页面输入金额，选一个价格区间（Meteora DLMM 还要选策略），然后点击 **Create Position**（Solana）或 **Zap In**（Robinhood Chain、BNB Chain 和 Elysium）。
       </Step>
       <Step title="设置保护">
         给仓位设置止盈和止损，或者在 Settings 里打开 **Auto TP/SL**，让每个新仓位都自动带上。

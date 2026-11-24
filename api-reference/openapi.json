@@ -42,11 +42,12 @@
               "type": "string",
               "enum": [
                 "SOL",
-                "ROBINHOOD"
+                "ROBINHOOD",
+                "ELYSIUM"
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). `ELYSIUM` serves Uniswap V3 and V4 on Elysium (EVM, chain id 99901) the same way as `ROBINHOOD`. Always pass it for Elysium data. Unrecognised values fall back to `SOL`."
           },
           {
             "in": "query",
@@ -477,11 +478,12 @@
               "type": "string",
               "enum": [
                 "SOL",
-                "ROBINHOOD"
+                "ROBINHOOD",
+                "ELYSIUM"
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). `ELYSIUM` serves Uniswap V3 and V4 on Elysium (EVM, chain id 99901) the same way as `ROBINHOOD`. Always pass it for Elysium data. Unrecognised values fall back to `SOL`."
           },
           {
             "in": "query",
@@ -995,11 +997,12 @@
               "type": "string",
               "enum": [
                 "SOL",
-                "ROBINHOOD"
+                "ROBINHOOD",
+                "ELYSIUM"
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). `ELYSIUM` serves Uniswap V3 and V4 on Elysium (EVM, chain id 99901) the same way as `ROBINHOOD`. Always pass it for Elysium data. Unrecognised values fall back to `SOL`."
           },
           {
             "in": "query",
@@ -1612,11 +1615,12 @@
               "type": "string",
               "enum": [
                 "SOL",
-                "ROBINHOOD"
+                "ROBINHOOD",
+                "ELYSIUM"
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). `ELYSIUM` serves Uniswap V3 and V4 on Elysium (EVM, chain id 99901) the same way as `ROBINHOOD`. Always pass it for Elysium data. Unrecognised values fall back to `SOL`."
           },
           {
             "in": "query",
@@ -1799,10 +1803,11 @@
               "type": "string",
               "enum": [
                 "SOL",
-                "ROBINHOOD"
+                "ROBINHOOD",
+                "ELYSIUM"
               ]
             },
-            "description": "Blockchain network to query: `SOL` (Meteora DLMM / DAMM v2) or `ROBINHOOD` (Uniswap V3 and V4 on Robinhood Chain, chain id 4663). Usually safe to omit: a Robinhood position ID is self-identifying, so the chain is inferred from `position` (`ROBINHOOD` for `0x<manager>-<tokenId>` or `robinhood:`-prefixed IDs, `SOL` otherwise). If you do send it, an unrecognised value falls back to `SOL`."
+            "description": "Blockchain network to query: `SOL` (Meteora DLMM / DAMM v2) or `ROBINHOOD` (Uniswap V3 and V4 on Robinhood Chain, chain id 4663). `ELYSIUM` serves Uniswap V3 and V4 on Elysium (EVM, chain id 99901) the same way as `ROBINHOOD`. Always pass it for Elysium data. Usually safe to omit: a Robinhood position ID is self-identifying, so the chain is inferred from `position` (`ROBINHOOD` for `0x<manager>-<tokenId>` or `robinhood:`-prefixed IDs, `SOL` otherwise). If you do send it, an unrecognised value falls back to `SOL`."
           },
           {
             "in": "query",
@@ -2403,11 +2408,12 @@
               "type": "string",
               "enum": [
                 "SOL",
-                "ROBINHOOD"
+                "ROBINHOOD",
+                "ELYSIUM"
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network to read balances from: `SOL` for Solana, `ROBINHOOD` for Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to read balances from: `SOL` for Solana, `ROBINHOOD` for Robinhood Chain (EVM, chain id 4663). `ELYSIUM` serves Uniswap V3 and V4 on Elysium (EVM, chain id 99901) the same way as `ROBINHOOD`. Always pass it for Elysium data. Unrecognised values fall back to `SOL`."
           },
           {
             "in": "query",
@@ -3333,11 +3339,12 @@
               "type": "string",
               "enum": [
                 "SOL",
-                "ROBINHOOD"
+                "ROBINHOOD",
+                "ELYSIUM"
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network the pool lives on. `SOL` returns Meteora (DLMM / DAMM v2) positions; `ROBINHOOD` returns Uniswap V3 and V4 positions on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`, so a Robinhood pool sent without `chain` is looked up on Solana and not found."
+            "description": "Blockchain network the pool lives on. `SOL` returns Meteora (DLMM / DAMM v2) positions; `ROBINHOOD` returns Uniswap V3 and V4 positions on Robinhood Chain (EVM, chain id 4663). `ELYSIUM` serves Uniswap V3 and V4 on Elysium (EVM, chain id 99901) the same way as `ROBINHOOD`. Always pass it for Elysium data. Unrecognised values fall back to `SOL`, so a Robinhood pool sent without `chain` is looked up on Solana and not found."
           },
           {
             "in": "query",
@@ -3573,10 +3580,11 @@
               "type": "string",
               "enum": [
                 "SOL",
-                "ROBINHOOD"
+                "ROBINHOOD",
+                "ELYSIUM"
               ]
             },
-            "description": "Blockchain network the pool lives on. `SOL` counts Meteora (DLMM / DAMM v2) positions; `ROBINHOOD` counts Uniswap V3 and V4 positions on Robinhood Chain (EVM, chain id 4663). When omitted, it is inferred from `poolId`: a `0x` ID is `ROBINHOOD`, anything else is `SOL`. An unrecognised value falls back to `SOL`."
+            "description": "Blockchain network the pool lives on. `SOL` counts Meteora (DLMM / DAMM v2) positions; `ROBINHOOD` counts Uniswap V3 and V4 positions on Robinhood Chain (EVM, chain id 4663). `ELYSIUM` serves Uniswap V3 and V4 on Elysium (EVM, chain id 99901) the same way as `ROBINHOOD`. Always pass it for Elysium data. When omitted, it is inferred from `poolId`: a `0x` ID is `ROBINHOOD`, anything else is `SOL`. An unrecognised value falls back to `SOL`."
           },
           {
             "in": "query",
@@ -3677,10 +3685,11 @@
               "type": "string",
               "enum": [
                 "SOL",
-                "ROBINHOOD"
+                "ROBINHOOD",
+                "ELYSIUM"
               ]
             },
-            "description": "Blockchain network the pool lives on. `SOL` returns Meteora (DLMM / DAMM v2) LPers; `ROBINHOOD` returns Uniswap V3 and V4 LPers on Robinhood Chain (EVM, chain id 4663). When omitted, it is inferred from `poolId`: a `0x` ID is `ROBINHOOD`, anything else is `SOL`. An unrecognised value falls back to `SOL`."
+            "description": "Blockchain network the pool lives on. `SOL` returns Meteora (DLMM / DAMM v2) LPers; `ROBINHOOD` returns Uniswap V3 and V4 LPers on Robinhood Chain (EVM, chain id 4663). `ELYSIUM` serves Uniswap V3 and V4 on Elysium (EVM, chain id 99901) the same way as `ROBINHOOD`. Always pass it for Elysium data. When omitted, it is inferred from `poolId`: a `0x` ID is `ROBINHOOD`, anything else is `SOL`. An unrecognised value falls back to `SOL`."
           },
           {
             "in": "query",
@@ -3950,11 +3959,12 @@
               "type": "string",
               "enum": [
                 "SOL",
-                "ROBINHOOD"
+                "ROBINHOOD",
+                "ELYSIUM"
               ],
               "default": "SOL"
             },
-            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). Unrecognised values fall back to `SOL`."
+            "description": "Blockchain network to query. `SOL` returns Meteora (DLMM / DAMM v2) data; `ROBINHOOD` returns Uniswap V3 and V4 data on Robinhood Chain (EVM, chain id 4663). `ELYSIUM` serves Uniswap V3 and V4 on Elysium (EVM, chain id 99901) the same way as `ROBINHOOD`. Always pass it for Elysium data. Unrecognised values fall back to `SOL`."
           },
           {
             "in": "path",

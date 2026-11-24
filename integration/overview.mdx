@@ -3,9 +3,9 @@ title: "Integration Overview"
 description: "The protocols and networks LP Agent supports"
 ---
 
-## Supported protocols
+## Supported networks
 
-LP Agent supports four pool types across two networks:
+LP Agent runs on four networks:
 
 <CardGroup cols={2}>
   <Card href="/integration/meteora">
@@ -30,24 +30,46 @@ LP Agent supports four pool types across two networks:
       **Uniswap V3** and **Uniswap V4** concentrated liquidity on Robinhood Chain (EVM, chain ID 4663), including tokenized stock pools. Funded in ETH or USDG.
     </div>
   </Card>
+
+  <Card href="/integration/bnb">
+    <div className="flex items-center gap-2">
+      <h3 className="text-xl font-semibold">PancakeSwap on BNB Chain</h3>
+    </div>
+    <div className="mt-3">
+      **PancakeSwap V3** and **PancakeSwap Infinity** pools on BNB Chain (EVM, chain ID 56). Funded in BNB, USDT or USDC.
+    </div>
+  </Card>
+
+  <Card href="/integration/elysium">
+    <div className="flex items-center gap-2">
+      <h3 className="text-xl font-semibold">Uniswap on Elysium</h3>
+    </div>
+    <div className="mt-3">
+      **Uniswap V3** and **Uniswap V4** pools on Elysium, Kinetiq's network on HyperEVM (chain ID 99901). Funded in HYPE or USDC.
+    </div>
+  </Card>
 </CardGroup>
+
+Robinhood Chain, BNB Chain and Elysium share one EVM account: the same agent wallet address works on all three. Pick the network in the **Chain** menu at the top of the app.
 
 ## What works where
 
-| Feature | Meteora DLMM | Meteora DAMM v2 | Uniswap V3 | Uniswap V4 |
+| Feature | Solana | Robinhood Chain | BNB Chain | Elysium |
 | --- | --- | --- | --- | --- |
-| [Smart LP](/features/smart-lp) leaderboard | Yes | - | Yes | Yes |
-| [Copy LP](/features/copy-lp) | Yes | Yes | Yes | Yes (hooked pools opt-in) |
-| [Zap in](/features/create-position) from one token | Yes | Yes | Yes | Yes |
-| Strategies (Spot, Curve, Bid-Ask) | Yes | - | - | - |
+| [Discover](/features/discover), [Pools](/features/pools), [Portfolio](/features/portfolio) | Yes | Yes | Yes | Yes |
+| [Smart LP](/features/smart-lp) leaderboard | Yes (DLMM) | Yes | Yes | Yes |
+| [Copy LP](/features/copy-lp) | DLMM, DAMM v2 | V3, V4 (hooked pools opt-in) | PancakeSwap V3 | V3, V4 |
+| [Zap in](/features/create-position) from one token | Yes | Yes | PancakeSwap V3 (Infinity soon) | Yes |
+| Strategies (Spot, Curve, Bid-Ask) | DLMM | - | - | - |
 | [Take profit / stop loss](/features/take-profit-stop-loss) | Yes | Yes | Yes | Yes |
 | Claim fees | Yes | Yes | Yes | Yes |
-| Compound | Yes | - | - | - |
-| One-click zap out | Yes | - | - | - |
-| [Fund protection](/features/copy-management#fund-protection-solana) | Yes | Yes | - | - |
-| [Claim SOL](/features/claim-sol) | Yes | Yes | - | - |
-| [Open API](/api-reference/introduction) | Read and transactions | Read and transactions | Read | Read |
+| Compound | DLMM | - | - | - |
+| [Fund protection](/features/copy-management#fund-protection-solana) | Yes | - | - | - |
+| [Claim SOL](/features/claim-sol) | Yes | - | - | - |
+| [Referral cashback](/referral) | Yes | Yes | - | - |
+| Funding currency | SOL | ETH or USDG | BNB, USDT or USDC | HYPE or USDC |
+| [Open API](/api-reference/introduction) | Read and transactions | Read | - | Read |
 
 ## For developers
 
-The [LP Agent Open API](/api-reference/introduction) serves pool, position and wallet data for both networks. Pass `chain=ROBINHOOD` to read Robinhood Chain data; it defaults to `SOL`. Building zap-in, zap-out and claim transactions through the API is available on Solana. See [Robinhood Chain Integration](/integration/robinhood) for the Robinhood specifics.
+The [LP Agent Open API](/api-reference/introduction) serves pool, position and wallet data for Solana, Robinhood Chain and Elysium. Pass `chain=ROBINHOOD` or `chain=ELYSIUM` to read EVM data; it defaults to `SOL`. Building zap-in, zap-out and claim transactions through the API is available on Solana. BNB Chain is not in the Open API yet. See [Robinhood Chain](/integration/robinhood), [BNB Chain](/integration/bnb) and [Elysium](/integration/elysium) for the specifics of each network.
